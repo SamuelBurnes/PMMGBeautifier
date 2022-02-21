@@ -92,6 +92,7 @@ export class PostLM implements Module {
 	  }
 	  else if(commodity.value != "")
 	  {
+		  console.log("Here");
 		  var xhr = new XMLHttpRequest();
 		  xhr.onreadystatechange = function()
 		  {
@@ -134,6 +135,8 @@ export class PostLM implements Module {
 		  };
 		  xhr.open("GET", "https://script.google.com/macros/s/" + this.webappID + "/exec?mode=%22price%22", true);
 		  xhr.send(null);
+		  
+		  console.log(xhr.readyState);
 	  }
 	  
       

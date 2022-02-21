@@ -198,6 +198,7 @@ function getSheetsTable(tile, parameter, webappID, tag, extraParam)
 	    {
 			
 		    var jsondata = xhr.responseText;
+			//console.log(xhr.responseText);
 			if(jsondata == undefined || jsondata == null){return;}
 			var data;
 			try
@@ -247,6 +248,7 @@ function getSheetsTable(tile, parameter, webappID, tag, extraParam)
 	if(extraParam != undefined){url += "&param=%22" + extraParam + "%22";}
 	xhr.open("GET", url, true);
     xhr.send(null);
+	
 	return;
 }
   

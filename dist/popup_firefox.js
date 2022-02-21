@@ -5,21 +5,14 @@ var apiKeyInput = document.getElementById('apikey');
 var webappIDInput = document.getElementById('webappID');
 var loadingIndicator = document.getElementById('loadingindicator');
 var curName = document.getElementById('curName');
+var curAPIkey = document.getElementById('curAPIkey');
+var curWebappID = document.getElementById('curWebappID');
 
 var name;
 var apikey;
 var webappID;
+browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 
-try
-{
-	browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
-}
-catch(err)
-{
-	chrome.storage.sync.get(["AHIBeautifier_Data"], function(result){
-			setDisplayedValues(result);
-		});
-}
 configureButton.addEventListener('click', function(event){ OnConfigure_Click(); });
 clearButton.addEventListener('click', function(event){ OnClear_Click(); });
 
@@ -28,22 +21,13 @@ function OnClear_Click()
 	name = undefined;
 	apikey = undefined;
 	webappID = undefined;
-	try
-	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]});
-		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
-	}
-	catch(err)
-	{
-		chrome.storage.sync.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
-		chrome.storage.sync.get(["AHIBeautifier_Data"], function(result){
-		setDisplayedValues(result);
-		});
-	}
+	browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]});
+	browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 }
 
 function OnConfigure_Click()
-{
+{	
+	
 	newName = nameInput.value;
 	newApikey = apiKeyInput.value;
 	newWebappID = webappIDInput.value;
@@ -52,20 +36,15 @@ function OnConfigure_Click()
 	if(newApikey != ""){apikey = newApikey;}
 	if(newWebappID != ""){webappID = newWebappID;}
 	
-	try
-	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]});
-		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
-	}
-	catch(err)
-	{
-		chrome.storage.sync.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
-		chrome.storage.sync.get(["AHIBeautifier_Data"], function(result){
-		setDisplayedValues(result);
-		});
-	}
+	browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]});
+	browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 	
 	SetLoadingIndicator(false);
+}
+
+function onError(error)
+{
+	console.log(error);
 }
 
 function setDisplayedValues(result)
@@ -99,12 +78,7 @@ function setDisplayedValues(result)
 	else{curWebappID.textContent = "Current: undefined";}
 	if(webappID != undefined){webappIDInput.value = webappID;}
 	
-}
-
-function onError(error)
-{
-	console.log(error);
-}
+	}
 
 function SetLoadingIndicator(isLoading)
 {

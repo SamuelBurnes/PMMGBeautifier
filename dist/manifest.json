@@ -11,7 +11,11 @@
   },
   "permissions": [
     "https://apex.prosperousuniverse.com/*",
-	"storage"
+	"https://script.google.com/*",
+	"https://script.googleusercontent.com/*",
+	"https://rest.fnar.net/*",
+	"storage",
+	"webRequest"
   ],
   "content_scripts": [
     {
