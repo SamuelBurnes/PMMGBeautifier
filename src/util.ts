@@ -1,4 +1,5 @@
 import {Selector} from "./Selector";
+import {MaterialNames} from "./GameProperties";
 
 /**
  * parse a duration into an actual ETA string
@@ -61,6 +62,127 @@ export function createTextSpan(text, className: string = "prun-remove-js") {
   return newSpan;
 }
 
+export function findInventoryAmount(ticker, inventory)
+{
+	for(var i = 0; i < inventory["Inventory"].length; i++)
+	{
+		if(inventory["Inventory"][i]["MaterialTicker"] == ticker)
+		{
+			return inventory["Inventory"][i]["MaterialAmount"];
+		}
+	}
+	return 0;
+}
+
+export function findBurnAmount(ticker, inventory)
+{
+	for(var i = 0; i < inventory["WorkforceConsumption"].length; i++)
+	{
+		if(inventory["WorkforceConsumption"][i]["MaterialTicker"] == ticker)
+		{
+			return inventory["WorkforceConsumption"][i]["DailyAmount"];
+		}
+	}
+	return 0;
+}
+
+export function findCorrespondingPlanet(planet, data)
+{
+	for(var i = 0; i < data.length; i++)
+	{
+		if(data[i]["PlanetName"] == planet)
+		{
+			return data[i];
+		}
+	}
+	return null;
+}
+
+export function parseBaseName(text)
+{
+	try
+	{
+		text = text.split("@")[1];
+		text = text.split(" Base")[0];
+		var hyphens = text.split(" - ");
+		text = hyphens[hyphens.length - 1];
+		var ending = text.split(" ");
+		if(ending[1] != undefined && ending[2] != undefined && ending[2].length == 1)
+		{
+			return ending[1] + ending[2];
+		}
+		else
+		{
+			return text;
+		}
+	} catch (TypeError)
+	{
+		return text;
+	}
+	
+}
+
+export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false)
+{
+	const name = MaterialNames[ticker];
+	const totalPicture = document.createElement("div");
+	totalPicture.classList.add("T5C45pTOW9QTzokWPqLQJg==");
+	totalPicture.style.height = "48px";
+	totalPicture.style.width = "48px";
+	const material = document.createElement("div");
+	material.classList.add("E7OLUChYCexMUgOolKYjOQ==");
+	material.title = name;
+	material.style.height = "48px";
+	material.style.width = "48px";
+	material.style.background = "linear-gradient(135deg, rgb(60, 60, 60), rgb(80, 80, 80))";
+	material.style.color = "rgb(170, 170, 170)";
+	material.style.fontSize = "15.84px";
+	material.style.cursor = "pointer";
+	material.style.margin = "2px auto";
+	totalPicture.classList.add(className);
+	const subDiv = document.createElement("div");
+	subDiv.classList.add("nlQirpSkdLH0a6+C4lhduA==");
+	const matText = document.createElement("span");
+	matText.classList.add("rjpYL1i9cZmf47fM9qWyZQ==");
+	matText.textContent = ticker;
+	subDiv.appendChild(matText);
+	material.appendChild(subDiv);
+	totalPicture.appendChild(material);
+	if(amount != "none")
+	{
+		const numberDiv = document.createElement("div");
+		numberDiv.classList.add("G37fUJPwMoJ6fKHDGeg+-w==");
+		const numberSubDiv = document.createElement("div");
+		numberSubDiv.classList.add("bHjlDPB84Uz0yUnvHa-Y5A==");
+		numberSubDiv.classList.add("_6OK6sXNjIIhq3NDD9ELVGw==");
+		numberSubDiv.classList.add("gl73vnp5jo+VaepDRocunA==");
+		numberSubDiv.textContent = amount;
+		numberDiv.appendChild(numberSubDiv);
+		totalPicture.appendChild(numberDiv);
+	}
+	var superElem = document.createElement("div");
+	superElem.classList.add(className);
+	superElem.appendChild(totalPicture);
+	superElem.style.display = "block";
+	superElem.style.width = "64px";
+	superElem.style.margin = "3px";
+	superElem.style.padding = "auto";
+	
+	if(text != false)
+	{
+		var label = document.createElement("span");
+		label.classList.add(className);
+		label.textContent = name;
+		label.style.fontWeight = "bold";
+		label.style.boxSizing = "border-box";
+		label.style.paddingTop = "2px";
+		label.style.display = "block";
+		superElem.appendChild(label);
+	}
+	
+	return superElem;
+}
+
 export function genericCleanup(className: string = "prun-remove-js") {
   // remove all elements added in the last run
   Array.from(document.getElementsByClassName(className)).forEach((elem) => {
@@ -78,6 +200,20 @@ export function getBuffer(bufferCode: string): HTMLElement {
   return document.evaluate(
     `//div[@class='${Selector.BufferHeader}'][starts-with(., '${bufferCode}')]/../..`,
     document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
+}
+
+export function getBuffers(bufferCode: string): HTMLElement[] {
+  const nodes = document.evaluate(
+    `//div[@class='${Selector.BufferHeader}'][starts-with(., '${bufferCode}')]/../..`,
+    document, null, XPathResult.ANY_TYPE, null);
+	var buffers = [];
+	var node;
+	
+	while(node = nodes.iterateNext())
+	{
+		buffers.push(node as never);
+	}
+	return buffers;
 }
 
 export function getElementsByXPath(xpath: string): Array<Node> {

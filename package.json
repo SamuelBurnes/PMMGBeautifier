@@ -10,6 +10,7 @@
     "package": "webpack"
   },
   "dependencies": {
-    "@types/chrome": "^0.0.50"
+    "@types/chrome": "^0.0.50",
+    "build": "^0.1.4"
   }
 }

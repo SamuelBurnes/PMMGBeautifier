@@ -32,7 +32,7 @@ export class ModuleRunner {
       enabled: true,
       count: 0,
       cleanupTime: 0,
-      runTime: 0,
+      runTime: 0
     }
   }
 
@@ -49,6 +49,7 @@ export class ModuleRunner {
         entry.cleanupTime += cleanupTime;
         entry.runTime += runTime;
       }
+	  
     });
 
     // @TODO: Vary the interval based on module performance
