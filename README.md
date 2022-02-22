@@ -1,4 +1,4 @@
-# Features
+# Base Features
 
 * Show the price per unit for local market ads
 * Show the ETA of ships as actual date-time
@@ -9,12 +9,27 @@
 * Change LM Post button to the type of ad
 * Calculate Queued production load in percentage
 
+# Extended Features
+
+* Show price per ton/m3 when posting shipping ads
+* Pull custom pricing scheme from Google webapp
+* Pull and display burnrate data from FIO on WF buffers
+* Implement custom buffers using the XIT commands listed below
+
+# XIT Commands
+
+* XIT INV_{username}\_{planet} - gets the FIO inventory for a user and planet
+* XIT DISCORD_{serverID or shortlist server name}\_{channelID if no shortlist server} - Opens a Discord chat window to Widget Bot connected servers (shortlist: PTS, UFO)
+* XIT SHEETS_{sheetID} - Opens a google sheets editor in a buffer
+* XIT PRUN - Opens a copy of PRUN in a buffer, it's PRUN-ception!
+* XIT SHEETTABLE_{switchable parameter}\_{optional extra parameter} - Displays any 2 dimensional array returned from the connected Google web app. The switchable parameter is passed as a parameter in the URL called "mode" and the optional extra parameter as "param"
+
 # Installation
 [![CircleCI](https://circleci.com/gh/YarekTyshchenko/PMMGBeautifier.svg?style=shield)](https://circleci.com/gh/YarekTyshchenko/PMMGBeautifier)
 
-For Chrome install from the [Web Store](https://chrome.google.com/webstore/detail/pmmg-beautifier/joibdcdllfaoegdpjkefncnmcmbkkabi)
+For Chrome install - use instructions for "Chrome" below to install manually.
 
-For Firefox you need to install this extension manually (see below for instructions). 
+For Firefox you need to install this extension manually (see below for instructions). **Not functioning Yet**
 
 ## Contributing
 
