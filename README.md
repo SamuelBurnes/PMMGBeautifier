@@ -37,6 +37,14 @@ PMMGBeautifier Extended adds all the features of the base PMMGBeautifier extensi
 * XIT SHEETTABLE_pirepairs_JS-952c (needs web app ID)
 * XIT FIN_PiBoy314 (needs web app ID)
 
+# Setting up API Key and Web App ID
+
+* Click on the PMMG icon in the upper right corner
+* Fill in your username
+* Fill in your FIO api key
+* Fill in your Web app ID (if available)
+* Click configure
+
 # Installation
 
 For Chrome install - use instructions for "Chrome" below to install manually.
