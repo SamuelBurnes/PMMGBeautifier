@@ -18,8 +18,9 @@ try
 } catch(err)
 {
 	console.log("Chromium detected");
-	chrome.storage.sync.get(["AHIBeautifier_Data"], function(result)
+	chrome.storage.local.get(["AHIBeautifier_Data"], function(result)
 	{
+		if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined]};}
 		const runner = new ModuleRunner([
 		  new LocalMarketAds(),
 		  new OrderETAs(),
@@ -39,6 +40,7 @@ try
 
 function mainRun(result)
 {
+	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined]};}
 	const runner = new ModuleRunner([
 	  new LocalMarketAds(),
 	  new OrderETAs(),

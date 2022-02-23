@@ -1,5 +1,6 @@
 import {Selector} from "./Selector";
 import {MaterialNames} from "./GameProperties";
+import {CategoryColors} from "./Style";
 
 /**
  * parse a duration into an actual ETA string
@@ -52,7 +53,6 @@ export function parseDuration(duration) {
  * Create a span with the given text
  * @param text
  * @param className
- * @param typeName
  * @returns {HTMLSpanElement}
  */
 export function createTextSpan(text, className: string = "prun-remove-js") {
@@ -60,6 +60,43 @@ export function createTextSpan(text, className: string = "prun-remove-js") {
   newSpan.classList.add(className);
   newSpan.textContent = text;
   return newSpan;
+}
+
+/**
+ * Create a textbox with larger primary and smaller secondary text inside of a div
+ * @param primaryText
+ * @param secondaryText
+ * @param primaryTextColor
+ * @param className
+ * @returns {HTMLDivElement}
+ */
+export function createFinancialTextBox(primaryText, secondaryText, primaryTextColor, className: string = "prun-remove-js")
+{
+	const box = document.createElement("div");
+	box.classList.add(className);
+	box.style.margin = "1px";
+	box.style.minWidth = "100px";
+	box.style.width = "calc(33% - 2px)";
+	box.style.maxWidth = "150px";
+	box.style.padding = "4px";
+	box.style.backgroundColor = "#23282b";
+	box.style.display = "inline-block";
+	const primaryTextSpan = document.createElement("span");
+	primaryTextSpan.style.fontSize = "12px";
+	primaryTextSpan.style.lineHeight = "1.1";
+	primaryTextSpan.style.color = primaryTextColor;
+	primaryTextSpan.textContent = primaryText;
+	box.appendChild(primaryTextSpan);
+	
+	const secondaryTextDiv = document.createElement("div");
+	secondaryTextDiv.textContent = secondaryText;
+	secondaryTextDiv.style.fontSize = "10px";
+	secondaryTextDiv.style.lineHeight = "1.1";
+	secondaryTextDiv.style.marginTop = "2px";
+	secondaryTextDiv.style.color = "#999";
+	box.appendChild(secondaryTextDiv);
+	
+	return box;
 }
 
 export function findInventoryAmount(ticker, inventory)
@@ -124,7 +161,8 @@ export function parseBaseName(text)
 
 export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false)
 {
-	const name = MaterialNames[ticker];
+	const name = MaterialNames[ticker][0];
+	const category = MaterialNames[ticker][1];
 	const totalPicture = document.createElement("div");
 	totalPicture.classList.add("T5C45pTOW9QTzokWPqLQJg==");
 	totalPicture.style.height = "48px";
@@ -134,8 +172,8 @@ export function createMaterialElement(ticker, className: string = "prun-remove-j
 	material.title = name;
 	material.style.height = "48px";
 	material.style.width = "48px";
-	material.style.background = "linear-gradient(135deg, rgb(60, 60, 60), rgb(80, 80, 80))";
-	material.style.color = "rgb(170, 170, 170)";
+	material.style.background = CategoryColors[category][0];
+	material.style.color = CategoryColors[category][1];
 	material.style.fontSize = "15.84px";
 	material.style.cursor = "pointer";
 	material.style.margin = "2px auto";
@@ -195,13 +233,14 @@ export function toFixed(value: number, precision: number = 2) {
   return Math.round(value * power) / power;
 }
 
-// TODO: Return an array of buffers
+// Return only 1 matching buffer (supplanted by getBuffers)
 export function getBuffer(bufferCode: string): HTMLElement {
   return document.evaluate(
     `//div[@class='${Selector.BufferHeader}'][starts-with(., '${bufferCode}')]/../..`,
     document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
 }
 
+// Return all matching buffers
 export function getBuffers(bufferCode: string): HTMLElement[] {
   const nodes = document.evaluate(
     `//div[@class='${Selector.BufferHeader}'][starts-with(., '${bufferCode}')]/../..`,

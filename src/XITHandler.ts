@@ -1,6 +1,7 @@
 import {Module} from "./ModuleRunner";
-import {createTextSpan, getBuffers, createMaterialElement} from "./util";
+import {createTextSpan, getBuffers, createMaterialElement, createFinancialTextBox} from "./util";
 import {Selector} from "./Selector";
+import {TextColors} from "./Style";
 
 /**
  * Handle XIT buffers
@@ -112,60 +113,20 @@ export class XITHandler implements Module {
 				break;
 			case "PRUN":
 				retrievedElements = Array.from(tile.children);
-				if(retrievedElements[0] != undefined && (retrievedElements[0] as HTMLElement).id == "sheets-success"){break;}
+				if(retrievedElements[0] != undefined && (retrievedElements[0] as HTMLElement).id == "prun-success"){break;}
 				Array.from(buffer.getElementsByClassName(Selector.BufferTitle))[0].textContent = "PRUN-CEPTION";	// Title the buffer
 				
 				const prun = document.createElement("iframe");
 				prun.src = "https://apex.prosperousuniverse.com/#/";
 				prun.width = "100%";
 				prun.height = "100%";
-				prun.id = "sheets-success";
+				prun.id = "prun-success";
 				
 				tile.appendChild(prun);
 				break;
-			case "AHI":
-				retrievedElements = Array.from(tile.children);
-				if(retrievedElements[0] != undefined && (retrievedElements[0] as HTMLElement).id == "ahi-success"){break;}
-				Array.from(buffer.getElementsByClassName(Selector.BufferTitle))[0].textContent = "AHI INVENTORY";	// Title the buffer
-				
-				var planet;
-				var material;
-				
-				if(parameters[1] == undefined)
-				{
-					tile.textContent = "Error! Too Few Parameters!";
-					break;
-				}
-				else if(parameters[2] == undefined)
-				{
-					if(parameters[1].length <= 3)
-					{
-						material = parameters[1];
-						planet = undefined;
-					}
-					else
-					{
-						planet = parameters[1];
-						material = undefined;
-					}
-				}
-				else
-				{
-					if(parameters[1].length <= 3)
-					{
-						material = parameters[1];
-						planet = parameters[2];
-					}
-					else
-					{
-						material = parameters[2];
-						planet = parameters[1];
-					}
-				}
-				
-				getAHIInventory(tile, material, planet, this.tag);
-				break;
+			
 			case "SHEETTABLE":
+				if(this.webappID == undefined){tile.textContent = "Error! No Web App ID!";break;}
 				retrievedElements = Array.from(tile.children);
 				if(retrievedElements[0] != undefined && (retrievedElements[0] as HTMLElement).id == "table-success"){break;}
 				Array.from(buffer.getElementsByClassName(Selector.BufferTitle))[0].textContent = "GOOGLE SHEETS TABLE";	// Title the buffer
@@ -177,6 +138,19 @@ export class XITHandler implements Module {
 				}
 				getSheetsTable(tile, parameters[1], this.webappID, this.tag, parameters[2]);
 				break;
+			case "FIN":
+				if(this.webappID == undefined){tile.textContent = "Error! No Web App ID!";break;}
+				retrievedElements = Array.from(tile.children);
+				if(retrievedElements[0] != undefined && (retrievedElements[0] as HTMLElement).id == "fin-success"){break;}
+				Array.from(buffer.getElementsByClassName(Selector.BufferTitle))[0].textContent = "FINANCIAL OVERVIEW";	// Title the buffer
+				
+				if(parameters[1] == undefined)
+				{
+					tile.textContent = "Error! Not Enough Parameters!";
+					break;
+				}
+				getFinTable(tile, parameters[1], this.webappID, this.tag);
+				break;
 			default:
 				tile.textContent = "Error! No Matching Function!";
 		}
@@ -186,6 +160,130 @@ export class XITHandler implements Module {
   
   
 }
+
+function getFinTable(tile, parameter, webappID, tag)
+{
+	tile.appendChild(document.createElement("div"));
+	tile.children[0].id = "fin-success";
+	var xhr = new XMLHttpRequest();
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			
+		    var jsondata = xhr.responseText;
+			
+			if(jsondata == undefined || jsondata == null){return;}
+			var data;
+			try
+			{
+				data = JSON.parse(jsondata);
+			}
+			catch(SyntaxError)
+			{
+				tile.textContent = "Error! Could Not Load JSON Data!";
+				return;
+			}
+			const tileHeader = document.createElement("h2");
+			tileHeader.classList.add(tag);
+			tileHeader.title = "Financial Overview Header";
+			tileHeader.textContent = "Key Figures";
+			tileHeader.style.display = "block";
+			tileHeader.style.fontSize = "12px";
+			tileHeader.style.marginBottom = "0px";
+			tileHeader.style.padding = "6px 4px 2px";
+			tileHeader.style.backgroundColor = "rgba(63, 162, 222, 0.15)";
+			tile.appendChild(tileHeader);
+			
+			tile.appendChild(createFinancialTextBox(Math.round(data[0][1]).toLocaleString(), "Fixed Assets", TextColors.Standard, tag));
+			tile.appendChild(createFinancialTextBox(Math.round(data[0][2]).toLocaleString(), "Current Assets", TextColors.Standard, tag));
+			tile.appendChild(createFinancialTextBox(Math.round(data[0][4]).toLocaleString(), "Liquid Assets", TextColors.Standard, tag));
+			tile.appendChild(createFinancialTextBox(Math.round(data[0][7]).toLocaleString(), "Equity", TextColors.Standard, tag));
+			tile.appendChild(createFinancialTextBox(Math.round(data[0][5]).toLocaleString(), "Liabilities", TextColors.Standard, tag));
+			
+			const now = data[0][0];
+			var weekAgo = -1;
+			var bestGuess = 86400000000;
+			for(var i = 1; i < data.length; i++)
+			{
+				if(Math.abs(Math.abs(now - data[i][0]) - 7*86400000) < bestGuess)
+				{
+					bestGuess = Math.abs(Math.abs(now - data[i][0]) - 7*86400000);
+					weekAgo = i;
+				}
+			}
+			if(weekAgo != -1)
+			{
+				const profit = Math.round(data[0][7] - data[weekAgo][7]);
+				const color = profit > 0 ? TextColors.Success : TextColors.Failure;
+				tile.appendChild(createFinancialTextBox(profit.toLocaleString(), "Profit", color, tag));
+			}
+			
+			const breakdownHeader = document.createElement("h2");
+			breakdownHeader.classList.add(tag);
+			breakdownHeader.title = "Financial Breakdown Header";
+			breakdownHeader.textContent = "Inventory Breakdown";
+			breakdownHeader.style.display = "block";
+			breakdownHeader.style.fontSize = "12px";
+			breakdownHeader.style.marginBottom = "0px";
+			breakdownHeader.style.padding = "6px 4px 2px";
+			breakdownHeader.style.backgroundColor = "rgba(63, 162, 222, 0.15)";
+			tile.appendChild(breakdownHeader);
+			
+			const table = document.createElement("table");
+			table.title = "Financial Breakdown Table";
+			table.classList.add(tag);
+			const head = document.createElement("thead");
+			const headRow = document.createElement("tr");
+			head.appendChild(headRow);
+			table.appendChild(head);
+			const headers = ["Name", "Fixed Assets", "Current Assets", "Total Assets"];
+			for(let title of headers)
+			{
+				const header = document.createElement("th");
+				header.title = title + " Header";
+				header.textContent = title;
+				headRow.appendChild(header);
+			}
+			
+			const body = document.createElement("tbody");
+			table.appendChild(body);
+			
+			const breakdown = JSON.parse(data[0][8]);
+			breakdown.sort(financialSort);
+			
+			for(let rowData of breakdown)
+			{
+				const row = document.createElement("tr");
+				body.appendChild(row);
+				const firstTableElem = document.createElement("td");
+				row.appendChild(firstTableElem);
+				firstTableElem.appendChild(createTextSpan(rowData[0]));
+				rowData.shift();
+				for(let point of rowData)
+				{
+					const tableElem = document.createElement("td");
+					row.appendChild(tableElem);
+					tableElem.appendChild(createTextSpan(point.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})));
+				}
+			}
+			
+			tile.appendChild(table);
+		}
+    };
+	var url = "https://script.google.com/macros/s/" + webappID + "/exec?mode=%22fin%22&param=%22" + parameter + "%22";
+	xhr.open("GET", url, true);
+    xhr.send(null);
+	
+	return;
+}
+
+function financialSort(a, b)
+{
+	return a[3] < b[3] ? 1 : -1;
+}
+
 function getSheetsTable(tile, parameter, webappID, tag, extraParam)
 {
 	tile.appendChild(document.createElement("div"));
@@ -249,131 +347,6 @@ function getSheetsTable(tile, parameter, webappID, tag, extraParam)
 	xhr.open("GET", url, true);
     xhr.send(null);
 	
-	return;
-}
-  
-function getAHIInventory(tile, material, planet, tag)
-{
-	var xhr = new XMLHttpRequest();
-	
-	xhr.onreadystatechange = function()
-    {
-	    if(xhr.readyState == XMLHttpRequest.DONE)
-	    {
-			
-		    var jsondata = xhr.responseText;
-			if(jsondata == undefined || jsondata == null){return;}
-			console.log(jsondata);
-			var inventoryData;
-			try
-			{
-				inventoryData = JSON.parse(jsondata);
-			}
-			catch(SyntaxError)
-			{
-				tile.textContent = "Error! Could Not Load JSON Data!";
-				return;
-			}
-			var itemsPerRow = Math.ceil(inventoryData.length / 4);
-			itemsPerRow = itemsPerRow > 3 ? 3 : itemsPerRow;
-			var rowNum = 0;
-			for(var i = 0; i < inventoryData.length; i++)
-			{
-				var divider;
-				if(rowNum == 0)
-				{
-					divider = document.createElement("div");
-					divider.style = "margin: 0px; padding: 5px; display: flex; flex-direction: row; flex-wrap: wrap; border-top-width: 1px; border-top-color: #2b485a; border-top-style: solid; border-bottom-width: 0px; border-bottom-color: #2b485a; border-bottom-style: solid;";
-					if((i / itemsPerRow) % 2 == 1){divider.style.backgroundColor = "#23282b";}
-					tile.appendChild(divider);
-				}
-				else
-				{
-					divider = tile.children[tile.children.length - 1];
-				}
-				const materialIcon = createMaterialElement(inventoryData[i]["material"], tag, inventoryData[i]["quantityAvail"], true);
-				
-				if(rowNum != 0)
-				{
-					materialIcon.style.paddingLeft = "15px";
-				}
-				divider.appendChild(materialIcon);
-				
-				const info = document.createElement("div");
-				divider.appendChild(info);
-				
-				const name = createTextSpan(inventoryData[i]["user"]["name"], tag);
-				name.style.fontWeight = "bold";
-				name.style.display = "block";
-				name.style.marginTop = "3px";
-				name.style.marginBottom = "2px";
-				info.appendChild(name);
-				
-				const planetElem = createTextSpan(inventoryData[i]["planet"]["name"], tag);
-				planetElem.style.display = "block";
-				info.appendChild(planetElem);
-				
-				const matAmount = createTextSpan(inventoryData[i]["quantityAvail"] + " " + inventoryData[i]["material"], tag);
-				matAmount.style.display = "block";
-				info.appendChild(matAmount);
-				
-				const timeDifference = (Date.now() - (new Date(inventoryData[i]["timestamp"]).getTime())) / 3600000;
-				const timeElem = createTextSpan(timeDifference.toFixed(0) + " hours ago", tag);
-				info.appendChild(timeElem);
-				
-				const fioIndicator = inventoryData[i]["isFIO"] ? "⯁" : "⯀";
-				const fioElem = createTextSpan(fioIndicator, tag);
-				fioElem.style.color = inventoryData[i]["isFIO"] ? "#f4900c" : "#bbbbbb";
-				fioElem.style.paddingLeft = "3px";
-				
-				info.appendChild(fioElem);
-				
-				rowNum++;
-				if(rowNum >= itemsPerRow){rowNum = 0;}
-			}
-			tile.children[tile.children.length - 1].style.borderBottomWidth = "1px";
-			return;
-			
-			
-	    }
-    };
-    var titleText;
-	if(material == undefined && planet == undefined)
-	{
-		titleText = "All Bot Entries";
-	}
-	else if(material == undefined)
-	{
-		titleText = "Bot Entries on " + planet;
-	}
-	else if(planet == undefined)
-	{
-		titleText = "Bot Entries for " + material;
-	}
-	else
-	{
-		titleText = "Bot Entries for " + material + " on " + planet;
-	}
-	var title = createTextSpan(titleText, tag);
-	title.id = "ahi-success";
-	title.style.padding = "2px 8px";
-	title.style.display = "inline";
-	title.style.color = "#3fa2de";
-	
-	tile.appendChild(title);
-	//xhr.timeout = 3000;
-	
-	var url = "https://ahi.technojones.us/api/v1/inventories";
-	if(material != undefined || planet != undefined){url += "?";}
-	if(planet != undefined){url += "planet=" + planet;}
-	if(material != undefined)
-	{
-		if(planet != undefined){url += "&";}
-		url += "material=" + material;
-	}
-	
-	xhr.open("POST", url, true);
-    xhr.send(null);
 	return;
 }
   

@@ -16,7 +16,7 @@ try
 }
 catch(err)
 {
-	chrome.storage.sync.get(["AHIBeautifier_Data"], function(result){
+	chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 			setDisplayedValues(result);
 		});
 }
@@ -35,8 +35,8 @@ function OnClear_Click()
 	}
 	catch(err)
 	{
-		chrome.storage.sync.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
-		chrome.storage.sync.get(["AHIBeautifier_Data"], function(result){
+		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
 	}
@@ -59,8 +59,8 @@ function OnConfigure_Click()
 	}
 	catch(err)
 	{
-		chrome.storage.sync.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
-		chrome.storage.sync.get(["AHIBeautifier_Data"], function(result){
+		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
 	}
