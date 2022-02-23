@@ -1,3 +1,5 @@
+PMMGBeautifier Extended adds all the features of the base PMMGBeautifier extension plus extra features including custom buffers via the XIT command.
+
 # Base Features
 
 * Show the price per unit for local market ads
@@ -14,22 +16,31 @@
 * Show price per ton/m3 when posting shipping ads
 * Pull custom pricing scheme from Google webapp
 * Pull and display burnrate data from FIO on WF buffers
-* Implement custom buffers using the XIT commands listed below
+* Implement custom buffers using the XIT commands
 
 # XIT Commands
 
 * XIT INV_{username}\_{planet} - gets the FIO inventory for a user and planet
-* XIT DISCORD_{serverID or shortlist server name}\_{channelID if no shortlist server} - Opens a Discord chat window to Widget Bot connected servers (shortlist: PTS, UFO)
+* XIT DISCORD_{serverID or shortlist server name}\_{channelID} - Opens a Discord chat window to Widget Bot connected servers
 * XIT SHEETS_{sheetID} - Opens a google sheets editor in a buffer
 * XIT PRUN - Opens a copy of PRUN in a buffer, it's PRUN-ception!
 * XIT SHEETTABLE_{switchable parameter}\_{optional extra parameter} - Displays any 2 dimensional array returned from the connected Google web app. The switchable parameter is passed as a parameter in the URL called "mode" and the optional extra parameter as "param"
+* XIT FIN_{parameter} - Loads a financial overview via the connected Google web app. Parameter is switched upon with the mode "fin" in the web app.
+
+# XIT Examples
+
+* XIT INV_PiBoy314_Gibson (needs API key)
+* XIT DISCORD_PTS
+* XIT SHEETS_1qU3WE2vUlIlADhmnQzh7vsxhfqQG-1pf4miNzjRMC0k
+* XIT PRUN
+* XIT SHEETTABLE_pirepairs_JS-952c (needs web app ID)
+* XIT FIN_PiBoy314 (needs web app ID)
 
 # Installation
-[![CircleCI](https://circleci.com/gh/YarekTyshchenko/PMMGBeautifier.svg?style=shield)](https://circleci.com/gh/YarekTyshchenko/PMMGBeautifier)
 
 For Chrome install - use instructions for "Chrome" below to install manually.
 
-For Firefox you need to install this extension manually (see below for instructions). **Not functioning Yet**
+For Firefox you need to install this extension manually (see below for instructions).
 
 ## Contributing
 
@@ -58,6 +69,11 @@ to tweak. On cleanup you should do the reverse, and ensure the UI is
 restored back to its original state. This ensures that when the module is
 disabled, the UI isn't broken. Have a look at existing modules for inspiration
 but be aware that some may need refactoring. Ask if you have questions.
+
+The XIT_Handler module works differently. When a buffer with the correct header is detected, 
+the XIT handler will load in the information once and set the ID to the first child to be something
+the original code recognizes as a success. The buffer will not update after that unless it is refreshed.
+Add another case to the switch statement and look at the other "get" methods to see this process in action.
 
 When you are happy with how it works submit a Pull Request to this repository.
 One of us will review it, suggest feedback with the goal of merging it in.
@@ -90,6 +106,7 @@ Extensions loaded from disk have permissions to open local files, see: https://s
 
 ## Chrome
 
+* Unzip the `dist` zip file
 * Open Chrome Extensions Screen
 * Enable Dev-Mode
 * Select `Load unpacked` and browse to the `dist` folder where the build output is
@@ -97,6 +114,7 @@ Extensions loaded from disk have permissions to open local files, see: https://s
 
 ## Firefox
 
+* Unzip the `dist` zip file
 * Open `about:debugging` in Firefox
 * Select `Load Temporary Add-on` and select the `manifest.json` from this repo
 * that's it
