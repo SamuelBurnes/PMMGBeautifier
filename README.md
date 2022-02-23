@@ -17,6 +17,7 @@ PMMGBeautifier Extended adds all the features of the base PMMGBeautifier extensi
 * Pull custom pricing scheme from Google webapp
 * Pull and display burnrate data from FIO on WF buffers
 * Implement custom buffers using the XIT commands
+* See Google web app template or contact PiBoy about setting up a web app for an individual or corporation: https://docs.google.com/spreadsheets/d/10ojMes08p3ZXKEEZTg_jDj166Bi8ZiuDrhajxp6GGak/edit?usp=sharing
 
 # XIT Commands
 
