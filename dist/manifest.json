@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "PMMG Beautifier",
+  "name": "PMMG Extended",
   "description": "Improve and tweak the interface elements of PrUn website",
-  "version": "0.5.0",
+  "version": "1.0.1",
   "icons": {
     "128": "icon128.png"
   },

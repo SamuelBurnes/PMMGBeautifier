@@ -102,7 +102,10 @@ export class XITHandler implements Module {
 					tile.textContent = "Error! No Matching Spreadsheet!";
 					break;
 				}
-				
+				for(var i = 2; i < parameters.length; i++)
+				{
+					parameters[1] += "_" + parameters[i];
+				}
 				const sheet = document.createElement("iframe");
 				sheet.src = "https://docs.google.com/spreadsheets/d/" + parameters[1] + "/edit?usp=sharing";
 				sheet.width = "100%";
