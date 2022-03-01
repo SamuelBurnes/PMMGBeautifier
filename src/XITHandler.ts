@@ -64,6 +64,18 @@ export class XITHandler implements Module {
 							serverID = "855488309802172469";
 							channelID = "855489711635431475";
 							break;
+						case "FIOC":
+							serverID = "807992640247300116";
+							channelID = "808451512351195166";
+							break;
+						case "AHI":
+							serverID = "704907707634941982";
+							channelID = "797157877324185650";
+							break;
+						case "PCT":
+							serverID = "667551433503014924";
+							channelID = "667551433503014927";
+							break;
 						default:
 							tile.textContent = "Error! No Matching Discord Server!";
 							valid = false;
@@ -113,6 +125,51 @@ export class XITHandler implements Module {
 				sheet.id = "sheets-success";
 				
 				tile.appendChild(sheet);
+				break;
+			case "CHAT":
+				retrievedElements = Array.from(tile.children);
+				if(retrievedElements[0] != undefined && (retrievedElements[0] as HTMLElement).id == "chat-success"){break;}
+				
+				if(parameters[1] == undefined)
+				{
+					tile.textContent = "Error! Not Enough Parameters!";
+					break;
+				}
+				else
+				{
+					tile.textContent = "";
+				}
+				Array.from(buffer.getElementsByClassName(Selector.BufferTitle))[0].textContent = parameters[1].toUpperCase() + " PLANET CHAT";	// Title the buffer
+				
+				const refreshDiv = document.createElement("div");
+				refreshDiv.classList.add(this.tag);
+				refreshDiv.id = "chat-success";
+				
+				tile.appendChild(refreshDiv);
+				
+				const refreshButton = document.createElement("button");
+				refreshButton.textContent = "REFRESH";
+				refreshButton.style.backgroundColor = "#f7a600";
+				refreshButton.style.color = "white";
+				refreshButton.style.borderWidth = "0px";
+				refreshButton.style.padding = "5px 10px";
+				refreshButton.style.margin = "5px";
+				refreshButton.style.display = "inline-block";
+				refreshButton.style.fontWeight = "bold";
+				refreshButton.style.fontSize = "11px";
+				refreshButton.style.cursor = "pointer";
+				refreshButton.addEventListener("mouseenter", function(){this.style.color = "#1e1e1e";});
+				refreshButton.addEventListener("mouseleave", function(){this.style.color = "#eeeeee";});
+				refreshButton.addEventListener("click", function(){reloadChat(chatDiv, parameters[1]);});
+				
+				refreshDiv.appendChild(refreshButton);
+				
+				const chatDiv = document.createElement("div");
+				chatDiv.classList.add(this.tag);
+				tile.appendChild(chatDiv);
+				
+				reloadChat(tile, parameters[1]);
+				
 				break;
 			case "PRUN":
 				retrievedElements = Array.from(tile.children);
@@ -279,6 +336,65 @@ function getFinTable(tile, parameter, webappID, tag)
 	xhr.open("GET", url, true);
     xhr.send(null);
 	
+	return;
+}
+
+function reloadChat(tile, planet)
+{
+	const chatDiv = tile.children[1];
+	for(let elem of chatDiv.children)
+	{
+		chatDiv.removeChild(elem);
+	}
+	chatDiv.textContent = "Loading...";
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {
+		chatDiv.textContent = "Error! Inventory Could Not Be Loaded!";
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			chatDiv.textContent = "";
+			console.log(xhr.responseText);
+		    var jsondata = xhr.responseText;
+			if(jsondata == undefined || jsondata == null){return;}
+			var chatData;
+			try
+			{
+				chatData = JSON.parse(jsondata);
+			}
+			catch(SyntaxError)
+			{
+				chatDiv.textContent = "Error! Could Not Load Data!";
+				return;
+			}
+			
+			chatData.forEach(chat => {
+				const chatLine = document.createElement("div");
+				chatLine.style.width = "100%";
+				chatDiv.appendChild(chatLine);
+				
+				const dateDiv = document.createElement("div");
+				chatLine.appendChild(dateDiv);
+				dateDiv.textContent = ((new Date(chat["MessageTimestamp"])).getMonth() + 1) + "/" + (new Date(chat["MessageTimestamp"])).getDate();
+				dateDiv.style.color = "#444444";
+				dateDiv.style.display = "flex";
+				dateDiv.style.flexDirection = "row";
+				dateDiv.style.padding = "2px 5px";
+				dateDiv.style.textAlign = "left";
+				dateDiv.style.whiteSpace = "nowrap";
+				dateDiv.style.overflow = "hidden";
+				
+			});
+		}
+    };
+    
+	xhr.timeout = 10000;
+	xhr.open("GET", "https://rest.fnar.net/chat/display/" + planet, true);
+    xhr.send(null);
+	return;
 	return;
 }
 
