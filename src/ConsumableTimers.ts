@@ -46,10 +46,21 @@ export function generateBurns(buffer, userName, apikey)
 			if(jsondata == undefined || jsondata == null){return;}
 		    var inventoryData = findCorrespondingPlanet(name, JSON.parse(jsondata));
 			if(inventoryData == undefined || inventoryData == null){return;}
+			
+			const headers = Array.from(buffer.querySelectorAll("table > thead > tr") as HTMLElement[]);
+			headers.forEach(header => {
+				const totalHeader = header.children[2] as HTMLElement;
+				const burnHeader = header.children[3] as HTMLElement;
+				totalHeader.textContent = "Total";
+				burnHeader.removeChild(burnHeader.children[0]);
+				burnHeader.textContent = "Burn";
+			});
+			
 			const elements = Array.from(buffer.querySelectorAll("table > tbody > tr") as HTMLElement[]);
 			elements.forEach(targetRow => {
 			  if(targetRow.childElementCount < 5){return;}
 			  const outputData = targetRow.children[4] as HTMLElement;
+			  const totalData = targetRow.children[3] as HTMLElement;
 			  if (outputData.textContent != "") {
 				var inventoryAmount = findInventoryAmount(targetRow.children[0].textContent, inventoryData);
 				var burnAmount = findBurnAmount(targetRow.children[0].textContent, inventoryData);
@@ -90,9 +101,13 @@ export function generateBurns(buffer, userName, apikey)
 				/*var prevText = outputData.firstChild.textContent.split(" ")[0] + " / Day ";	// Adds back in amount per day
 				outputData.removeChild(outputData.firstChild);
 				outputData.appendChild(createTextSpan(prevText + daysLeft));*/
-				const firstChild = outputData.firstChild;
+				var firstChild = outputData.firstChild;
 				if(firstChild != null){outputData.removeChild(firstChild);}
 				outputData.appendChild(createTextSpan(daysLeft));
+				
+				firstChild = totalData.firstChild;
+				if(firstChild != null){totalData.removeChild(firstChild);}
+				totalData.appendChild(createTextSpan(burnAmount == 0 ? "" : burnAmount.toFixed(2)));
 			  }
 			})
 	    }

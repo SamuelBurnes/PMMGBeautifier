@@ -161,7 +161,8 @@ export function parseBaseName(text)
 
 export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false)
 {
-	const name = MaterialNames[ticker][0];
+	if(MaterialNames[ticker] == undefined){return null;}
+	const name = MaterialNames[ticker][0];	// GIVES AN ERROR IF SHIPMENT PRESENT
 	const category = MaterialNames[ticker][1];
 	const totalPicture = document.createElement("div");
 	totalPicture.classList.add("T5C45pTOW9QTzokWPqLQJg==");

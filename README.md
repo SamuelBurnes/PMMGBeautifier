@@ -1,5 +1,7 @@
 PMMGBeautifier Extended adds all the features of the base PMMGBeautifier extension plus extra features including custom buffers via the XIT command.
 
+Thank you to yarekt for developing the base features of PMMGBeautifier that this extension is based on.
+
 # Base Features
 
 * Show the price per unit for local market ads
@@ -27,6 +29,7 @@ PMMGBeautifier Extended adds all the features of the base PMMGBeautifier extensi
 * XIT PRUN - Opens a copy of PRUN in a buffer, it's PRUN-ception!
 * XIT SHEETTABLE_{switchable parameter}\_{optional extra parameter} - Displays any 2 dimensional array returned from the connected Google web app. The switchable parameter is passed as a parameter in the URL called "mode" and the optional extra parameter as "param"
 * XIT FIN_{parameter} - Loads a financial overview via the connected Google web app. Parameter is switched upon with the mode "fin" in the web app.
+* XIT CHAT_{planet name} - Loads the planet chat for a specified planet.
 
 # XIT Examples
 
@@ -36,6 +39,7 @@ PMMGBeautifier Extended adds all the features of the base PMMGBeautifier extensi
 * XIT PRUN
 * XIT SHEETTABLE_pirepairs_JS-952c (needs web app ID)
 * XIT FIN_PiBoy314 (needs web app ID)
+* XIT CHAT_Montem
 
 # Setting up API Key and Web App ID
 
