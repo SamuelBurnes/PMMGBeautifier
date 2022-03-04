@@ -44,7 +44,16 @@ export function generateBurns(buffer, userName, apikey)
 	    {
 		    var jsondata = xhr.responseText;
 			if(jsondata == undefined || jsondata == null){return;}
-		    var inventoryData = findCorrespondingPlanet(name, JSON.parse(jsondata));
+			var rawData;
+			try
+			{
+				rawData = JSON.parse(jsondata);
+			} 
+			catch(SyntaxError)
+			{
+				return;
+			}
+		    var inventoryData = findCorrespondingPlanet(name, rawData);
 			if(inventoryData == undefined || inventoryData == null){return;}
 			
 			const headers = Array.from(buffer.querySelectorAll("table > thead > tr") as HTMLElement[]);
@@ -52,7 +61,7 @@ export function generateBurns(buffer, userName, apikey)
 				const totalHeader = header.children[2] as HTMLElement;
 				const burnHeader = header.children[3] as HTMLElement;
 				totalHeader.textContent = "Total";
-				burnHeader.removeChild(burnHeader.children[0]);
+				if(burnHeader.children != undefined && burnHeader.children[0] != undefined){burnHeader.removeChild(burnHeader.children[0]);}
 				burnHeader.textContent = "Burn";
 			});
 			
@@ -109,7 +118,7 @@ export function generateBurns(buffer, userName, apikey)
 				if(firstChild != null){totalData.removeChild(firstChild);}
 				totalData.appendChild(createTextSpan(burnAmount == 0 ? "" : burnAmount.toFixed(2)));
 			  }
-			})
+			});
 	    }
     };
     
