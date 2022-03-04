@@ -1,6 +1,7 @@
 import {Module} from "./ModuleRunner";
 import {Selector} from "./Selector";
 import {createTextSpan, genericCleanup, toFixed} from "./util";
+import {RatingColors} from "./GameProperties";
 
 export class LocalMarketAds implements Module {
   private tag = "pb-lm-ads";
@@ -9,7 +10,6 @@ export class LocalMarketAds implements Module {
   }
   run() {
     const elements = document.querySelectorAll(Selector.LMCommodityAdText);
-	console.log(elements);
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
       const text = element.textContent;
@@ -18,15 +18,14 @@ export class LocalMarketAds implements Module {
         const count = parseInt(matches[2]);
         const totalCents = parseInt(matches[3].replace(/[,.]/g, ''));
 		const priceSpan = element.querySelector(Selector.LMCommodityAdPriceSpan)!;
-		if(totalCents <= 100)
+		if(totalCents <= 100 || totalCents == undefined)
 		{
 			element.children[0].children[0].textContent = "CP";
 			(element.children[0].children[0] as HTMLElement).style.color = "#bf2521";
-			element.children[0].children[1].textContent = element.children[0].children[1].textContent.replace(/BUYING/g, "CORP");
-			element.children[0].children[1].textContent = element.children[0].children[1].textContent.replace(/@\s([\d,.]+)\s[A-Z]+\sfor/, "for");
 		}
 		else
 		{
+			(element.children[0].children[0] as HTMLElement).style.color = RatingColors[element.children[0].children[0].textContent || "P"];
 			const perItem = toFixed(totalCents / count / 100, 2);
 			
 			priceSpan.appendChild(createTextSpan(` (${perItem} ea)`, this.tag));

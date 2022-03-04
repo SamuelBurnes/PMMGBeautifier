@@ -213,7 +213,7 @@ function Fin_post(tile, parameters, jsondata)
 		return parameters;
 	}
 	const tileHeader = document.createElement("h2");
-	tileHeader.title = "Financial Overview Header";
+	tileHeader.title = "Financial Overview";
 	tileHeader.textContent = "Key Figures";
 	tileHeader.style.display = "block";
 	tileHeader.style.fontSize = "12px";
@@ -247,7 +247,7 @@ function Fin_post(tile, parameters, jsondata)
 	}
 	
 	const breakdownHeader = document.createElement("h2");
-	breakdownHeader.title = "Financial Breakdown Header";
+	breakdownHeader.title = "Financial Breakdown";
 	breakdownHeader.textContent = "Inventory Breakdown";
 	breakdownHeader.style.display = "block";
 	breakdownHeader.style.fontSize = "12px";
@@ -257,7 +257,6 @@ function Fin_post(tile, parameters, jsondata)
 	tile.appendChild(breakdownHeader);
 	
 	const table = document.createElement("table");
-	table.title = "Financial Breakdown Table";
 	const head = document.createElement("thead");
 	const headRow = document.createElement("tr");
 	head.appendChild(headRow);
@@ -266,7 +265,6 @@ function Fin_post(tile, parameters, jsondata)
 	for(let title of headers)
 	{
 		const header = document.createElement("th");
-		header.title = title + " Header";
 		header.textContent = title;
 		headRow.appendChild(header);
 	}
@@ -334,7 +332,6 @@ function SheetTable_post(tile, parameters, jsondata)
 	}
 	
 	const table = document.createElement("table");
-	table.title = "Sheet Table";
 	
 	const head = document.createElement("thead");
 	const headRow = document.createElement("tr");
@@ -343,7 +340,6 @@ function SheetTable_post(tile, parameters, jsondata)
 	for(let title of data[0])
 	{
 		const header = document.createElement("th");
-		header.title = title + " Header";
 		header.textContent = title;
 		header.style.paddingTop = "0";
 		headRow.appendChild(header);
@@ -526,7 +522,6 @@ function FIOInv_post(tile, parameters, jsondata)
 	const volumeBar = document.createElement("progress");
 	volumeBar.id = "volume-bar";
 	volumeBar.classList.add(tag);
-	volumeBar.title = "pmmg-progress-bar";
 	volumeBar.style.width = "30px";
 	volumeBar.style.height = "9px";
 	volumeBar.style.border = "1px solid #999";
@@ -546,7 +541,6 @@ function FIOInv_post(tile, parameters, jsondata)
 	const weightBar = document.createElement("progress");
 	weightBar.id = "weight-bar";
 	weightBar.classList.add(tag);
-	weightBar.title = "pmmg-progress-bar";
 	weightBar.style.width = "30px";
 	weightBar.style.height = "9px";
 	weightBar.style.border = "1px solid #999";

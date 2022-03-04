@@ -11,6 +11,17 @@ export const CurrencySymbols = {
 	"ECD": "€",
 }
 
+export const RatingColors = {
+	"P": "#1b6b9c",
+	"U": "#8b211e",
+	"F": "#e26c37",
+	"E": "#e7782b",
+	"D": "#e87d28",
+	"C": "#ed891c",
+	"B": "#f19510",
+	"A": "#f6a204"
+}
+
 export const MaterialNames = {
 	"AAR": ["Antenna Array", "electronic devices"],
 	"ABH": ["Advanced Bulkhead", "construction prefabs"],

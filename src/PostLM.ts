@@ -90,7 +90,7 @@ export class PostLM implements Module {
 		  };
 		  calculatePricePerUnit();
 	  }
-	  else if(commodity.value != "")
+	  else if(commodity.value != undefined && Materials[commodity.value] != undefined)
 	  {
 		  console.log("Here");
 		  var xhr = new XMLHttpRequest();
@@ -133,7 +133,7 @@ export class PostLM implements Module {
 				})*/
 			}
 		  };
-		  xhr.open("GET", "https://script.google.com/macros/s/" + this.webappID + "/exec?mode=%22price%22", true);
+		  xhr.open("GET", "https://script.google.com/macros/s/" + this.webappID + "/exec?mode=%22price%22&param=%22" + commodity.value + "%22", true);
 		  xhr.send(null);
 		  
 		  console.log(xhr.readyState);
