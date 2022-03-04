@@ -8,6 +8,7 @@ import { PostLM } from "./PostLM";
 import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { XITHandler } from "./XITHandler";
+import { Notifications } from "./Notifications";
 
 
 //chrome.storage.sync.get(["AHIBeautifier_Data"], mainRun(result));
@@ -30,7 +31,8 @@ try
 		  new QueueLoad(),
 		  new ConsumableTimers(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]),
 		  new FleetETAs(),
-		  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2])
+		  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2]),
+		  new Notifications()
 		]);
 		(function () {
 		  runner.loop()

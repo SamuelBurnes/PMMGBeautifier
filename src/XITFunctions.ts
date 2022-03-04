@@ -45,7 +45,6 @@ function XITWebRequest(tile, parameters, callbackFunction, url, requestType: str
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
 		tile.textContent = "Error! Data Could Not Be Loaded! Timed Out!";
-		tile.id = "pmmg-failure";
 	};
 	
 	xhr.onreadystatechange = function()
@@ -87,7 +86,6 @@ export function Chat_pre(tile, parameters)
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		tile.id = "pmmg-failure";
 	}
 	
 	XITWebRequest(tile, parameters, Chat_post, "https://rest.fnar.net/chat/display/" + parameters[1], "GET", undefined, undefined);
@@ -190,7 +188,6 @@ export function Fin_pre(tile, parameters, apikey, webappID)
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		tile.id = "pmmg-failure";
 		return apikey;
 	}
 	const url = "https://script.google.com/macros/s/" + webappID + "/exec?mode=%22fin%22&param=%22" + parameters[1] + "%22";
@@ -305,7 +302,6 @@ export function SheetTable_pre(tile, parameters, apikey, webappID)
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		tile.id = "pmmg-failure";
 		return apikey;
 	}
 	var url = "https://script.google.com/macros/s/" + webappID + "/exec?mode=%22" + parameters[1] + "%22";
@@ -393,7 +389,6 @@ export function Sheets_pre(tile, parameters)
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		tile.id = "pmmg-failure";
 		return;
 	}
 	for(var i = 2; i < parameters.length; i++)
@@ -419,7 +414,6 @@ export function Discord_pre(tile, parameters)
 		if(DiscordServers[parameters[1]] == undefined)
 		{
 			tile.textContent = "Error! Not Enough Parameters";
-			tile.id = "pmmg-failure";
 			return;
 		}
 		else
@@ -436,7 +430,6 @@ export function Discord_pre(tile, parameters)
 	else
 	{
 		tile.textContent = "Error! Not Enough Parameters";
-		tile.id = "pmmg-failure";
 		return;
 	}
 	const discord = document.createElement("iframe");
@@ -455,7 +448,6 @@ export function FIOInv_pre(tile, parameters, apikey)
 	if(parameters.length < 3)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		tile.id = "pmmg-failure";
 		return;
 	}
 	
