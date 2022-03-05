@@ -22,6 +22,7 @@ export class ConsumableTimers implements Module {
     const buffers = getBuffers("WF");
     if (buffers == undefined || buffers == null){return};
 	if(this.userName == undefined){return;}
+	
 	buffers.forEach(buffer => {
 		generateBurns(buffer, this.userName, this.apikey);
 	});
@@ -36,7 +37,8 @@ export function generateBurns(buffer, userName, apikey)
 	
 	if(nameElem == null || nameElem == undefined || nameElem.textContent == null || nameElem.textContent == undefined) return;
 	const name = parseBaseName(nameElem.textContent);
-	
+	if(nameElem.classList.contains("pmmg-pending") || nameElem.classList.contains("pmmg-loaded")){return;}
+	nameElem.classList.add("pmmg-pending");
 	var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function()
     {
@@ -51,8 +53,13 @@ export function generateBurns(buffer, userName, apikey)
 			} 
 			catch(SyntaxError)
 			{
+				nameElem.classList.remove("pmmg-loaded");
+				nameElem.classList.remove("pmmg-pending");
 				return;
 			}
+			nameElem.classList.add("pmmg-loaded");
+			nameElem.classList.remove("pmmg-pending");
+			
 		    var inventoryData = findCorrespondingPlanet(name, rawData);
 			if(inventoryData == undefined || inventoryData == null){return;}
 			
@@ -125,5 +132,6 @@ export function generateBurns(buffer, userName, apikey)
 	xhr.open("GET", "https://rest.fnar.net" + "/fioweb/burn/user/" + userName, true);
     xhr.setRequestHeader("Authorization", apikey);
     xhr.send(null);
+	
 	return;
 }
