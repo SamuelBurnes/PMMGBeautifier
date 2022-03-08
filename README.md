@@ -53,7 +53,7 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 
 For Chrome install - use instructions for "Chrome" below to install manually.
 
-For Firefox you need to install this extension manually (see below for instructions).
+For Firefox you need to install this extension manually (see below for instructions). **New Instructions to be Compatible with Manifest V3**
 
 ## Contributing
 
@@ -128,6 +128,8 @@ Extensions loaded from disk have permissions to open local files, see: https://s
 ## Firefox
 
 * Unzip the `dist` zip file
+* Delete manifest.json
+* Rename manifest_v2.json to manifest.json
 * Open `about:debugging` in Firefox
 * Select `Load Temporary Add-on` and select the `manifest.json` from this repo
 * that's it
