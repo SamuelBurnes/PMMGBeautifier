@@ -114,9 +114,6 @@ export function generateBurns(buffer, userName, apikey)
 				{
 					daysLeft = "";
 				}
-				/*var prevText = outputData.firstChild.textContent.split(" ")[0] + " / Day ";	// Adds back in amount per day
-				outputData.removeChild(outputData.firstChild);
-				outputData.appendChild(createTextSpan(prevText + daysLeft));*/
 				var firstChild = outputData.firstChild;
 				if(firstChild != null){outputData.removeChild(firstChild);}
 				outputData.appendChild(createTextSpan(daysLeft));

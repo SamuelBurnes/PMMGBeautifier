@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {convertDurationToETA, createTextSpan, genericCleanup, getBuffers} from "./util";
+import {convertDurationToETA, parseDuration, createTextSpan, genericCleanup, getBuffers} from "./util";
 
 export class FlightETAs implements Module {
   private tag = "pb-sfc-eta";
@@ -16,7 +16,7 @@ export class FlightETAs implements Module {
 		elements.forEach(targetRow => {
 		  const etaData = targetRow.children[3];
 		  if (etaData.textContent != "") {
-			const eta = convertDurationToETA(etaData.textContent);
+			const eta = convertDurationToETA(parseDuration(etaData.textContent));
 			etaData.appendChild(createTextSpan(` (${eta})`, this.tag))
 		  }
 		})

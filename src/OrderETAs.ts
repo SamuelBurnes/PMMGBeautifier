@@ -1,6 +1,6 @@
 import {Module} from "./ModuleRunner";
 import {Selector} from "./Selector";
-import {convertDurationToETA, createTextSpan, genericCleanup} from "./util";
+import {convertDurationToETA, parseDuration, createTextSpan, genericCleanup} from "./util";
 
 export class OrderETAs implements Module {
   private tag = "pb-order-eta";
@@ -11,7 +11,6 @@ export class OrderETAs implements Module {
 
   run() {
     this.beautifyOrders();
-    this.beautifyProductionQueue();
   }
 
   /**
@@ -19,38 +18,50 @@ export class OrderETAs implements Module {
    * @private
    */
   private beautifyOrders() {
-    const elements = Array.from(document.querySelectorAll(Selector.ProdItem));
-    elements.forEach(etaDiv => {
-      const etaSpan = etaDiv.querySelector("span")
-      if (etaSpan) {
-        this.beautifyEta(etaSpan);
-      }
+    const elements = Array.from(document.querySelectorAll(Selector.ProdQueue));
+    elements.forEach(queue => {
+      const prodSlots = Array.from(queue.children);
+	  var inQueue = false;
+	  var lineTimes = [] as number[];
+	  var timeElapsed = 0;
+	  prodSlots.forEach(prodItem => {
+		  if(prodItem.classList.contains(Selector.ProdItem))
+		  {
+			  try
+			  {
+				  var duration;
+				  if(inQueue)
+				  {
+					if(prodItem.children[0].children.length < 2){return;}
+					lineTimes.sort(function(a, b){return a - b;});
+					const minTime = lineTimes[0];
+					timeElapsed += minTime;
+					lineTimes.shift();
+					lineTimes = lineTimes.map( function(value){return value - minTime;});
+					
+					duration = parseDuration(prodItem.children[0].children[1].children[0].textContent);
+					lineTimes.push(duration);
+					
+					prodItem.children[0].children[1].appendChild(createTextSpan(` (${convertDurationToETA(duration + timeElapsed)})`, this.tag));
+				  }
+				  else
+				  {
+					  duration = parseDuration(prodItem.children[1].children[1].children[0].textContent);
+					  lineTimes.push(duration);
+					  
+					  prodItem.children[1].children[1].appendChild(createTextSpan(` (${convertDurationToETA(duration)})`, this.tag));
+				  }
+			  } catch(TypeError)
+			  {
+				  
+			  }
+			  
+		  } else
+		  {
+			  inQueue = true;
+		  }
+	  });
     });
-  }
-
-  /**
-   * Parse all ProdQ orders
-   * @private
-   */
-  private beautifyProductionQueue() {
-    const tables = Array.from(document.querySelectorAll(Selector.ProdQueueTable));
-    tables.forEach(table => {
-      // Select 4th row, which should contain the ETA
-      const rows = Array.from(table.querySelectorAll("tbody > tr"))
-      rows.forEach(row => {
-        const etaCell = row.querySelectorAll("td").item(5)
-        if (etaCell) {
-          const etaSpan = etaCell.querySelector("span")
-          if (etaSpan) {
-            this.beautifyEta(etaSpan);
-          }
-        }
-      });
-    });
-  }
-  private beautifyEta(etaSpan: Node){
-    const eta = convertDurationToETA(etaSpan.textContent);
-    etaSpan.parentElement!.appendChild(createTextSpan(` (${eta})`, this.tag));
   }
 
 }

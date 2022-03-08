@@ -8,8 +8,7 @@ import {CategoryColors} from "./Style";
  * @returns {string}
  */
 
-export function convertDurationToETA(duration) {
-  const parsedSeconds = parseDuration(duration);
+export function convertDurationToETA(parsedSeconds) {
   const eta = new Date();
   const now = new Date();
   eta.setSeconds(eta.getSeconds() + parsedSeconds);

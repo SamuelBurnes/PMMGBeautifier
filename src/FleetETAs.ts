@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {convertDurationToETA, createTextSpan, genericCleanup, getBuffers} from "./util";
+import {convertDurationToETA, parseDuration, createTextSpan, genericCleanup, getBuffers} from "./util";
 
 /**
  * Parse Fleet ETA times and add the actual date-time of arrival
@@ -18,7 +18,7 @@ export class FleetETAs implements Module {
 		elements.forEach(targetRow => {
 		  const etaData = targetRow.children[7];
 		  if (etaData.textContent != "") {
-			const eta = convertDurationToETA(etaData.textContent);
+			const eta = convertDurationToETA(parseDuration(etaData.textContent));
 			etaData.appendChild(createTextSpan(` (${eta})`, this.tag))
 		  }
 		})

@@ -79,6 +79,7 @@ const Searchers = [
 	["contract", "contract", "rgb(247, 166, 0)"],
 	["produced", "produced", "#3fa2de"],
 	["accepted", "advert", "#449c57"],
+	["expired", "advert", "#449c57"],
 	["trade", "trade", "#008000"],
 	["order filled", "order", "#cc2929"],
 	["arrived at it", "arrival", "#b336b3"],
