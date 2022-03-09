@@ -45,14 +45,15 @@ function mainRun(result)
 	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined]};}
 	const runner = new ModuleRunner([
 	  new LocalMarketAds(),
-	  new OrderETAs(),
-	  new FlightETAs(),
-	  new ShippingAds(),
-	  new PostLM(result["AHIBeautifier_Data"][2]),
-	  new QueueLoad(),
-	  new ConsumableTimers(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]),
-	  new FleetETAs(),
-	  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2])
+		  new OrderETAs(),
+		  new FlightETAs(),
+		  new ShippingAds(),
+		  new PostLM(result["AHIBeautifier_Data"][2]),
+		  new QueueLoad(),
+		  new ConsumableTimers(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]),
+		  new FleetETAs(),
+		  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2]),
+		  new Notifications()
 	]);
 	(function () {
 	  runner.loop()
