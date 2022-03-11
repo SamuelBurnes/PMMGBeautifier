@@ -1,5 +1,6 @@
-import {createTextSpan, createMaterialElement, createFinancialTextBox} from "./util";
+import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet} from "./util";
 import {TextColors} from "./Style";
+import {MaterialNames} from "./GameProperties";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -9,7 +10,8 @@ export const XITPreFunctions = {
 	"PRUN": PRuN_pre,
 	"SHEETTABLE": SheetTable_pre,
 	"FIN": Fin_pre,
-	"CHAT": Chat_pre
+	"CHAT": Chat_pre,
+	"BURN": EnhancedBurn_pre
 }
 
 export const XITBufferTitles = {
@@ -20,7 +22,8 @@ export const XITBufferTitles = {
 	"PRUN": "PRUN-CEPTION",
 	"SHEETTABLE": "GOOGLE SHEETS TABLE",
 	"FIN": "FINANCIAL OVERVIEW",
-	"CHAT": "CHAT"
+	"CHAT": "CHAT",
+	"BURN": "ENHANCED BURN"
 }
 
 const DiscordServers = {
@@ -294,6 +297,140 @@ function Fin_post(tile, parameters, jsondata)
 function financialSort(a, b)
 {
 	return a[3] < b[3] ? 1 : -1;
+}
+
+export function EnhancedBurn_pre(tile, parameters, apikey, webappID, burn)
+{
+	clearChildren(tile);
+	if(parameters.length < 2)
+	{
+		tile.textContent = "Error! Not Enough Parameters!";
+		return [apikey, webappID];
+	}
+	if(burn.length == 0)
+	{
+		tile.textContent = "Loading Burn Data...";
+		tile.id = "pmmg-reload";
+		return;
+	}
+	// Burn data is non-empty
+	tile.id = "pmmg-load-success";
+	const planetBurn = findCorrespondingPlanet(parameters[1], burn);	// The planet data to work with
+	if(planetBurn == undefined){tile.textContent = "Error! No Matching Planet!";return;}
+	const table = document.createElement("table");
+	const head = document.createElement("thead");
+	const headRow = document.createElement("tr");
+	head.appendChild(headRow);
+	table.appendChild(head);
+	for(let title of ["Needs", "Usage", "Inv", "Burn"])
+	{
+		const header = document.createElement("th");
+		header.textContent = title;
+		header.style.paddingTop = "0";
+		headRow.appendChild(header);
+	}
+	(headRow.firstChild as HTMLTableCellElement).colSpan = 2;
+	
+	const body = document.createElement("tbody");
+	table.appendChild(body);
+	
+	var data = {};
+	for(let cons of planetBurn["WorkforceConsumption"])
+	{
+		if(data[cons["MaterialTicker"]] == undefined)
+		{
+			data[cons["MaterialTicker"]] = cons["DailyAmount"];
+			continue;
+		}
+		data[cons["MaterialTicker"]] += cons["DailyAmount"]; 
+	}
+	for(let cons of planetBurn["OrderConsumption"])
+	{
+		if(data[cons["MaterialTicker"]] == undefined)
+		{
+			data[cons["MaterialTicker"]] = cons["DailyAmount"];
+			continue;
+		}
+		data[cons["MaterialTicker"]] += cons["DailyAmount"]; 
+	}
+	for(let cons of planetBurn["OrderProduction"])
+	{
+		if(data[cons["MaterialTicker"]] == undefined)
+		{
+			data[cons["MaterialTicker"]] = cons["DailyAmount"];
+			data[cons["MaterialTicker"]] *= -1;
+			continue;
+		}
+		data[cons["MaterialTicker"]] -= cons["DailyAmount"]; 
+	}
+	
+	var burnMaterials = Object.keys(data);
+	burnMaterials.sort(CategorySort);
+	for(let material of burnMaterials)
+	{
+		if(data[material] <= 0){continue;}
+		const row = document.createElement("tr");
+		body.appendChild(row);
+		const materialColumn = document.createElement("td");
+		materialColumn.style.width = "32px";
+		materialColumn.style.paddingRight = "0px";
+		materialColumn.style.paddingLeft = "0px";
+		const matElem = createMaterialElement(material, "prun-remove-js", "none", false, true);
+		if(matElem){materialColumn.appendChild(matElem);}
+		row.appendChild(materialColumn);
+		const nameSpan = createTextSpan(MaterialNames[material][0]);
+		nameSpan.style.fontWeight = "bold";
+		const nameColumn = document.createElement("td");
+		nameColumn.appendChild(nameSpan);
+		row.appendChild(nameColumn);
+		
+		const consColumn = document.createElement("td");
+		consColumn.appendChild(createTextSpan(data[material].toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Day"));
+		row.appendChild(consColumn);
+		
+		const invColumn = document.createElement("td");
+		var invAmount = 0;
+		for(let inv of planetBurn["Inventory"])
+		{
+			if(inv["MaterialTicker"] == material)
+			{
+				invAmount = inv["MaterialAmount"];
+				break;
+			}
+		}
+		invColumn.appendChild(createTextSpan(invAmount.toLocaleString(undefined)));
+		row.appendChild(invColumn);
+		
+		const burn = invAmount == 0 ? 0 : invAmount / data[material];
+		const burnColumn = document.createElement("td");
+		burnColumn.appendChild(createTextSpan(Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) + " Days"));
+		if(burn <= 3)
+		{
+			burnColumn.style.backgroundColor = "#5a3130";
+			burnColumn.style.color = "#c59c9b";
+		}
+		else if(burn <= 6)
+		{
+			burnColumn.style.backgroundColor = "#836e24";
+			burnColumn.style.color = "#f6df94";
+		}
+		else
+		{
+			burnColumn.style.backgroundColor = "#345034";
+			burnColumn.style.color = "#9fbb9f";
+		}
+		row.appendChild(burnColumn);
+		
+	}
+	
+	tile.appendChild(table);
+	return;
+}
+
+function CategorySort(a, b)
+{
+	if(MaterialNames[a] == undefined || MaterialNames[b] == undefined){return 0;}
+	return MaterialNames[a][1].localeCompare(MaterialNames[b][1]);
 }
 
 export function SheetTable_pre(tile, parameters, apikey, webappID)

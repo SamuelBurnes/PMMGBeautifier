@@ -130,8 +130,12 @@ export function findCorrespondingPlanet(planet, data)
 		{
 			return data[i];
 		}
+		else if(data[i]["PlanetNaturalId"] == planet)
+		{
+			return data[i];
+		}
 	}
-	return null;
+	return undefined;
 }
 
 export function parseBaseName(text)
@@ -158,25 +162,43 @@ export function parseBaseName(text)
 	
 }
 
-export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false)
+export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false, small: boolean = false)
 {
 	if(MaterialNames[ticker] == undefined){return null;}
 	const name = MaterialNames[ticker][0];	// GIVES AN ERROR IF SHIPMENT PRESENT
 	const category = MaterialNames[ticker][1];
 	const totalPicture = document.createElement("div");
 	totalPicture.classList.add("T5C45pTOW9QTzokWPqLQJg==");
-	totalPicture.style.height = "48px";
-	totalPicture.style.width = "48px";
+	if(small)
+	{
+		totalPicture.style.height = "32px";
+		totalPicture.style.width = "32px";
+	}
+	else
+	{
+		totalPicture.style.height = "48px";
+		totalPicture.style.width = "48px";
+	}
 	const material = document.createElement("div");
 	material.classList.add("E7OLUChYCexMUgOolKYjOQ==");
 	material.title = name;
-	material.style.height = "48px";
-	material.style.width = "48px";
+	if(small)
+	{
+		material.style.height = "32px";
+		material.style.width = "32px";
+		material.style.fontSize = "10.56px";
+	}
+	else
+	{
+		material.style.height = "48px";
+		material.style.width = "48px";
+		material.style.fontSize = "15.84px";
+		material.style.margin = "2px auto";
+	}
 	material.style.background = CategoryColors[category][0];
 	material.style.color = CategoryColors[category][1];
-	material.style.fontSize = "15.84px";
+	
 	material.style.cursor = "pointer";
-	material.style.margin = "2px auto";
 	totalPicture.classList.add(className);
 	const subDiv = document.createElement("div");
 	subDiv.classList.add("nlQirpSkdLH0a6+C4lhduA==");
@@ -198,6 +220,9 @@ export function createMaterialElement(ticker, className: string = "prun-remove-j
 		numberDiv.appendChild(numberSubDiv);
 		totalPicture.appendChild(numberDiv);
 	}
+	
+	if(small){return totalPicture;}
+	
 	var superElem = document.createElement("div");
 	superElem.classList.add(className);
 	superElem.appendChild(totalPicture);

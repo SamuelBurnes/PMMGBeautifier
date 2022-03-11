@@ -6,129 +6,97 @@ import {Selector} from "./Selector";
  * Get inventory and burn data and implement on WF buffers
  */
 export class ConsumableTimers implements Module {
-	private apikey;
-	private userName;
-	constructor(userName, apikey)
+	private burn;
+	constructor(burn)
 	{
-		this.userName = userName;
-		this.apikey = apikey;
+		this.burn = burn;
 	}
   private tag = "pb-consumable-timers";
   cleanup() {
     genericCleanup(this.tag);
   }
   run() {
-	if(this.userName == undefined || this.apikey == undefined){return;}
+	if(this.burn.length == 0){return;}
     const buffers = getBuffers("WF");
     if (buffers == undefined || buffers == null){return};
-	if(this.userName == undefined){return;}
 	
 	buffers.forEach(buffer => {
-		generateBurns(buffer, this.userName, this.apikey);
+		generateBurns(buffer, this.burn);
 	});
 	return;
   }
   
   
 }
-export function generateBurns(buffer, userName, apikey)
+export function generateBurns(buffer, burn)
 {
 	const nameElem = buffer.querySelector(Selector.WorkforceConsumptionTable);
 	
 	if(nameElem == null || nameElem == undefined || nameElem.textContent == null || nameElem.textContent == undefined) return;
 	const name = parseBaseName(nameElem.textContent);
-	if(nameElem.classList.contains("pmmg-pending") || nameElem.classList.contains("pmmg-loaded")){return;}
-	nameElem.classList.add("pmmg-pending");
-	var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function()
-    {
-	    if(xhr.readyState == XMLHttpRequest.DONE)
-	    {
-		    var jsondata = xhr.responseText;
-			if(jsondata == undefined || jsondata == null){return;}
-			var rawData;
-			try
+	const headers = Array.from(buffer.querySelectorAll("table > thead > tr") as HTMLElement[]);
+	headers.forEach(header => {
+		const totalHeader = header.children[2] as HTMLElement;
+		const burnHeader = header.children[3] as HTMLElement;
+		totalHeader.textContent = "Total";
+		if(burnHeader.children != undefined && burnHeader.children[0] != undefined){burnHeader.removeChild(burnHeader.children[0]);}
+		burnHeader.textContent = "Burn";
+	});
+	
+	const planetBurn = findCorrespondingPlanet(name, burn);
+	if(planetBurn == undefined){return;}
+	
+	const elements = Array.from(buffer.querySelectorAll("table > tbody > tr") as HTMLElement[]);
+	elements.forEach(targetRow => {
+	  if(targetRow.childElementCount < 5){return;}
+	  const outputData = targetRow.children[4] as HTMLElement;
+	  const totalData = targetRow.children[3] as HTMLElement;
+	  if (outputData.textContent != "") {
+		var inventoryAmount = findInventoryAmount(targetRow.children[0].textContent, planetBurn);
+		var burnAmount = findBurnAmount(targetRow.children[0].textContent, planetBurn);
+		var daysLeft;
+		if(burnAmount != 0)
+		{
+			daysLeft = Math.floor(inventoryAmount / burnAmount);
+			if(daysLeft <= 3)
 			{
-				rawData = JSON.parse(jsondata);
-			} 
-			catch(SyntaxError)
-			{
-				nameElem.classList.remove("pmmg-loaded");
-				nameElem.classList.remove("pmmg-pending");
-				return;
+				outputData.style.backgroundColor = "#5a3130";
+				outputData.style.color = "#c59c9b";
 			}
-			nameElem.classList.add("pmmg-loaded");
-			nameElem.classList.remove("pmmg-pending");
+			else if(daysLeft <= 6)
+			{
+				outputData.style.backgroundColor = "#836e24";
+				outputData.style.color = "#f6df94";
+			}
+			else
+			{
+				outputData.style.backgroundColor = "#345034";
+				outputData.style.color = "#9fbb9f";
+			}
 			
-		    var inventoryData = findCorrespondingPlanet(name, rawData);
-			if(inventoryData == undefined || inventoryData == null){return;}
-			
-			const headers = Array.from(buffer.querySelectorAll("table > thead > tr") as HTMLElement[]);
-			headers.forEach(header => {
-				const totalHeader = header.children[2] as HTMLElement;
-				const burnHeader = header.children[3] as HTMLElement;
-				totalHeader.textContent = "Total";
-				if(burnHeader.children != undefined && burnHeader.children[0] != undefined){burnHeader.removeChild(burnHeader.children[0]);}
-				burnHeader.textContent = "Burn";
-			});
-			
-			const elements = Array.from(buffer.querySelectorAll("table > tbody > tr") as HTMLElement[]);
-			elements.forEach(targetRow => {
-			  if(targetRow.childElementCount < 5){return;}
-			  const outputData = targetRow.children[4] as HTMLElement;
-			  const totalData = targetRow.children[3] as HTMLElement;
-			  if (outputData.textContent != "") {
-				var inventoryAmount = findInventoryAmount(targetRow.children[0].textContent, inventoryData);
-				var burnAmount = findBurnAmount(targetRow.children[0].textContent, inventoryData);
-				var daysLeft;
-				if(burnAmount != 0)
-				{
-					daysLeft = Math.floor(inventoryAmount / burnAmount);
-					if(daysLeft <= 3)
-					{
-						outputData.style.backgroundColor = "#5a3130";
-						outputData.style.color = "#c59c9b";
-					}
-					else if(daysLeft <= 6)
-					{
-						outputData.style.backgroundColor = "#836e24";
-						outputData.style.color = "#f6df94";
-					}
-					else
-					{
-						outputData.style.backgroundColor = "#345034";
-						outputData.style.color = "#9fbb9f";
-					}
-					
-					daysLeft = daysLeft.toFixed(0);
-					if(daysLeft == 1)
-					{
-						daysLeft += " Day Remains";
-					}
-					else
-					{
-					 daysLeft += " Days Remain";
-					}
-				}
-				else
-				{
-					daysLeft = "";
-				}
-				var firstChild = outputData.firstChild;
-				if(firstChild != null){outputData.removeChild(firstChild);}
-				outputData.appendChild(createTextSpan(daysLeft));
-				
-				firstChild = totalData.firstChild;
-				if(firstChild != null){totalData.removeChild(firstChild);}
-				totalData.appendChild(createTextSpan(burnAmount == 0 ? "" : burnAmount.toFixed(2)));
-			  }
-			});
-	    }
-    };
-    
-	xhr.open("GET", "https://rest.fnar.net" + "/fioweb/burn/user/" + userName, true);
-    xhr.setRequestHeader("Authorization", apikey);
-    xhr.send(null);
+			daysLeft = daysLeft.toFixed(0);
+			if(daysLeft == 1)
+			{
+				daysLeft += " Day";
+			}
+			else
+			{
+			 daysLeft += " Days";
+			}
+		}
+		else
+		{
+			daysLeft = "";
+		}
+		var firstChild = outputData.firstChild;
+		if(firstChild != null){outputData.removeChild(firstChild);}
+		outputData.appendChild(createTextSpan(daysLeft));
+		
+		firstChild = totalData.firstChild;
+		if(firstChild != null){totalData.removeChild(firstChild);}
+		totalData.appendChild(createTextSpan(burnAmount == 0 ? "" : burnAmount.toFixed(2)));
+	  }
+	});
 	
 	return;
 }

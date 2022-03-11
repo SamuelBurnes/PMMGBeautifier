@@ -10,10 +10,12 @@ export class XITHandler implements Module {
   private tag = "pb-xit";
   private apikey;
   private webappID;
-  constructor(apikey, webappID)
+  private burn;
+  constructor(apikey, webappID, burn)
   {  
 	this.apikey = apikey;
 	this.webappID = webappID;
+	this.burn = burn;
   }
   cleanup() {
     //genericCleanup(this.tag);	// Don't clean up because causes flashing when doing asynchronous requests
@@ -21,6 +23,7 @@ export class XITHandler implements Module {
   run() {
     const buffers = getBuffers("XIT");
     if (buffers == undefined) return;
+	var burn = this.burn;
 	buffers.forEach(buffer => {
 		var tile = buffer.querySelector(Selector.XITTile) as HTMLElement;
 		if(tile == null){tile = buffer.querySelector(Selector.XITTileFloat) as HTMLElement;}
@@ -32,6 +35,9 @@ export class XITHandler implements Module {
 		if(parametersRaw == undefined || parametersRaw == null) return;
 		var parameters = parametersRaw.slice(4).split("_");
 		if(parameters == undefined || parameters == null) return;
+		
+		if(tile.children[1] != undefined && tile.children[1].id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.children[1], parameters, this.apikey, this.webappID, burn);return;}
+		
 		tile.style.backgroundColor = "#222222";
 		tile.style.paddingTop = "4px";
 		tile.style.display = "flex";
@@ -79,8 +85,8 @@ export class XITHandler implements Module {
 			const apikey = this.apikey;
 			const webappID = this.webappID;
 			contentDiv.id = "pmmg-load-success";
-			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, apikey, webappID);});
-			preFunc(contentDiv, parameters, this.apikey, this.webappID);
+			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, apikey, webappID, burn);});
+			preFunc(contentDiv, parameters, this.apikey, this.webappID, burn);
 		}
 		return;
 		

@@ -9,6 +9,7 @@ import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { XITHandler } from "./XITHandler";
 import { Notifications } from "./Notifications";
+import { getPrices, getBurn } from "./BackgroundRunner";
 
 
 //chrome.storage.sync.get(["AHIBeautifier_Data"], mainRun(result));
@@ -21,40 +22,33 @@ try
 	console.log("Chromium detected");
 	chrome.storage.local.get(["AHIBeautifier_Data"], function(result)
 	{
-		if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined]};}
-		const runner = new ModuleRunner([
-		  new LocalMarketAds(),
-		  new OrderETAs(),
-		  new FlightETAs(),
-		  new ShippingAds(),
-		  new PostLM(result["AHIBeautifier_Data"][2]),
-		  new QueueLoad(),
-		  new ConsumableTimers(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]),
-		  new FleetETAs(),
-		  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2]),
-		  new Notifications()
-		]);
-		(function () {
-		  runner.loop()
-		})();
+		mainRun(result);
 	});
 }
 
 function mainRun(result)
 {
 	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined]};}
+	
+	var prices = {};
+	getPrices(prices, result["AHIBeautifier_Data"][2]);
+	
+	var burn = [];
+	getBurn(burn, result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]);
+	
 	const runner = new ModuleRunner([
-	  new LocalMarketAds(),
+		  new LocalMarketAds(),
 		  new OrderETAs(),
 		  new FlightETAs(),
 		  new ShippingAds(),
-		  new PostLM(result["AHIBeautifier_Data"][2]),
+		  new PostLM(prices),
 		  new QueueLoad(),
-		  new ConsumableTimers(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]),
+		  new ConsumableTimers(burn),
 		  new FleetETAs(),
-		  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2]),
+		  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], burn),
 		  new Notifications()
 	]);
+	
 	(function () {
 	  runner.loop()
 	})();
