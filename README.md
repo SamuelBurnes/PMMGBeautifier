@@ -30,6 +30,7 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * XIT SHEETTABLE_{switchable parameter}\_{optional extra parameter} - Displays any 2 dimensional array returned from the connected Google web app. The switchable parameter is passed as a parameter in the URL called "mode" and the optional extra parameter as "param"
 * XIT FIN_{parameter} - Loads a financial overview via the connected Google web app. Parameter is switched upon with the mode "fin" in the web app.
 * XIT CHAT_{planet name} - Loads the planet chat for a specified planet.
+* XIT BURN_{planet name} - Loads workforce and material consumption and burn.
 
 # XIT Examples
 
@@ -40,6 +41,7 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * XIT SHEETTABLE_pirepairs_JS-952c (needs web app ID)
 * XIT FIN_PiBoy314 (needs web app ID)
 * XIT CHAT_Montem
+* XIT BURN_Gibson
 
 # Setting up API Key and Web App ID
 
