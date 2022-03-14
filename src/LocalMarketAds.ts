@@ -18,10 +18,10 @@ export class LocalMarketAds implements Module {
         const count = parseInt(matches[2]);
         const totalCents = parseInt(matches[3].replace(/[,.]/g, ''));
 		const priceSpan = element.querySelector(Selector.LMCommodityAdPriceSpan)!;
-		if(totalCents <= 100 || totalCents == undefined)
+		if(totalCents <= -100 || totalCents == undefined)
 		{
-			element.children[0].children[0].textContent = "CP";
-			(element.children[0].children[0] as HTMLElement).style.color = "#bf2521";
+			//element.children[0].children[0].textContent = "CP";
+			//(element.children[0].children[0] as HTMLElement).style.color = "#bf2521";
 		}
 		else
 		{
