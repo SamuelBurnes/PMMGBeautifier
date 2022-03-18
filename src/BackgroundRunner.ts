@@ -36,11 +36,13 @@ export function getPrices(prices, webappID)
 
 export function getBurn(burn, username, apikey)
 {
+	if(burn == undefined){burn = {};}
 	if(apikey == undefined || apikey == null || username == undefined || username == null){return;}
-	
+	burn[username] = [];
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
 		console.log("FIO Burn Timeout");
+		burn[username] = undefined;
 		getBurn(burn, username, apikey);
 	};
 	
@@ -53,7 +55,45 @@ export function getBurn(burn, username, apikey)
 				console.log("Retreived Burn from FIO");
 				var burnData = JSON.parse(xhr.responseText);
 				burnData.forEach(data => {
-					burn.push(data);
+					burn[username].push(data);
+				});
+			}
+			catch(SyntaxError)
+			{
+				console.log("Bad Data from FIO");
+				burn[username] = undefined;
+			}
+			return;
+		}
+    };
+    
+	xhr.timeout = 10000;
+	xhr.open("GET", "https://rest.fnar.net" + "/fioweb/burn/user/" + username, true);
+    xhr.setRequestHeader("Authorization", apikey);
+    xhr.send(null);
+	return;
+}
+
+export function getBurnSettings(burnSettings, username, apikey)
+{
+	if(apikey == undefined || apikey == null || username == undefined || username == null){return;}
+	
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {
+		console.log("FIO Burn Settings Timeout");
+		getBurnSettings(burnSettings, username, apikey);
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			try
+			{
+				console.log("Retreived Burn Settings from FIO");
+				var burnData = JSON.parse(xhr.responseText);
+				burnData.forEach(data => {
+					burnSettings.push(data);
 				});
 			}
 			catch(SyntaxError)
@@ -66,7 +106,7 @@ export function getBurn(burn, username, apikey)
     };
     
 	xhr.timeout = 10000;
-	xhr.open("GET", "https://rest.fnar.net" + "/fioweb/burn/user/" + username, true);
+	xhr.open("GET", "https://rest.fnar.net" + "/usersettings/burnrate/" + username, true);
     xhr.setRequestHeader("Authorization", apikey);
     xhr.send(null);
 	return;

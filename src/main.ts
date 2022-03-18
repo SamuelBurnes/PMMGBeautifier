@@ -9,7 +9,7 @@ import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { XITHandler } from "./XITHandler";
 import { Notifications } from "./Notifications";
-import { getPrices, getBurn } from "./BackgroundRunner";
+import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
 
 
 //chrome.storage.sync.get(["AHIBeautifier_Data"], mainRun(result));
@@ -36,6 +36,9 @@ function mainRun(result)
 	var burn = [];
 	getBurn(burn, result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]);
 	
+	var burnSettings = [];
+	getBurnSettings(burnSettings, result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]);
+	
 	const runner = new ModuleRunner([
 		  new LocalMarketAds(),
 		  new OrderETAs(),
@@ -43,9 +46,9 @@ function mainRun(result)
 		  new ShippingAds(),
 		  new PostLM(prices),
 		  new QueueLoad(),
-		  new ConsumableTimers(burn),
+		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn),
 		  new FleetETAs(),
-		  new XITHandler(result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], burn),
+		  new XITHandler(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], burn, burnSettings),
 		  new Notifications()
 	]);
 	

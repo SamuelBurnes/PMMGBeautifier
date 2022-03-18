@@ -7,22 +7,27 @@ import {Selector} from "./Selector";
  */
 export class ConsumableTimers implements Module {
 	private burn;
-	constructor(burn)
+	private username;
+	
+	constructor(username, burn)
 	{
 		this.burn = burn;
+		this.username = username;
 	}
   private tag = "pb-consumable-timers";
   cleanup() {
     genericCleanup(this.tag);
   }
   run() {
-	if(this.burn.length == 0){return;}
+	if(this.burn[this.username] == undefined || this.burn[this.username].length == 0){return;}
     const buffers = getBuffers("WF");
+	
     if (buffers == undefined || buffers == null){return};
 	
 	buffers.forEach(buffer => {
-		generateBurns(buffer, this.burn);
+		generateBurns(buffer, this.burn[this.username]);
 	});
+	
 	return;
   }
   

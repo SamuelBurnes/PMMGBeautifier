@@ -126,11 +126,11 @@ export function findCorrespondingPlanet(planet, data)
 {
 	for(var i = 0; i < data.length; i++)
 	{
-		if(data[i]["PlanetName"] == planet)
+		if(data[i]["PlanetNaturalId"] == planet)
 		{
 			return data[i];
 		}
-		else if(data[i]["PlanetNaturalId"] == planet)
+		else if(data[i]["PlanetName"] == planet)
 		{
 			return data[i];
 		}

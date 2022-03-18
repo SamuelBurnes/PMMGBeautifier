@@ -17,5 +17,9 @@ export const Selector = {
   XITTileFloat: "#TOUR_TARGET_EMPTY_TILE > div > div.zJrIzEvWM7K6oP0jrRRpbQ\\=\\=.fTT52i\\+1oFauxHOjVfGTww\\=\\=.O7RX4zXL4gzHLoOwTVbrXw\\=\\= > div > div > div.gecI5uGBluvjP5GCRk3dHA\\=\\= > div",
   BufferTitle: "_4Ksi09VXhfvkGgtPbhCEyg== RUuw11b631eXrQYp-Id2wg==",
   Notification: "div[class~='_6iTMJZ+xm-PbG+nWoPqh7g==']",
-  ProdQueue: "div[class~='o1YcYrDkxt9IvN4ApCEjIw==']"
+  ProdQueue: "div[class~='o1YcYrDkxt9IvN4ApCEjIw==']",
+  NewBFRButton: "TOUR_TARGET_BUTTON_BUFFER_NEW",
+  WholeWindow: "#container",
+  BufferTextField: ".UoOoh9EGx7YihezkSGeV2Q\\=\\=",
+  BufferList: "#container > div > div > div > div:nth-child(3)"
 }

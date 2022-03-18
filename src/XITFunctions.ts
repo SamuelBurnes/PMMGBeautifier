@@ -1,6 +1,7 @@
 import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet} from "./util";
 import {TextColors} from "./Style";
 import {MaterialNames} from "./GameProperties";
+import {Selector} from "./Selector";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -81,6 +82,58 @@ function clearChildren(elem)
 		elem.removeChild(elem.children[0]);
 	}
 	return;
+}
+
+function showBuffer(command) {
+    const addSubmitCommand = (input, cmd) => {
+        changeValue(input, cmd);
+        input.parentElement.parentElement.requestSubmit();
+    }
+
+    // Watch for future buffer creation
+    monitorOnElementCreated(Selector.BufferTextField, (elem) => addSubmitCommand(elem, command));
+
+    // Create new Buffer
+    const button = document.getElementById(Selector.NewBFRButton);
+	if(button == null){console.log("Button Null");return;}
+	button.click();
+}
+
+function changeValue(input, value){
+    var propDescriptor = Object.getOwnPropertyDescriptor(
+      window["HTMLInputElement"].prototype,
+      "value"
+    );
+	if(propDescriptor == undefined){return;}
+	var nativeInputValueSetter = propDescriptor.set;
+	if(nativeInputValueSetter == undefined){return;}
+    nativeInputValueSetter.call(input, value);
+
+    var inputEvent = new Event("input", { bubbles: true });
+    input.dispatchEvent(inputEvent);
+}
+
+function monitorOnElementCreated(selector, callback, onlyOnce = true) {
+    const getElementsFromNodes = (nodes) => (Array.from(nodes)).flatMap(node => node.nodeType === 3 ? null : Array.from(node.querySelectorAll(selector))).filter(item => item !== null);
+    let onMutationsObserved = function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.addedNodes.length) {
+                var elements = getElementsFromNodes(mutation.addedNodes);
+                for (var i = 0, len = elements.length; i < len; i++) {
+                    callback(elements[i]);
+                    if (onlyOnce) observer.disconnect();
+                }
+            }
+        });
+    };
+
+    let containerSelector = 'body';
+    let target = document.querySelector(containerSelector);
+    let config = { childList: true, subtree: true };
+    let MutationObserver = window["MutationObserver"] || window["WebKitMutationObserver"];
+    let observer = new MutationObserver(onMutationsObserved);
+    observer.observe(target, config);
+	
 }
 
 export function Chat_pre(tile, parameters)
@@ -299,23 +352,40 @@ function financialSort(a, b)
 	return a[3] < b[3] ? 1 : -1;
 }
 
-export function EnhancedBurn_pre(tile, parameters, apikey, webappID, burn)
+export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, fullBurn, burnSettings)
 {
 	clearChildren(tile);
+	var burn;
+	var unloaded = false;
+	var planet;
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
 		return [apikey, webappID];
 	}
-	if(burn.length == 0)
+	else if(parameters.length == 3)
+	{
+		if(fullBurn[parameters[1]] != undefined && fullBurn[parameters[1]].length > 0){burn = fullBurn[parameters[1]];planet = parameters[2];}
+		else{unloaded = true;tile.textContent = "Error! Third Party Burn not Supported Yet!";}
+	}
+	else
+	{
+		if(fullBurn[username] != undefined && fullBurn[username].length > 0){burn = fullBurn[username];planet = parameters[1];}
+		else{unloaded = true;}
+	}
+	if(burnSettings.length == 0 || unloaded)
 	{
 		tile.textContent = "Loading Burn Data...";
 		tile.id = "pmmg-reload";
 		return;
 	}
+	
+	
+	
 	// Burn data is non-empty
 	tile.id = "pmmg-load-success";
-	const planetBurn = findCorrespondingPlanet(parameters[1], burn);	// The planet data to work with
+	const planetBurn = findCorrespondingPlanet(planet, burn);	// The planet data to work with
+	const settings = findCorrespondingPlanet(planet, burnSettings);
 	if(planetBurn == undefined){tile.textContent = "Error! No Matching Planet!";return;}
 	const table = document.createElement("table");
 	const head = document.createElement("thead");
@@ -369,6 +439,15 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, burn)
 	for(let material of burnMaterials)
 	{
 		if(data[material] <= 0){continue;}
+		var included = true;
+		if(settings != undefined)
+		{
+			settings["MaterialExclusions"].forEach((mat) => {
+				if(mat["MaterialTicker"] == material){included = false;return;}
+			});
+		}
+		if(!included){continue;}
+		
 		const row = document.createElement("tr");
 		body.appendChild(row);
 		const materialColumn = document.createElement("td");
@@ -685,7 +764,7 @@ function FIOInv_post(tile, parameters, jsondata)
 	{
 		const mat = createMaterialElement(item["MaterialTicker"], tag, item["MaterialAmount"], true);
 		
-		if(mat != null){body.appendChild(mat);}
+		if(mat != null){mat.addEventListener("click", function(){showBuffer("MAT " + item["MaterialTicker"]);});body.appendChild(mat);}
 	}
 	return;
 }
