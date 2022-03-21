@@ -90,5 +90,6 @@ const Searchers = [
 	["governor", "governor", "#8f52cc"],
 	["rules", "rules", "#8f52cc"],
 	["upkeep phase", "COGC", "#8f52cc"],
-	["expert", "expert", "#ff8a00"]
+	["expert", "expert", "#ff8a00"],
+	["dividend", "dividend", "#8f52cc"]
 ]

@@ -1,7 +1,6 @@
-import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet} from "./util";
+import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet, createLink, showBuffer} from "./util";
 import {TextColors} from "./Style";
 import {MaterialNames} from "./GameProperties";
-import {Selector} from "./Selector";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -84,57 +83,7 @@ function clearChildren(elem)
 	return;
 }
 
-function showBuffer(command) {
-    const addSubmitCommand = (input, cmd) => {
-        changeValue(input, cmd);
-        input.parentElement.parentElement.requestSubmit();
-    }
 
-    // Watch for future buffer creation
-    monitorOnElementCreated(Selector.BufferTextField, (elem) => addSubmitCommand(elem, command));
-
-    // Create new Buffer
-    const button = document.getElementById(Selector.NewBFRButton);
-	if(button == null){console.log("Button Null");return;}
-	button.click();
-}
-
-function changeValue(input, value){
-    var propDescriptor = Object.getOwnPropertyDescriptor(
-      window["HTMLInputElement"].prototype,
-      "value"
-    );
-	if(propDescriptor == undefined){return;}
-	var nativeInputValueSetter = propDescriptor.set;
-	if(nativeInputValueSetter == undefined){return;}
-    nativeInputValueSetter.call(input, value);
-
-    var inputEvent = new Event("input", { bubbles: true });
-    input.dispatchEvent(inputEvent);
-}
-
-function monitorOnElementCreated(selector, callback, onlyOnce = true) {
-    const getElementsFromNodes = (nodes) => (Array.from(nodes)).flatMap(node => node.nodeType === 3 ? null : Array.from(node.querySelectorAll(selector))).filter(item => item !== null);
-    let onMutationsObserved = function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.addedNodes.length) {
-                var elements = getElementsFromNodes(mutation.addedNodes);
-                for (var i = 0, len = elements.length; i < len; i++) {
-                    callback(elements[i]);
-                    if (onlyOnce) observer.disconnect();
-                }
-            }
-        });
-    };
-
-    let containerSelector = 'body';
-    let target = document.querySelector(containerSelector);
-    let config = { childList: true, subtree: true };
-    let MutationObserver = window["MutationObserver"] || window["WebKitMutationObserver"];
-    let observer = new MutationObserver(onMutationsObserved);
-    observer.observe(target, config);
-	
-}
 
 export function Chat_pre(tile, parameters)
 {
@@ -661,18 +610,26 @@ export function Discord_pre(tile, parameters)
 export function FIOInv_pre(tile, parameters, apikey)
 {
 	clearChildren(tile);
-	if(parameters.length < 3)
+	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
 		return;
 	}
 	
-	for(var i = 3; i < parameters.length; i++)	// Allow for spaces in planet names
+	if(parameters.length == 2)
 	{
-		parameters[2] += " " + parameters[i];
+		parameters.push(apikey);
+		XITWebRequest(tile, parameters, FIOInv_getAllStorages, "https://rest.fnar.net/auth/group/" + parameters[1], "GET", ["Authorization", apikey], undefined);
 	}
-	
-	XITWebRequest(tile, parameters, FIOInv_post, "https://rest.fnar.net/storage/" + parameters[1] + "/" + parameters[2], "GET", ["Authorization", apikey], undefined);
+	else
+	{
+		for(var i = 3; i < parameters.length; i++)	// Allow for spaces in planet names
+		{
+			parameters[2] += " " + parameters[i];
+		}
+		
+		XITWebRequest(tile, parameters, FIOInv_post, "https://rest.fnar.net/storage/" + parameters[1] + "/" + parameters[2], "GET", ["Authorization", apikey], undefined);
+	}
 	return;
 }
 
@@ -737,7 +694,7 @@ function FIOInv_post(tile, parameters, jsondata)
 	volumeBar.max = 1;
 	volumeBar.value = volumeUsed / volumeTotal;
 	volumeLine.appendChild(volumeBar);
-	volumeLine.appendChild(createTextSpan(volumeUsed.toFixed(2) + " / " + volumeTotal.toFixed(0) + " m³", tag));
+	volumeLine.appendChild(createTextSpan(volumeUsed.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " / " + volumeTotal.toLocaleString(undefined, {maximumFractionDigits: 0, minimumFractionDigits: 0}) + " m³", tag));
 	
 	header.appendChild(volumeLine);
 	
@@ -756,7 +713,7 @@ function FIOInv_post(tile, parameters, jsondata)
 	weightBar.max = 1;
 	weightBar.value = weightUsed / weightTotal;
 	weightLine.appendChild(weightBar);
-	weightLine.appendChild(createTextSpan(weightUsed.toFixed(2) + " / " + weightTotal.toFixed(0) + " t", tag));
+	weightLine.appendChild(createTextSpan(weightUsed.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " / " + weightTotal.toLocaleString(undefined, {maximumFractionDigits: 0, minimumFractionDigits: 0}) + " t", tag));
 	
 	header.appendChild(weightLine);
 	inventoryData["StorageItems"].sort(fioMatsAlphabetSort);
@@ -766,6 +723,72 @@ function FIOInv_post(tile, parameters, jsondata)
 		
 		if(mat != null){mat.addEventListener("click", function(){showBuffer("MAT " + item["MaterialTicker"]);});body.appendChild(mat);}
 	}
+	return;
+}
+
+function FIOInv_getAllStorages(tile, parameters, jsondata)
+{
+	var userJSON;
+	try
+	{
+		userJSON = JSON.parse(jsondata);
+	} catch(SyntaxError)
+	{
+		tile.textContent = "Error! Bad Data from FIO!";
+	}
+	var usernames = [] as string[];
+	userJSON["GroupUsers"].forEach(user => {
+		usernames.push(user["GroupUserName"]);
+	});
+	
+	parameters.push(userJSON["GroupName"]);
+	
+	XITWebRequest(tile, parameters, FIOInv_allDisplay, "https://rest.fnar.net/fioweb/grouphub", "POST", ["Authorization", parameters[2]], JSON.stringify(usernames));
+	return;
+}
+
+function FIOInv_allDisplay(tile, parameters, jsondata)
+{
+	var groupData = [];
+	try
+	{
+		groupData = JSON.parse(jsondata);
+	} catch(SyntaxError)
+	{
+		tile.textContent = "Error! Bad Data from FIO!";
+	}
+	const titleDiv = document.createElement("div");
+	titleDiv.style.display = "block";
+	titleDiv.style.fontWeight = "bold";
+	titleDiv.style.fontSize = "16px";
+	titleDiv.appendChild(createTextSpan(parameters[3] + " Inventories"));
+	titleDiv.style.paddingLeft = "5px";
+	tile.appendChild(titleDiv);
+	const bodyDiv = document.createElement("div");
+	tile.appendChild(bodyDiv);
+	bodyDiv.style.width = "100%";
+	bodyDiv.style.display = "flex";
+	bodyDiv.style.flex = "1";
+	bodyDiv.style.flexDirection = "row";
+	bodyDiv.style.flexWrap = "wrap";
+	bodyDiv.style.justifyContent = "left";
+	bodyDiv.style.alignItems = "left";;
+	groupData["PlayerModels"].forEach(player => {
+		if(player["Locations"].length == 0){return;}
+		const playerDiv = document.createElement("div");
+		playerDiv.style.display = "block";
+		playerDiv.style.padding = "5px";
+		playerDiv.appendChild(createTextSpan(player["UserName"]));
+		(playerDiv.firstChild as HTMLElement).style.fontWeight = "bold";
+		player["Locations"].forEach(location => {
+			playerDiv.appendChild(createLink(location["LocationName"], "XIT INV_" + player["UserName"] + "_" + location["LocationName"]));
+		});
+		
+		bodyDiv.appendChild(playerDiv);
+		
+	});
+	parameters.pop();
+	parameters.pop();
 	return;
 }
 
