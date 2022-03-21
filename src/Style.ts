@@ -59,3 +59,269 @@ export const CategoryColors = {
 	"ship kits": ["linear-gradient(135deg, rgb(154, 84, 0), rgb(178, 109, 25))", "rgb(255, 211, 127)"],
 	"utility": ["linear-gradient(135deg, rgb(161, 148, 136), rgb(186, 173, 161))", "rgb(255, 255, 255)"],
 }
+
+export const PMMGStyle = `.title {
+	font-weight: bold;
+	display: block;
+	font-size: 16px;
+	padding-left: 5px;
+}
+.flex-table {
+	width: 100%;
+	display: flex;
+	flex: 1;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: left;
+	align-items: left;
+}
+.list {
+	display: block;
+	padding: 5px;
+}
+.chat-line {
+	width: 100%;
+	display: grid;
+	grid-template-columns: minmax(8em, 1fr) minmax(8em, 4fr) minmax(8em, 15fr);
+	grid-column-gap: 1px;
+	font-size: 11px;
+	line-height: 1.1;
+}
+.time-date {
+	color: #444444;
+	display: inline-block;
+	padding: 2px 5px;
+	padding-right: 0px;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.chat-name {
+	display: inline-block;
+	text-align: right;
+	color: #999999;
+	text-overflow: ellipsis;
+	padding: 2px 5px;
+	border-right: 1px solid #999999;
+}
+.chat-message {
+	display: inline-block;
+	text-align: left;
+	color: #bbbbbb;
+	word-break: break-word;
+	padding: 2px 5px;
+}
+.fin-title {
+	display: block;
+	font-size: 12px;
+	margin-bottom: 0px;
+	padding: 6px 4px 2px;
+	background-color: rgba(63, 162, 222, 0.15);
+}
+.burn-green {
+	background-color: #345034 !important;
+	color: #9fbb9f;
+}
+.burn-yellow {
+	background-color: #836e24 !important;
+	color: #f6df94;
+}
+.burn-red {
+	background-color: #5a3130 !important;
+	color: #c59c9b;
+}
+.inv-header {
+	display: inline;
+	padding: 2px 8px;
+	color: #3fa2de;
+}
+.inv-body {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	align-items: stretch;
+	margin-bottom: 23px;
+	padding: 5px 8px;
+}
+.progress-bar {
+	width: 30px;
+	height: 9px;
+	border: 1px solid #999;
+	margin: 1px 2px;
+}
+.progress-bar::-webkit-progress-value {background: #f7a600;}
+.xit-tile {
+	background-color: #222222 !important;
+	padding-top: 4px;
+	display: flex;
+	flex-flow: column;
+}
+.refresh-button {
+	background-color: #f7a600;
+	color: #eee;
+	border-width: 0px;
+	padding: 0px 8px;
+	display: block;
+	font-weight: bold;
+	font-size: 11px;
+	cursor: pointer;
+	margin: 4px 8px;
+}
+.refresh-button:hover {
+	color: #1e1e1e;
+}
+.notification {
+	display: inline-block;
+	min-width: 62px;
+	max-width: 62px;
+}
+.fin-box {
+	margin: 1px;
+	min-width: 100px;
+	width: calc(33% - 2px);
+	max-width: 150px;
+	padding: 4px;
+	background-color: #23282b;
+	display: inline-block;
+}
+.link {
+	color: #3fa2de;
+	cursor: pointer;
+	display: block;
+}
+.link:hover {
+	color: #f7a600 !important;
+}`;
+
+export const EnhancedColors = `/* consumables (luxury) */
+div[title="Stellar Pale Ale"],
+div[data-tooltip-content="#tooltip_ALE"],
+div[title="Caffeinated Infusion"],
+div[data-tooltip-content="#tooltip_COF"],
+div[title="Einsteinium-Infused Gin"],
+div[data-tooltip-content="#tooltip_GIN"],
+div[title="Kombucha"],
+div[data-tooltip-content="#tooltip_KOM"],
+div[title="NeuroStimulants"],
+div[data-tooltip-content="#tooltip_NST"],
+div[title="Padded Work Overall"],
+div[data-tooltip-content="#tooltip_PWO"],
+div[title="Repair Kit"],
+div[data-tooltip-content="#tooltip_REP"],
+div[title="Stem Cell Treatment"],
+div[data-tooltip-content="#tooltip_SC"],
+div[title="VitaGel"],
+div[data-tooltip-content="#tooltip_VG"],
+div[title="Smart Zinfandel"],
+div[data-tooltip-content="#tooltip_WIN"]
+{
+background: linear-gradient(135deg, #680000, #7b0012) !important;
+color: #db9191 !important;
+}
+/* agricultural products */
+div[title="Protein-Rich Algae"],
+div[data-tooltip-content="#tooltip_ALG"],
+div[title="Protein-Rich Beans"],
+div[data-tooltip-content="#tooltip_BEA"],
+div[title="Caffeinated Beans"],
+div[data-tooltip-content="#tooltip_CAF"],
+div[title="All-Purpose Fodder"],
+div[data-tooltip-content="#tooltip_FOD"],
+div[title="Wine-Quality Grapes"],
+div[data-tooltip-content="#tooltip_GRA"],
+div[title="High-Carb Grains"],
+div[data-tooltip-content="#tooltip_GRN"],
+div[title="Hydrocarbon Plants"],
+div[data-tooltip-content="#tooltip_HCP"],
+div[title="Spicy Herbs"],
+div[data-tooltip-content="#tooltip_HER"],
+div[title="Flowery Hops"],
+div[data-tooltip-content="#tooltip_HOP"],
+div[title="High-Carb Maize"],
+div[data-tooltip-content="#tooltip_MAI"],
+div[title="Meat Tissue Patties"],
+div[data-tooltip-content="#tooltip_MTP"],
+div[title="Protein-Rich Mushrooms"],
+div[data-tooltip-content="#tooltip_MUS"],
+div[title="Triglyceride Nuts"],
+div[data-tooltip-content="#tooltip_NUT"],
+div[title="Pineberries"],
+div[data-tooltip-content="#tooltip_PIB"],
+div[title="Protein Paste"],
+div[data-tooltip-content="#tooltip_PPA"],
+div[title="Raw Cotton Fiber"],
+div[data-tooltip-content="#tooltip_RCO"],
+div[title="Raw Silk Strains"],
+div[data-tooltip-content="#tooltip_RSI"],
+div[title="Triglyceride Fruits"],
+div[data-tooltip-content="#tooltip_VEG"],
+div[title="Vita Essence"],
+div[data-tooltip-content="#tooltip_VIT"]
+{
+background: linear-gradient(135deg, #003800, #0a4708) !important;
+color: #8bb37b !important;
+}
+/* plastics */
+div[title="Durable Casing L"],
+div[data-tooltip-content="#tooltip_DCL"],
+div[title="Durable Casing M"],
+div[data-tooltip-content="#tooltip_DCM"],
+div[title="Durable Casing S"],
+div[data-tooltip-content="#tooltip_DCS"],
+div[title="Poly-Ethylene"],
+div[data-tooltip-content="#tooltip_PE"],
+div[title="Polymer Granulate"],
+div[data-tooltip-content="#tooltip_PG"],
+div[title="Polymer Sheet Type L"],
+div[data-tooltip-content="#tooltip_PSL"],
+div[title="Polymer Sheet Type M"],
+div[data-tooltip-content="#tooltip_PSM"],
+div[title="Polymer Sheet Type S"],
+div[data-tooltip-content="#tooltip_PSS"]
+{
+background: linear-gradient(135deg, #791f62, #92387b) !important;
+color: #f89ee1 !important;
+}
+/* consumables (basic) */
+div[title="Drinking Water"],
+div[data-tooltip-content="#tooltip_DW"],
+div[title="Exoskeleton Work Suit"],
+div[data-tooltip-content="#tooltip_EXO"],
+div[title="Flavoured Insta-Meal"],
+div[data-tooltip-content="#tooltip_FIM"],
+div[title="HazMat Work Suit"],
+div[data-tooltip-content="#tooltip_HMS"],
+div[title="Smart Space Suit"],
+div[data-tooltip-content="#tooltip_HSS"],
+div[title="AI-Assisted Lab Coat"],
+div[data-tooltip-content="#tooltip_LC"],
+div[title="Quality Meat Meal"],
+div[data-tooltip-content="#tooltip_MEA"],
+div[title="Basic Medical Kit"],
+div[data-tooltip-content="#tooltip_MED"],
+div[title="Basic Overalls"],
+div[data-tooltip-content="#tooltip_OVE"],
+div[title="Personal Data Assistant"],
+div[data-tooltip-content="#tooltip_PDA"],
+div[title="Power Tools"],
+div[data-tooltip-content="#tooltip_PT"],
+div[title="Basic Rations"],
+div[data-tooltip-content="#tooltip_RAT"],
+div[title="Multi-Purpose Scanner"],
+div[data-tooltip-content="#tooltip_SCN"],
+div[title="Scientific Work Station"],
+div[data-tooltip-content="#tooltip_WS"]
+{
+background: linear-gradient(135deg, #a62c2a, #ba363c) !important;
+color: #ff989e !important;
+}
+/* fuels */
+div[title="FTL Fuel"],
+div[data-tooltip-content="#tooltip_FF"],
+div[title="STL Fuel"],
+div[data-tooltip-content="#tooltip_SF"]
+{
+background: linear-gradient(135deg, #548d22, #6ba23c) !important;
+color: #cbfaa3 !important;
+}`;

@@ -65,18 +65,18 @@ export function generateBurns(buffer, burn)
 			daysLeft = Math.floor(inventoryAmount / burnAmount);
 			if(daysLeft <= 3)
 			{
-				outputData.style.backgroundColor = "#5a3130";
-				outputData.style.color = "#c59c9b";
+				if(!outputData.classList.contains("burn-red"))
+					outputData.classList.add("burn-red");
 			}
 			else if(daysLeft <= 6)
 			{
-				outputData.style.backgroundColor = "#836e24";
-				outputData.style.color = "#f6df94";
+				if(!outputData.classList.contains("burn-yellow"))
+					outputData.classList.add("burn-yellow");
 			}
 			else
 			{
-				outputData.style.backgroundColor = "#345034";
-				outputData.style.color = "#9fbb9f";
+				if(!outputData.classList.contains("burn-green"))
+					outputData.classList.add("burn-green");
 			}
 			
 			daysLeft = daysLeft.toFixed(0);

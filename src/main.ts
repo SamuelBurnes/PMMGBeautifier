@@ -10,6 +10,7 @@ import { QueueLoad } from "./QueueLoad";
 import { XITHandler } from "./XITHandler";
 import { Notifications } from "./Notifications";
 import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
+import { PMMGStyle, EnhancedColors } from "./Style";
 
 
 //chrome.storage.sync.get(["AHIBeautifier_Data"], mainRun(result));
@@ -28,7 +29,23 @@ try
 
 function mainRun(result)
 {
-	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined]};}
+	const style = document.createElement("style");
+	style.type = "text/css";
+	style.id = "pmmg-style";
+	style.textContent = PMMGStyle;
+	const doc = document.querySelector("html");
+	if(doc != null){doc.appendChild(style);}
+	
+	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, false]};}
+	
+	if(result["AHIBeautifier_Data"][3] == true)
+	{
+		const colors = document.createElement("style");
+		colors.type = "text/css";
+		colors.id = "pmmg-enhanced-colors";
+		colors.textContent = EnhancedColors;
+		if(doc != null){doc.appendChild(colors);}
+	}
 	
 	var prices = {};
 	getPrices(prices, result["AHIBeautifier_Data"][2]);

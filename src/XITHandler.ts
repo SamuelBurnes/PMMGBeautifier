@@ -43,10 +43,7 @@ export class XITHandler implements Module {
 		
 		if(tile.children[1] != undefined && tile.children[1].id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.children[1], parameters, this.apikey, this.webappID, this.username, burn, burnSettings);return;}
 		
-		tile.style.backgroundColor = "#222222";
-		tile.style.paddingTop = "4px";
-		tile.style.display = "flex";
-		tile.style.flexFlow = "column";
+		tile.classList.add("xit-tile");
 		
 		const topDiv = document.createElement("div");
 		topDiv.style.display = "block";
@@ -58,17 +55,7 @@ export class XITHandler implements Module {
 		
 		const refreshButton = document.createElement("button");
 			refreshButton.textContent = "⟳";
-			refreshButton.style.backgroundColor = "#f7a600";
-			refreshButton.style.color = "white";
-			refreshButton.style.borderWidth = "0px";
-			refreshButton.style.padding = "0px 8px";
-			refreshButton.style.display = "block";
-			refreshButton.style.fontWeight = "bold";
-			refreshButton.style.fontSize = "11px";
-			refreshButton.style.cursor = "pointer";
-			refreshButton.style.margin = "4px 8px";
-			refreshButton.addEventListener("mouseenter", function(){this.style.color = "#1e1e1e";});
-			refreshButton.addEventListener("mouseleave", function(){this.style.color = "#eeeeee";});
+			refreshButton.classList.add("refresh-button");
 			
 		topDiv.appendChild(refreshButton);
 		

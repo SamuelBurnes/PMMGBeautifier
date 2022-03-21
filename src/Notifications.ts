@@ -22,10 +22,8 @@ export class Notifications implements Module {
 			const typeSpan = document.createElement("div");
 			typeSpan.textContent = search[1].toUpperCase();
 			typeSpan.classList.add(this.tag);
-			typeSpan.style.display = "inline-block";
+			typeSpan.classList.add("notification");
 			typeSpan.style.color = search[2];
-			typeSpan.style.minWidth = "62px";
-			typeSpan.style.maxWidth = "62px";
 			element.children[1].insertBefore(typeSpan, element.children[1].children[0]);
 			
 			// Shorten notifications

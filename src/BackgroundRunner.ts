@@ -67,7 +67,7 @@ export function getBurn(burn, username, apikey)
 		}
     };
     
-	xhr.timeout = 10000;
+	xhr.timeout = 20000;
 	xhr.open("GET", "https://rest.fnar.net" + "/fioweb/burn/user/" + username, true);
     xhr.setRequestHeader("Authorization", apikey);
     xhr.send(null);

@@ -112,18 +112,12 @@ function Chat_post(chatDiv, parameters, jsondata)
 	}
 	const titleDiv = document.createElement("div");
 	titleDiv.textContent = parameters[1] + " Global Site Owners";
-	titleDiv.style.paddingLeft = "4px";
-	titleDiv.style.color = "#3fa2de";
+	titleDiv.classList.add("title");
 	chatDiv.appendChild(titleDiv);
 	
 	chatData.forEach(chat => {
 		const chatLine = document.createElement("div");
-		chatLine.style.width = "100%";
-		chatLine.style.display = "grid";
-		chatLine.style.gridTemplateColumns = "minmax(8em, 1fr) minmax(8em, 4fr) minmax(8em, 15fr)";
-		chatLine.style.gridColumnGap = "1px";
-		chatLine.style.fontSize = "11px";
-		chatLine.style.lineHeight = "1.1";
+		chatLine.classList.add("chat-line");
 		chatDiv.appendChild(chatLine);
 		
 		const timeDateDiv = document.createElement("div");
@@ -131,43 +125,23 @@ function Chat_post(chatDiv, parameters, jsondata)
 		const dateDiv = document.createElement("div");
 		timeDateDiv.appendChild(dateDiv);
 		dateDiv.textContent = (new Date(chat["MessageTimestamp"])).toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"});
-		dateDiv.style.color = "#444444";
-		dateDiv.style.display = "inline-block";
-		dateDiv.style.padding = "2px 5px";
-		dateDiv.style.paddingRight = "0px";
-		dateDiv.style.textAlign = "left";
-		dateDiv.style.whiteSpace = "nowrap";
-		dateDiv.style.overflow = "hidden";
+		dateDiv.classList.add("time-date");
 		
 		const timeDiv = document.createElement("div");
 		timeDateDiv.appendChild(timeDiv);
 		timeDiv.textContent = (new Date(chat["MessageTimestamp"])).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"});
-		timeDiv.style.display = "inline-block";
-		timeDiv.style.padding = "2px 5px";
-		timeDiv.style.paddingLeft = "2px";
-		timeDiv.style.textAlign = "left";
-		timeDiv.style.whiteSpace = "nowrap";
-		timeDiv.style.overflow = "hidden";
+		timeDiv.classList.add("time-date");
 		timeDiv.style.color = "#999999";
 		
 		chatLine.appendChild(timeDateDiv);
 		
 		const nameDiv = document.createElement("div");
 		chatLine.appendChild(nameDiv);
-		nameDiv.style.display = "inline-block";
-		nameDiv.style.textAlign = "right";
-		nameDiv.style.color = "#999999";
-		nameDiv.style.textOverflow = "ellipsis";
-		nameDiv.style.padding = "2px 5px";
-		nameDiv.style.borderRight = "1px solid #999999";
+		nameDiv.classList.add("chat-name");
 		
 		const messageDiv = document.createElement("div");
 		chatLine.appendChild(messageDiv);
-		messageDiv.style.display = "inline-block";
-		messageDiv.style.textAlign = "left";
-		messageDiv.style.color = "#bbbbbb";
-		messageDiv.style.wordBreak = "break-word";
-		messageDiv.style.padding = "2px 5px";
+		messageDiv.classList.add("chat-message");
 		
 		switch(chat["MessageType"])
 		{
@@ -217,11 +191,7 @@ function Fin_post(tile, parameters, jsondata)
 	const tileHeader = document.createElement("h2");
 	tileHeader.title = "Financial Overview";
 	tileHeader.textContent = "Key Figures";
-	tileHeader.style.display = "block";
-	tileHeader.style.fontSize = "12px";
-	tileHeader.style.marginBottom = "0px";
-	tileHeader.style.padding = "6px 4px 2px";
-	tileHeader.style.backgroundColor = "rgba(63, 162, 222, 0.15)";
+	tileHeader.classList.add("fin-title");
 	tile.appendChild(tileHeader);
 	
 	tile.appendChild(createFinancialTextBox(Math.round(data[0][1]).toLocaleString(), "Fixed Assets", TextColors.Standard));
@@ -251,11 +221,7 @@ function Fin_post(tile, parameters, jsondata)
 	const breakdownHeader = document.createElement("h2");
 	breakdownHeader.title = "Financial Breakdown";
 	breakdownHeader.textContent = "Inventory Breakdown";
-	breakdownHeader.style.display = "block";
-	breakdownHeader.style.fontSize = "12px";
-	breakdownHeader.style.marginBottom = "0px";
-	breakdownHeader.style.padding = "6px 4px 2px";
-	breakdownHeader.style.backgroundColor = "rgba(63, 162, 222, 0.15)";
+	breakdownHeader.classList.add("fin-title");
 	tile.appendChild(breakdownHeader);
 	
 	const table = document.createElement("table");
@@ -434,18 +400,15 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		burnColumn.appendChild(createTextSpan(Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) + " Days"));
 		if(burn <= 3)
 		{
-			burnColumn.style.backgroundColor = "#5a3130";
-			burnColumn.style.color = "#c59c9b";
+			burnColumn.classList.add("burn-red");
 		}
 		else if(burn <= 6)
 		{
-			burnColumn.style.backgroundColor = "#836e24";
-			burnColumn.style.color = "#f6df94";
+			burnColumn.classList.add("burn-yellow");
 		}
 		else
 		{
-			burnColumn.style.backgroundColor = "#345034";
-			burnColumn.style.color = "#9fbb9f";
+			burnColumn.classList.add("burn-green");
 		}
 		row.appendChild(burnColumn);
 		
@@ -562,8 +525,6 @@ export function Sheets_pre(tile, parameters)
 	}
 	const sheet = document.createElement("iframe");
 		sheet.src = "https://docs.google.com/spreadsheets/d/" + parameters[1] + "/edit?usp=sharing";
-		sheet.width = "100%";
-		sheet.height = "100%";
 		sheet.style.borderWidth = "0";
 	tile.appendChild(sheet);
 	return;
@@ -653,9 +614,7 @@ function FIOInv_post(tile, parameters, jsondata)
 	const weightTotal = inventoryData["WeightCapacity"];
 	
 	const header = document.createElement("div");
-	header.style.padding = "2px 8px";
-	header.style.display = "inline";
-	header.style.color = "#3fa2de";
+	header.classList.add("inv-header");
 	header.id = "header";
 	header.classList.add(tag);
 	
@@ -663,13 +622,7 @@ function FIOInv_post(tile, parameters, jsondata)
 	const body = document.createElement("div");
 	tile.appendChild(body);
 	body.classList.add(tag);
-	body.style.display = "flex";
-	body.style.flexDirection = "row";
-	body.style.flexWrap = "wrap";
-	body.style.justifyContent = "space-around";
-	body.style.alignItems = "stretch";
-	body.style.marginBottom = "23px";
-	body.style.padding = "5px 8px";
+	body.classList.add("inv-body");
 	body.id = "body";
 	
 	
@@ -687,10 +640,7 @@ function FIOInv_post(tile, parameters, jsondata)
 	const volumeBar = document.createElement("progress");
 	volumeBar.id = "volume-bar";
 	volumeBar.classList.add(tag);
-	volumeBar.style.width = "30px";
-	volumeBar.style.height = "9px";
-	volumeBar.style.border = "1px solid #999";
-	volumeBar.style.margin = "1px 2px";
+	volumeBar.classList.add("progress-bar");
 	volumeBar.max = 1;
 	volumeBar.value = volumeUsed / volumeTotal;
 	volumeLine.appendChild(volumeBar);
@@ -706,10 +656,7 @@ function FIOInv_post(tile, parameters, jsondata)
 	const weightBar = document.createElement("progress");
 	weightBar.id = "weight-bar";
 	weightBar.classList.add(tag);
-	weightBar.style.width = "30px";
-	weightBar.style.height = "9px";
-	weightBar.style.border = "1px solid #999";
-	weightBar.style.margin = "1px 2px";
+	weightBar.classList.add("progress-bar");
 	weightBar.max = 1;
 	weightBar.value = weightUsed / weightTotal;
 	weightLine.appendChild(weightBar);
@@ -758,26 +705,19 @@ function FIOInv_allDisplay(tile, parameters, jsondata)
 		tile.textContent = "Error! Bad Data from FIO!";
 	}
 	const titleDiv = document.createElement("div");
-	titleDiv.style.display = "block";
-	titleDiv.style.fontWeight = "bold";
-	titleDiv.style.fontSize = "16px";
+	titleDiv.classList.add("title");
 	titleDiv.appendChild(createTextSpan(parameters[3] + " Inventories"));
-	titleDiv.style.paddingLeft = "5px";
 	tile.appendChild(titleDiv);
 	const bodyDiv = document.createElement("div");
 	tile.appendChild(bodyDiv);
-	bodyDiv.style.width = "100%";
-	bodyDiv.style.display = "flex";
-	bodyDiv.style.flex = "1";
-	bodyDiv.style.flexDirection = "row";
-	bodyDiv.style.flexWrap = "wrap";
-	bodyDiv.style.justifyContent = "left";
-	bodyDiv.style.alignItems = "left";;
+	bodyDiv.classList.add("flex-table");
+	
+	if(groupData["PlayerModels"] == undefined){tile.textContent = "Error! Bad Data!"; return;}
+	
 	groupData["PlayerModels"].forEach(player => {
 		if(player["Locations"].length == 0){return;}
 		const playerDiv = document.createElement("div");
-		playerDiv.style.display = "block";
-		playerDiv.style.padding = "5px";
+		playerDiv.classList.add("list");
 		playerDiv.appendChild(createTextSpan(player["UserName"]));
 		(playerDiv.firstChild as HTMLElement).style.fontWeight = "bold";
 		player["Locations"].forEach(location => {

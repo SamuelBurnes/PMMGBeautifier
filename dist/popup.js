@@ -5,10 +5,12 @@ var apiKeyInput = document.getElementById('apikey');
 var webappIDInput = document.getElementById('webappID');
 var loadingIndicator = document.getElementById('loadingindicator');
 var curName = document.getElementById('curName');
+var colorCheck = document.getElementById('colors');
 
 var name;
 var apikey;
 var webappID;
+var colors;
 
 try
 {
@@ -28,6 +30,7 @@ function OnClear_Click()
 	name = undefined;
 	apikey = undefined;
 	webappID = undefined;
+	colors = undefined;
 	try
 	{
 		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]});
@@ -47,19 +50,21 @@ function OnConfigure_Click()
 	newName = nameInput.value;
 	newApikey = apiKeyInput.value;
 	newWebappID = webappIDInput.value;
+	newColors = colorCheck.checked;
 	SetLoadingIndicator(true);
 	if(newName != ""){name = newName;}
 	if(newApikey != ""){apikey = newApikey;}
 	if(newWebappID != ""){webappID = newWebappID;}
+	colors = newColors;
 	
 	try
 	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]});
+		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors]});
 		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 	}
 	catch(err)
 	{
-		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors]}, function(){console.log("Saved Configuration");});
 		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
@@ -74,12 +79,15 @@ function setDisplayedValues(result)
 		name = undefined;
 		apikey = undefined;
 		webappID = undefined;
+		colors = false;
 	}
 	else
 	{
 		name = result["AHIBeautifier_Data"][0];
 		apikey = result["AHIBeautifier_Data"][1];
 		webappID = result["AHIBeautifier_Data"][2];
+		colors = result["AHIBeautifier_Data"][3];
+		if(colors == undefined){colors = false;}
 	}
 	
 	
@@ -99,6 +107,7 @@ function setDisplayedValues(result)
 	else{curWebappID.textContent = "Current: undefined";}
 	if(webappID != undefined){webappIDInput.value = webappID;}
 	
+	colorCheck.checked = colors;
 }
 
 function onError(error)

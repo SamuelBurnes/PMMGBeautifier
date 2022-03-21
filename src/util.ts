@@ -73,13 +73,7 @@ export function createFinancialTextBox(primaryText, secondaryText, primaryTextCo
 {
 	const box = document.createElement("div");
 	box.classList.add(className);
-	box.style.margin = "1px";
-	box.style.minWidth = "100px";
-	box.style.width = "calc(33% - 2px)";
-	box.style.maxWidth = "150px";
-	box.style.padding = "4px";
-	box.style.backgroundColor = "#23282b";
-	box.style.display = "inline-block";
+	box.classList.add("fin-box");
 	const primaryTextSpan = document.createElement("span");
 	primaryTextSpan.style.fontSize = "12px";
 	primaryTextSpan.style.lineHeight = "1.1";
@@ -249,16 +243,11 @@ export function createMaterialElement(ticker, className: string = "prun-remove-j
 export function createLink(text, command)
 {
 	const link = document.createElement("span");
-	link.style.color = "#3fa2de";
 	link.textContent = text;
-	link.style.cursor = "pointer";
-	
 	link.addEventListener("click", function(){showBuffer(command);});
-	link.addEventListener("mouseenter", function(){link.style.color = "#f7a600";});
-	link.addEventListener("mouseleave", function(){link.style.color = "#3fa2de";});
 	
 	const linkDiv = document.createElement("div");
-	linkDiv.style.display = "block";
+	linkDiv.classList.add("link");
 	linkDiv.appendChild(link);
 	return linkDiv;
 }
