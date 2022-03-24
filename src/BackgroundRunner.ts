@@ -74,6 +74,47 @@ export function getBurn(burn, username, apikey)
 	return;
 }
 
+export function getGroupBurn(burn, groupid, apikey)
+{
+	if(burn == undefined){burn = {};}
+	if(apikey == undefined || apikey == null || groupid == undefined || groupid == null){return;}
+	
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {
+		console.log("FIO Burn Timeout");
+		burn[groupid] = undefined;
+		getGroupBurn(burn, groupid, apikey);
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			try
+			{
+				console.log("Retreived Group Burn from FIO");
+				var burnData = JSON.parse(xhr.responseText);
+				burn[groupid] = [];
+				burnData.forEach(data => {
+					burn[groupid].push(data);
+				});
+			}
+			catch(SyntaxError)
+			{
+				console.log("Bad Data from FIO");
+				burn[groupid] = undefined;
+			}
+			return;
+		}
+    };
+    
+	xhr.timeout = 20000;
+	xhr.open("GET", "https://rest.fnar.net" + "/fioweb/burn/group/" + groupid, true);
+    xhr.setRequestHeader("Authorization", apikey);
+    xhr.send(null);
+	return;
+}
+
 export function getBurnSettings(burnSettings, username, apikey)
 {
 	if(apikey == undefined || apikey == null || username == undefined || username == null){return;}

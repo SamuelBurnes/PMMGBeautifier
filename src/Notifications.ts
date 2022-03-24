@@ -32,6 +32,8 @@ export class Notifications implements Module {
 			
 			if(notText == null){return;}
 			
+			notText = notText.replace(/Chamber of Global Commerce/, "COGC");
+			
 			switch(search[0])
 			{
 				case "produced":
@@ -63,6 +65,15 @@ export class Notifications implements Module {
 					notText = notText.replace(/ the/, "");
 					notText = notText.replace(/ local market/, "");
 					break;
+				case "contract":
+					notText = notText.replace(/Your partner /, "");
+					break;
+				case "arrived at":
+					notText = notText.replace(/its destination /, "");
+					break;
+				case "started":
+					notText = notText.replace(/ a new economic program/, "");
+					break;
 			}
 			(element.children[1].children[1] as HTMLElement).textContent = notText;
 		  }
@@ -80,9 +91,9 @@ const Searchers = [
 	["expired", "advert", "#449c57"],
 	["trade", "trade", "#008000"],
 	["order filled", "order", "#cc2929"],
-	["arrived at it", "arrival", "#b336b3"],
+	["arrived at", "arrival", "#b336b3"],
 	["report", "report", "#00aa77"],
-	["program", "COGC", "#8f52cc"],
+	["started", "COGC", "#8f52cc"],
 	["election", "election", "#8f52cc"],
 	["strike", "COGC", "#8f52cc"],
 	["governor", "governor", "#8f52cc"],

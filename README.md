@@ -20,6 +20,7 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * Pull and display burnrate data from FIO on WF buffers
 * Implement custom buffers using the XIT commands
 * See Google web app template or contact PiBoy about setting up a web app for an individual or corporation: https://docs.google.com/spreadsheets/d/10ojMes08p3ZXKEEZTg_jDj166Bi8ZiuDrhajxp6GGak/edit?usp=sharing
+* Colorful notifications based on type
 
 # XIT Commands
 
@@ -30,7 +31,8 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * XIT SHEETTABLE_{switchable parameter}\_{optional extra parameter} - Displays any 2 dimensional array returned from the connected Google web app. The switchable parameter is passed as a parameter in the URL called "mode" and the optional extra parameter as "param"
 * XIT FIN_{parameter} - Loads a financial overview via the connected Google web app. Parameter is switched upon with the mode "fin" in the web app.
 * XIT CHAT_{planet name} - Loads the planet chat for a specified planet.
-* XIT BURN_{planet name} - Loads workforce and material consumption and burn.
+* XIT BURN_{planet name} - Loads workforce and material production and burn.
+* XIT BURN_GROUP_{group id} - Loads workforce and material production and burn for a whole group.
 
 # XIT Examples
 

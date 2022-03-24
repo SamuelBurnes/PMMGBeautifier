@@ -1,6 +1,7 @@
 import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet, createLink, showBuffer} from "./util";
 import {TextColors} from "./Style";
 import {MaterialNames} from "./GameProperties";
+import {getGroupBurn} from "./BackgroundRunner";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -278,10 +279,17 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		tile.textContent = "Error! Not Enough Parameters!";
 		return [apikey, webappID];
 	}
-	else if(parameters.length == 3)
+	else if(parameters.length == 3 && parameters[1].toLowerCase() == "group")
 	{
-		if(fullBurn[parameters[1]] != undefined && fullBurn[parameters[1]].length > 0){burn = fullBurn[parameters[1]];planet = parameters[2];}
-		else{unloaded = true;tile.textContent = "Error! Third Party Burn not Supported Yet!";}
+		if(fullBurn[parameters[2]] != undefined && fullBurn[parameters[2]].length > 0){burn = fullBurn[parameters[2]];}
+		else
+		{
+			unloaded = true;
+			if(tile.id != "pmmg-reload")
+			{
+				getGroupBurn(fullBurn, parameters[2], apikey);
+			}
+		}
 	}
 	else
 	{
@@ -299,15 +307,112 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	
 	// Burn data is non-empty
 	tile.id = "pmmg-load-success";
-	const planetBurn = findCorrespondingPlanet(planet, burn);	// The planet data to work with
-	const settings = findCorrespondingPlanet(planet, burnSettings);
-	if(planetBurn == undefined){tile.textContent = "Error! No Matching Planet!";return;}
+	var settings;
+	if(parameters[1].toLowerCase() == "group")
+	{
+		var inv = {};
+		var cons = {};
+		fullBurn[parameters[2]].forEach(planetData => {
+			if(planetData["Error"] == null)
+			{
+				planetData["Inventory"].forEach(material => {
+					if(inv[material["MaterialTicker"]] == undefined)
+					{
+						inv[material["MaterialTicker"]] = material["MaterialAmount"];
+					}
+					else
+					{
+						inv[material["MaterialTicker"]] += material["MaterialAmount"];
+					}
+				});
+				
+				planetData["OrderConsumption"].forEach(material => {
+					if(cons[material["MaterialTicker"]] == undefined)
+					{
+						cons[material["MaterialTicker"]] = -material["DailyAmount"];
+					}
+					else
+					{
+						cons[material["MaterialTicker"]] -= material["DailyAmount"];
+					}
+				});
+				
+				planetData["WorkforceConsumption"].forEach(material => {
+					if(cons[material["MaterialTicker"]] == undefined)
+					{
+						cons[material["MaterialTicker"]] = -material["DailyAmount"];
+					}
+					else
+					{
+						cons[material["MaterialTicker"]] -= material["DailyAmount"];
+					}
+				});
+				
+				planetData["OrderProduction"].forEach(material => {
+					if(cons[material["MaterialTicker"]] == undefined)
+					{
+						cons[material["MaterialTicker"]] = material["DailyAmount"];
+					}
+					else
+					{
+						cons[material["MaterialTicker"]] += material["DailyAmount"];
+					}
+				});
+			}
+		});
+	} else
+	{
+		const planetBurn = findCorrespondingPlanet(planet, burn);	// The planet data to work with
+		settings = findCorrespondingPlanet(planet, burnSettings);
+		if(planetBurn == undefined){tile.textContent = "Error! No Matching Planet!";return;}
+		
+		
+		var cons = {};
+		var inv = {};
+		for(let material of planetBurn["WorkforceConsumption"])
+		{
+			if(cons[material["MaterialTicker"]] == undefined)
+			{
+				cons[material["MaterialTicker"]] = -material["DailyAmount"];
+				continue;
+			}
+			cons[material["MaterialTicker"]] -= material["DailyAmount"]; 
+		}
+		for(let material of planetBurn["OrderConsumption"])
+		{
+			if(cons[material["MaterialTicker"]] == undefined)
+			{
+				cons[material["MaterialTicker"]] = -material["DailyAmount"];
+				continue;
+			}
+			cons[material["MaterialTicker"]] -= material["DailyAmount"]; 
+		}
+		for(let material of planetBurn["OrderProduction"])
+		{
+			if(cons[material["MaterialTicker"]] == undefined)
+			{
+				cons[material["MaterialTicker"]] = material["DailyAmount"];
+				continue;
+			}
+			cons[material["MaterialTicker"]] += material["DailyAmount"]; 
+		}
+		for(let material of planetBurn["Inventory"])
+		{
+			if(inv[material["MaterialTicker"]] == undefined)
+			{
+				inv[material["MaterialTicker"]] = material["MaterialAmount"];
+				continue;
+			}
+			inv[material["MaterialTicker"]] += material["MaterialAmount"]; 
+		}
+	}
+	
 	const table = document.createElement("table");
 	const head = document.createElement("thead");
 	const headRow = document.createElement("tr");
 	head.appendChild(headRow);
 	table.appendChild(head);
-	for(let title of ["Needs", "Usage", "Inv", "Burn"])
+	for(let title of ["Needs", "Production", "Inv", "Burn"])
 	{
 		const header = document.createElement("th");
 		header.textContent = title;
@@ -319,43 +424,12 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	const body = document.createElement("tbody");
 	table.appendChild(body);
 	
-	var data = {};
-	for(let cons of planetBurn["WorkforceConsumption"])
-	{
-		if(data[cons["MaterialTicker"]] == undefined)
-		{
-			data[cons["MaterialTicker"]] = cons["DailyAmount"];
-			continue;
-		}
-		data[cons["MaterialTicker"]] += cons["DailyAmount"]; 
-	}
-	for(let cons of planetBurn["OrderConsumption"])
-	{
-		if(data[cons["MaterialTicker"]] == undefined)
-		{
-			data[cons["MaterialTicker"]] = cons["DailyAmount"];
-			continue;
-		}
-		data[cons["MaterialTicker"]] += cons["DailyAmount"]; 
-	}
-	for(let cons of planetBurn["OrderProduction"])
-	{
-		if(data[cons["MaterialTicker"]] == undefined)
-		{
-			data[cons["MaterialTicker"]] = cons["DailyAmount"];
-			data[cons["MaterialTicker"]] *= -1;
-			continue;
-		}
-		data[cons["MaterialTicker"]] -= cons["DailyAmount"]; 
-	}
-	
-	var burnMaterials = Object.keys(data);
+	var burnMaterials = Object.keys(cons);
 	burnMaterials.sort(CategorySort);
 	for(let material of burnMaterials)
 	{
-		if(data[material] <= 0){continue;}
 		var included = true;
-		if(settings != undefined)
+		if(settings != undefined && parameters[1].toLowerCase() != "group")
 		{
 			settings["MaterialExclusions"].forEach((mat) => {
 				if(mat["MaterialTicker"] == material){included = false;return;}
@@ -379,26 +453,22 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		row.appendChild(nameColumn);
 		
 		const consColumn = document.createElement("td");
-		consColumn.appendChild(createTextSpan(data[material].toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Day"));
+		consColumn.appendChild(createTextSpan(cons[material].toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Day"));
 		row.appendChild(consColumn);
 		
 		const invColumn = document.createElement("td");
-		var invAmount = 0;
-		for(let inv of planetBurn["Inventory"])
-		{
-			if(inv["MaterialTicker"] == material)
-			{
-				invAmount = inv["MaterialAmount"];
-				break;
-			}
-		}
+		const invAmount = inv[material] == undefined ? 0 : inv[material];
 		invColumn.appendChild(createTextSpan(invAmount.toLocaleString(undefined)));
 		row.appendChild(invColumn);
 		
-		const burn = invAmount == 0 ? 0 : invAmount / data[material];
+		const burn = invAmount == 0 ? 0 : -invAmount / cons[material];
 		const burnColumn = document.createElement("td");
-		burnColumn.appendChild(createTextSpan(Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) + " Days"));
-		if(burn <= 3)
+		burnColumn.appendChild(createTextSpan((Math.abs(burn - 500) <= 500 ? Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
+		if(burn < 0)
+		{
+			burnColumn.classList.add("burn-green");
+		}
+		else if(burn <= 3)
 		{
 			burnColumn.classList.add("burn-red");
 		}
@@ -721,7 +791,7 @@ function FIOInv_allDisplay(tile, parameters, jsondata)
 		playerDiv.appendChild(createTextSpan(player["UserName"]));
 		(playerDiv.firstChild as HTMLElement).style.fontWeight = "bold";
 		player["Locations"].forEach(location => {
-			playerDiv.appendChild(createLink(location["LocationName"], "XIT INV_" + player["UserName"] + "_" + location["LocationName"]));
+			playerDiv.appendChild(createLink(location["LocationName"], "XIT INV_" + player["UserName"] + "_" + location["LocationName"].replace(/ /, "_")));
 		});
 		
 		bodyDiv.appendChild(playerDiv);
