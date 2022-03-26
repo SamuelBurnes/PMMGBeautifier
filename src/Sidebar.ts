@@ -17,8 +17,10 @@ interface ModulePerformance {
 export class Sidebar implements Module {
   private tag = "pb-sidebar";
   private list: ModulePerformance[];
-  constructor(list: ModulePerformance[]) {
+  private result;
+  constructor(list: ModulePerformance[], result) {
     this.list = list;
+	this.result = result;
   }
 
   cleanup() {
@@ -30,7 +32,7 @@ export class Sidebar implements Module {
     const area = document.createElement('div');
     area.classList.add(this.tag);
     const h3 = document.createElement('h3');
-    h3.appendChild(document.createTextNode("PMMG Beautifier"));
+    h3.appendChild(document.createTextNode("PMMG Extended"));
     h3.classList.add(...Style.SidebarSectionHead);
     area.appendChild(h3);
     const content = document.createElement("div");
@@ -54,11 +56,35 @@ export class Sidebar implements Module {
 
       const time = toFixed((mp.cleanupTime + mp.runTime) / mp.count, 2);
       right.appendChild(createTextSpan(`${time}ms `));
-
+	  
+	  var result = this.result;
+	  if(result["AHIBeautifier_Data"][4] == undefined){result["AHIBeautifier_Data"][4] = [];}
       const toggle = this.makeToggleButton("On", "Off", () => {
         mp.enabled = !mp.enabled;
+		if(result["AHIBeautifier_Data"][4].includes(mp.name))
+		{
+			if(mp.enabled){
+				for(var i = 0; i < result["AHIBeautifier_Data"][4].length; i++)
+				{
+					if(result["AHIBeautifier_Data"][4][i] == mp.name)
+					{
+						result["AHIBeautifier_Data"][4].splice(i, 1);
+						i--;
+					}
+				}
+			} // Was just enabled, remove disabled label
+		}
+		else
+		{
+			if(!mp.enabled){result["AHIBeautifier_Data"][4].push(mp.name);}	// Was just disabled, add disabled label
+		}
+		this.setEnabledSettings(result);
       }, mp.enabled);
       right.appendChild(toggle);
+	  if(result["AHIBeautifier_Data"][4] != undefined && result["AHIBeautifier_Data"][4].includes(mp.name))
+	  {
+		mp.enabled = false;
+	  }
 
       const cleanup = this.makePushButton("x", () => mp.module.cleanup());
       right.appendChild(cleanup);
@@ -107,6 +133,19 @@ export class Sidebar implements Module {
       setState(newState);
       f();
     };
+	toggle.style.width = "40px";
     return toggle;
+  }
+  
+  private setEnabledSettings(result)
+  {
+	try
+	{
+		browser.storage.local.set(result);
+	}
+	catch(err)
+	{
+		chrome.storage.local.set(result, function(){console.log("Saved Configuration");});
+	}
   }
 }

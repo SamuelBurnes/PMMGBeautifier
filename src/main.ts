@@ -36,7 +36,7 @@ function mainRun(result)
 	const doc = document.querySelector("html");
 	if(doc != null){doc.appendChild(style);}
 	
-	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, false]};}
+	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, false, []]};}
 	
 	if(result["AHIBeautifier_Data"][3] == true)
 	{
@@ -67,7 +67,7 @@ function mainRun(result)
 		  new FleetETAs(),
 		  new XITHandler(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], burn, burnSettings),
 		  new Notifications()
-	]);
+	], result);
 	
 	(function () {
 	  runner.loop()

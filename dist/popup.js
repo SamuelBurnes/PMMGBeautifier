@@ -11,6 +11,7 @@ var name;
 var apikey;
 var webappID;
 var colors;
+var sidebarSettings;
 
 try
 {
@@ -30,15 +31,16 @@ function OnClear_Click()
 	name = undefined;
 	apikey = undefined;
 	webappID = undefined;
-	colors = undefined;
+	colors = false;
+	sidebarSettings = [];
 	try
 	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]});
+		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]});
 		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 	}
 	catch(err)
 	{
-		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]}, function(){console.log("Saved Configuration");});
 		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
@@ -59,12 +61,12 @@ function OnConfigure_Click()
 	
 	try
 	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors]});
+		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]});
 		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 	}
 	catch(err)
 	{
-		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]}, function(){console.log("Saved Configuration");});
 		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
@@ -80,6 +82,7 @@ function setDisplayedValues(result)
 		apikey = undefined;
 		webappID = undefined;
 		colors = false;
+		sidebarSettings = [];
 	}
 	else
 	{
@@ -87,6 +90,7 @@ function setDisplayedValues(result)
 		apikey = result["AHIBeautifier_Data"][1];
 		webappID = result["AHIBeautifier_Data"][2];
 		colors = result["AHIBeautifier_Data"][3];
+		sidebarSettings = result["AHIBeautifier_Data"][4];
 		if(colors == undefined){colors = false;}
 	}
 	

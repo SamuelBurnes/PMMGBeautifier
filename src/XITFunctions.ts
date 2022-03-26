@@ -463,8 +463,8 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		
 		const burn = invAmount == 0 ? 0 : -invAmount / cons[material];
 		const burnColumn = document.createElement("td");
-		burnColumn.appendChild(createTextSpan((Math.abs(burn - 500) <= 500 ? Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
-		if(burn < 0)
+		burnColumn.appendChild(createTextSpan((Math.abs(burn - 500) < 500 && cons[material] < 0 ? Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
+		if(cons[material] >= 0)
 		{
 			burnColumn.classList.add("burn-green");
 		}

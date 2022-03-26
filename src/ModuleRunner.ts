@@ -17,11 +17,11 @@ interface ModuleEntry {
 export class ModuleRunner {
   private readonly modules: ModuleEntry[];
   private readonly sidebar: Sidebar;
-  constructor(modules: Module[]) {
+  constructor(modules: Module[], result) {
     this.modules = modules.map(m => this.moduleToME(m));
 
     // Create the sidebar, and push it as one of the modules
-    this.sidebar = new Sidebar(this.modules);
+    this.sidebar = new Sidebar(this.modules, result);
     this.modules.push(this.moduleToME(this.sidebar));
   }
 

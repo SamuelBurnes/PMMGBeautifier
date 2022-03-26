@@ -100,5 +100,7 @@ const Searchers = [
 	["rules", "rules", "#8f52cc"],
 	["upkeep phase", "COGC", "#8f52cc"],
 	["expert", "expert", "#ff8a00"],
-	["dividend", "dividend", "#8f52cc"]
+	["dividend", "dividend", "#8f52cc"],
+	["our corporation", "corp", "#996a1a"],
+	["population infrastructure project", "POPI", "#8f52cc"]
 ]
