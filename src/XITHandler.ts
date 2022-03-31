@@ -38,7 +38,18 @@ export class XITHandler implements Module {
 		
 		const parametersRaw = Array.from(buffer.getElementsByClassName(Selector.BufferHeader))[0].textContent;
 		if(parametersRaw == undefined || parametersRaw == null) return;
-		var parameters = parametersRaw.slice(4).split("_");
+		var parameters = [] as string[];
+		if(parametersRaw.charAt(4) == "1")
+		{
+			const keyValues = parametersRaw.slice(4).split(" ");
+			keyValues.forEach(key => {
+				parameters.push(key.slice(2));
+			});
+		}
+		else
+		{
+			parameters = parametersRaw.slice(4).split("_");
+		}
 		if(parameters == undefined || parameters == null) return;
 		
 		if(tile.children[1] != undefined && tile.children[1].id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.children[1], parameters, this.apikey, this.webappID, this.username, burn, burnSettings);return;}

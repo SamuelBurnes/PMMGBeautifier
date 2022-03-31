@@ -71,7 +71,8 @@ export class Notifications implements Module {
 				case "arrived at":
 					notText = notText.replace(/its destination /, "");
 					break;
-				case "started":
+				case "cogc":
+				case "chamber of global commerce":
 					notText = notText.replace(/ a new economic program/, "");
 					break;
 			}
@@ -84,6 +85,7 @@ export class Notifications implements Module {
 }
 
 // Words to search for, their types, and colors courtesy of Ray K
+// Searches must be lower case
 const Searchers = [
 	["contract", "contract", "rgb(247, 166, 0)"],
 	["produced", "produced", "#3fa2de"],
@@ -93,14 +95,13 @@ const Searchers = [
 	["order filled", "order", "#cc2929"],
 	["arrived at", "arrival", "#b336b3"],
 	["report", "report", "#00aa77"],
-	["started", "COGC", "#8f52cc"],
 	["election", "election", "#8f52cc"],
-	["strike", "COGC", "#8f52cc"],
 	["governor", "governor", "#8f52cc"],
 	["rules", "rules", "#8f52cc"],
-	["upkeep phase", "COGC", "#8f52cc"],
+	["cogc", "COGC", "#8f52cc"],
+	["chamber of global commerce", "COGC", "#8f52cc"],
 	["expert", "expert", "#ff8a00"],
-	["dividend", "dividend", "#8f52cc"],
-	["our corporation", "corp", "#996a1a"],
-	["population infrastructure project", "POPI", "#8f52cc"]
+	["our corporation", "corp", "#8f52cc"],
+	["population infrastructure project", "POPI", "#8f52cc"],
+	["apex", "update", "#00aa77"]
 ]

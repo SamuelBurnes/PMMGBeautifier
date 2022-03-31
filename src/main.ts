@@ -11,6 +11,7 @@ import { XITHandler } from "./XITHandler";
 import { Notifications } from "./Notifications";
 import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors } from "./Style";
+import { ProductionScroll } from "./ProductionScroll";
 
 
 //chrome.storage.sync.get(["AHIBeautifier_Data"], mainRun(result));
@@ -66,7 +67,8 @@ function mainRun(result)
 		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn),
 		  new FleetETAs(),
 		  new XITHandler(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], burn, burnSettings),
-		  new Notifications()
+		  new Notifications(),
+		  new ProductionScroll()
 	], result);
 	
 	(function () {

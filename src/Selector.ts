@@ -18,6 +18,8 @@ export const Selector = {
   BufferTitle: "_4Ksi09VXhfvkGgtPbhCEyg== RUuw11b631eXrQYp-Id2wg==",
   Notification: "div[class~='_6iTMJZ+xm-PbG+nWoPqh7g==']",
   ProdQueue: "div[class~='o1YcYrDkxt9IvN4ApCEjIw==']",
+  ProdWindow: "div[class~='Iw1zMtcrB7NFCxAG4xTz8g==']",
+  ProdPanel: "div[class~='gecI5uGBluvjP5GCRk3dHA==']",
   NewBFRButton: "TOUR_TARGET_BUTTON_BUFFER_NEW",
   WholeWindow: "#container",
   BufferTextField: ".UoOoh9EGx7YihezkSGeV2Q\\=\\=",
