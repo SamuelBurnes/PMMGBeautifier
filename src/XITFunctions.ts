@@ -2,6 +2,7 @@ import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorre
 import {TextColors} from "./Style";
 import {MaterialNames} from "./GameProperties";
 import {getGroupBurn} from "./BackgroundRunner";
+import {Style, WithStyles} from "./Style";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -12,7 +13,8 @@ export const XITPreFunctions = {
 	"SHEETTABLE": SheetTable_pre,
 	"FIN": Fin_pre,
 	"CHAT": Chat_pre,
-	"BURN": EnhancedBurn_pre
+	"BURN": EnhancedBurn_pre,
+	"SETTINGS": Settings_pre
 }
 
 export const XITBufferTitles = {
@@ -24,7 +26,8 @@ export const XITBufferTitles = {
 	"SHEETTABLE": "GOOGLE SHEETS TABLE",
 	"FIN": "FINANCIAL OVERVIEW",
 	"CHAT": "CHAT",
-	"BURN": "ENHANCED BURN"
+	"BURN": "ENHANCED BURN",
+	"SETTINGS": "PMMG SETTINGS"
 }
 
 const DiscordServers = {
@@ -84,7 +87,236 @@ function clearChildren(elem)
 	return;
 }
 
+export function Settings_pre(tile, parameters, apikey, webappID, username, fullBurn, burnSettings, modules, result)
+{
+	clearChildren(tile);
+	const warningDiv = document.createElement("div");
+	tile.appendChild(warningDiv);
+	warningDiv.style.marginTop = "4px";
+	warningDiv.appendChild(createTextSpan("Settings changes require a refresh to take effect."));
+	const moduleSettingsHeader = document.createElement('h3');
+    moduleSettingsHeader.appendChild(document.createTextNode("Module Settings"));
+    moduleSettingsHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(moduleSettingsHeader);
+	const content = document.createElement("div");
+	content.classList.add(...Style.SidebarSectionContent);
+    tile.appendChild(content);
+	modules.forEach(mp => {
+		// Div for the whole line
+		const line = document.createElement('div');
+		line.classList.add(...WithStyles(Style.SidebarLine, Style.FontsRegular));
+		content.appendChild(line);
 
+		// Left
+		line.appendChild(createTextSpan(mp.name));
+		content.appendChild(line);
+		
+		// Right
+		const right = document.createElement("span");
+        right.style.flexGrow = "1";
+        right.style.textAlign = "right";
+        line.appendChild(right);
+		
+	    if(result["AHIBeautifier_Data"][4] == undefined){result["AHIBeautifier_Data"][4] = [];}
+        const toggle = makeToggleButton("On", "Off", () => {
+			mp.enabled = !mp.enabled;
+			if(result["AHIBeautifier_Data"][4].includes(mp.name))
+			{
+				if(mp.enabled){
+					for(var i = 0; i < result["AHIBeautifier_Data"][4].length; i++)
+					{
+						if(result["AHIBeautifier_Data"][4][i] == mp.name)
+						{
+							result["AHIBeautifier_Data"][4].splice(i, 1);
+							i--;
+						}
+					}
+				} // Was just enabled, remove disabled label
+			}
+			else
+			{
+				if(!mp.enabled){result["AHIBeautifier_Data"][4].push(mp.name);}	// Was just disabled, add disabled label
+			}
+			setEnabledSettings(result);
+		}, mp.enabled);
+		if(result["AHIBeautifier_Data"][4].includes(mp.name))
+		{
+			toggle.setAttribute("data-state", "false");
+			mp.enabled = false;
+			toggle.classList.remove(...Style.ButtonSuccess);
+			toggle.classList.add(...Style.ButtonPrimary);
+			toggle.innerText = "Off";
+		}
+		right.appendChild(toggle);
+
+		const cleanup = makePushButton("x", () => mp.module.cleanup());
+		cleanup.style.marginRight = "8px";
+		right.appendChild(cleanup);
+	});
+	
+	const enhancedColorHeader = document.createElement('h3');
+    enhancedColorHeader.appendChild(document.createTextNode("Enhanced Colors"));
+    enhancedColorHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(enhancedColorHeader);
+	
+	const colorDiv = document.createElement("div");
+	
+	const colorLabel = createTextSpan("Enhanced Colors");
+	colorLabel.style.marginBottom = "4px";
+	colorDiv.appendChild(colorLabel);
+	
+	const colorCheck = document.createElement("input");
+	colorCheck.type = "checkbox";
+	colorCheck.checked = result["AHIBeautifier_Data"][3];
+	colorCheck.style.display = "inline-block";
+	colorCheck.addEventListener("click", function(){
+		result["AHIBeautifier_Data"][3] = colorCheck.checked;
+		setEnabledSettings(result);
+	});
+	
+	colorDiv.appendChild(colorCheck);
+	tile.appendChild(colorDiv);
+	
+	const screenUnpackHeader = document.createElement('h3');
+    screenUnpackHeader.appendChild(document.createTextNode("Screen Unpack Exclusions"));
+    screenUnpackHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(screenUnpackHeader);
+	const notifDiv = document.createElement("div");
+	tile.appendChild(notifDiv);
+	notifDiv.appendChild(createTextSpan("List screen names separated by commas, no spaces."));
+	const exclusionInput = document.createElement("input");
+	exclusionInput.classList.add("input-text");
+	exclusionInput.value = result["AHIBeautifier_Data"][5] == undefined ? "" : result["AHIBeautifier_Data"][5].join(",");
+	exclusionInput.addEventListener("input", function(){
+		result["AHIBeautifier_Data"][5] = exclusionInput.value.split(",");
+		setEnabledSettings(result);
+	});
+	
+	tile.appendChild(exclusionInput);
+	
+	const hotkeyHeader = document.createElement('h3');
+    hotkeyHeader.appendChild(document.createTextNode("Left Sidebar Buttons"));
+    hotkeyHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(hotkeyHeader);
+	const hotkeyInputDiv = document.createElement("div");
+	tile.appendChild(hotkeyInputDiv);
+	result["AHIBeautifier_Data"][6].forEach(hotkey => {
+		const div = createInputPair(hotkey, result, hotkeyInputDiv);
+		if(div != null){hotkeyInputDiv.appendChild(div);}
+	});
+	
+	const addButton = makePushButton("+", function(){
+		const div = createInputPair([[],[]], result, hotkeyInputDiv);
+		if(div != null){hotkeyInputDiv.appendChild(div);}
+	}, Style.ButtonSuccess);
+	addButton.style.marginLeft = "4px";
+	addButton.style.marginBottom = "4px";
+	
+	tile.appendChild(addButton);
+	
+	
+	
+	return [parameters, apikey, webappID, username, fullBurn, burnSettings];
+}
+
+function createInputPair(hotkey, result, fullDiv)
+{
+	if(hotkey.length != 2){return null;}
+	const div = document.createElement("div");
+	const displayedValue = document.createElement("input");
+	displayedValue.classList.add("input-text");
+	displayedValue.style.display = "inline-block";
+	div.appendChild(displayedValue);
+	const command = document.createElement("input");
+	command.classList.add("input-text");
+	command.style.display = "inline-block";
+	div.appendChild(command);
+	const remove = makePushButton("X", function(){
+		displayedValue.value = "";
+		command.value = "";
+		
+		displayedValue.dispatchEvent(new Event("input"));
+		(Array.from(div.children) as HTMLElement[]).forEach(elem => {div.removeChild(elem);});
+	}, Style.ButtonDanger);
+	remove.style.display = "inline-block";
+	div.appendChild(remove);
+	
+	displayedValue.value = hotkey[0];
+	command.value = hotkey[1];
+	
+	displayedValue.addEventListener("input", function(){
+		var hotkeys = [] as string[][];
+		(Array.from(fullDiv.children) as HTMLElement[]).forEach(option => {
+			if(option.children[0] != undefined && option.children[1] != undefined && (option.children[0] as HTMLInputElement).value != "" && (option.children[0] as HTMLInputElement).value != undefined && (option.children[1] as HTMLInputElement).value != "" && (option.children[1] as HTMLInputElement).value != undefined)
+			{
+				hotkeys.push([(option.children[0] as HTMLInputElement).value, (option.children[1] as HTMLInputElement).value] as string[]);
+			}
+		});
+		result["AHIBeautifier_Data"][6] = hotkeys;
+		setEnabledSettings(result);
+	});
+	
+	command.addEventListener("input", function(){
+		var hotkeys = [] as string[][];
+		(Array.from(fullDiv.children) as HTMLElement[]).forEach(option => {
+			if(option.children[0] != undefined && option.children[1] != undefined && (option.children[0] as HTMLInputElement).value != "" && (option.children[0] as HTMLInputElement).value != undefined && (option.children[1] as HTMLInputElement).value != "" && (option.children[1] as HTMLInputElement).value != undefined)
+			{
+				hotkeys.push([(option.children[0] as HTMLInputElement).value, (option.children[1] as HTMLInputElement).value] as string[]);
+			}
+		});
+		result["AHIBeautifier_Data"][6] = hotkeys;
+		setEnabledSettings(result);
+	});
+	return div;
+}
+
+function makePushButton(text: string, f: () => void, style = Style.ButtonPrimary) {
+    const button = document.createElement('button');
+    button.classList.add(...Style.Button);
+    button.classList.add(...style);
+    button.onclick = f;
+    button.innerText = text;
+    return button;
+}
+
+function makeToggleButton(on: string, off: string, f: () => void, state: boolean = false) {
+	const toggle = document.createElement('button');
+	toggle.classList.add(...Style.Button);
+	const setLook = (s: boolean) => {
+	  toggle.innerText = s ? on : off;
+	  // If state is switched on:
+	  if (s) {
+		toggle.classList.remove(...Style.ButtonPrimary);
+		toggle.classList.add(...Style.ButtonSuccess);
+	  } else {
+		toggle.classList.remove(...Style.ButtonSuccess);
+		toggle.classList.add(...Style.ButtonPrimary);
+	  }
+	};
+
+	toggle.setAttribute("data-state", String(state));
+	setLook(state);
+	toggle.onclick = () => {
+	  const newState = !(toggle.getAttribute("data-state") === "true");
+	  toggle.setAttribute("data-state", String(newState));
+	  setLook(newState);
+	  f();
+	};
+	toggle.style.width = "40px";
+	return toggle;
+}
+
+function setEnabledSettings(result)
+{
+	try
+	{
+		browser.storage.local.set(result);
+	}
+	catch(err)
+	{
+		chrome.storage.local.set(result, function(){console.log("Saved Configuration");});
+	}
+}
 
 export function Chat_pre(tile, parameters)
 {

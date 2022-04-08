@@ -10,6 +10,9 @@ export const Style = {
   SidebarSectionContent: ["CN0NPNovlYtaIm4bqHFbLw==", "fTT52i+1oFauxHOjVfGTww=="],
   SidebarLine: ["y84EUI8gCP-SV91X7vIihQ==", "fVd3aYJhFY-uuaH+QTByhA=="],
   FontsRegular: ["CBorIbFC6Yt+FRYEHZyuaA=="],
+  SidebarText: ["x-mLxEwC-ODh9MXDx4DxSQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
+  SidebarSliver: ["ZPsRYCOj7pX59GYDIiOtKg==", "-dcYfbCWP72VS2OFhoDG-Q=="],
+  SidebarButton: ["GHCPyjs3bxhb+WZ2BGLWHw=="]
 }
 
 export const WithStyles = (...style: string[][]): string[] => {
@@ -192,6 +195,25 @@ export const PMMGStyle = `.title {
 }
 .link:hover {
 	color: #f7a600 !important;
+}
+.input-text{
+    padding: 5px 10px;
+    margin: 5px;
+	background-color: #42361d;
+	border-width: 0px;
+	border-bottom: 1px solid #8d6411;
+	color: #cccccc;
+	
+}
+.input-text:focus{
+	outline: none;
+}
+.hidden-element{
+	visibility: false !important;
+	max-height: 0 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	font-size: 0px !important;
 }`;
 
 export const EnhancedColors = `/* consumables (luxury) */
@@ -324,4 +346,17 @@ div[data-tooltip-content="#tooltip_SF"]
 {
 background: linear-gradient(135deg, #548d22, #6ba23c) !important;
 color: #cbfaa3 !important;
+}
+/* liquids */
+div[title="Heliotrope Extract"],
+div[data-tooltip-content="#tooltip_HEX"],
+div[title="Liquid Einsteinium"],
+div[data-tooltip-content="#tooltip_LES"],
+div[title="Bacterial Tungsten Solution"],
+div[data-tooltip-content="#tooltip_BTS"],
+div[title="Water"],
+div[data-tooltip-content="#tooltip_H2O"]
+{
+background: linear-gradient(135deg, #67a8da, #6098c3) !important;
+color: #f1ffff !important;
 }`;

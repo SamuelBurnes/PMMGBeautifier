@@ -7,14 +7,14 @@ import { FleetETAs } from "./FleetETAs";
 import { PostLM } from "./PostLM";
 import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
-import { XITHandler } from "./XITHandler";
 import { Notifications } from "./Notifications";
 import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors } from "./Style";
 import { ProductionScroll } from "./ProductionScroll";
+import { ScreenUnpack } from "./ScreenUnpack";
+import { Sidebar } from "./Sidebar";
 
 
-//chrome.storage.sync.get(["AHIBeautifier_Data"], mainRun(result));
 try
 {
 	browser.storage.local.get("AHIBeautifier_Data").then(mainRun, onError);
@@ -37,7 +37,12 @@ function mainRun(result)
 	const doc = document.querySelector("html");
 	if(doc != null){doc.appendChild(style);}
 	
-	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, false, []]};}
+	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, false, [], [], [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]]]};}
+	
+	if(result["AHIBeautifier_Data"][6] == undefined)
+	{
+		result["AHIBeautifier_Data"][6] = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];
+	}
 	
 	if(result["AHIBeautifier_Data"][3] == true)
 	{
@@ -66,10 +71,11 @@ function mainRun(result)
 		  new QueueLoad(),
 		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn),
 		  new FleetETAs(),
-		  new XITHandler(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], burn, burnSettings),
 		  new Notifications(),
-		  new ProductionScroll()
-	], result);
+		  new ProductionScroll(),
+		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
+		  new Sidebar(result["AHIBeautifier_Data"][6])
+	], result, burn, burnSettings);
 	
 	(function () {
 	  runner.loop()

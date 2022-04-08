@@ -1,4 +1,4 @@
-import {Sidebar} from "./Sidebar";
+import {XITHandler} from "./XITHandler";
 
 export interface Module {
   run();
@@ -16,13 +16,23 @@ interface ModuleEntry {
 
 export class ModuleRunner {
   private readonly modules: ModuleEntry[];
-  private readonly sidebar: Sidebar;
-  constructor(modules: Module[], result) {
+  private readonly xit: XITHandler;
+  constructor(modules: Module[], result, burn, burnSettings) {
     this.modules = modules.map(m => this.moduleToME(m));
-
-    // Create the sidebar, and push it as one of the modules
-    this.sidebar = new Sidebar(this.modules, result);
-    this.modules.push(this.moduleToME(this.sidebar));
+	this.xit = new XITHandler(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], result, burn, burnSettings, this.modules);
+	
+	this.updateActiveModules(result);
+  }
+  
+  private updateActiveModules(result)
+  {
+	if(result["AHIBeautifier_Data"][4] == undefined){return;}
+	this.modules.forEach(mp => {
+		if(result["AHIBeautifier_Data"][4] != undefined && result["AHIBeautifier_Data"][4].includes(mp.name))
+		{
+			mp.enabled = false;
+		}
+	});
   }
 
   private moduleToME(module: Module): ModuleEntry {
@@ -37,6 +47,7 @@ export class ModuleRunner {
   }
 
   loop() {
+	this.xit.run();
     this.modules.map(entry => {
       if (entry.enabled) {
         const t0 = performance.now();

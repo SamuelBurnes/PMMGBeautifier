@@ -29,6 +29,8 @@ button:disabled {
 
 label{
     margin: 5px;
+	font-size: 12;
+	font-family: Arial, sans-serif;
 }
 
 input{

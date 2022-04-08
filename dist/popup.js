@@ -5,13 +5,14 @@ var apiKeyInput = document.getElementById('apikey');
 var webappIDInput = document.getElementById('webappID');
 var loadingIndicator = document.getElementById('loadingindicator');
 var curName = document.getElementById('curName');
-var colorCheck = document.getElementById('colors');
 
 var name;
 var apikey;
 var webappID;
 var colors;
 var sidebarSettings;
+var exclusionSettings;
+var hotkeySettings;
 
 try
 {
@@ -33,14 +34,16 @@ function OnClear_Click()
 	webappID = undefined;
 	colors = false;
 	sidebarSettings = [];
+	exclusionSettings = [];
+	hotkeySettings = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];
 	try
 	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]});
+		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings, exclusionSettings, hotkeySettings]});
 		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 	}
 	catch(err)
 	{
-		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings, exclusionSettings, hotkeySettings]}, function(){console.log("Saved Configuration");});
 		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
@@ -52,21 +55,19 @@ function OnConfigure_Click()
 	newName = nameInput.value;
 	newApikey = apiKeyInput.value;
 	newWebappID = webappIDInput.value;
-	newColors = colorCheck.checked;
 	SetLoadingIndicator(true);
 	if(newName != ""){name = newName;}
 	if(newApikey != ""){apikey = newApikey;}
 	if(newWebappID != ""){webappID = newWebappID;}
-	colors = newColors;
 	
 	try
 	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]});
+		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings, exclusionSettings, hotkeySettings]});
 		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 	}
 	catch(err)
 	{
-		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings, exclusionSettings, hotkeySettings]}, function(){console.log("Saved Configuration");});
 		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
@@ -83,6 +84,8 @@ function setDisplayedValues(result)
 		webappID = undefined;
 		colors = false;
 		sidebarSettings = [];
+		exclusionSettings = [];
+		hotkeySettings = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];
 	}
 	else
 	{
@@ -91,6 +94,7 @@ function setDisplayedValues(result)
 		webappID = result["AHIBeautifier_Data"][2];
 		colors = result["AHIBeautifier_Data"][3];
 		sidebarSettings = result["AHIBeautifier_Data"][4];
+		exclusionSettings = result["AHIBeautifier_Data"][5];
 		if(colors == undefined){colors = false;}
 	}
 	
@@ -110,8 +114,6 @@ function setDisplayedValues(result)
 	if(webappID != undefined){curWebappID.textContent = "Current: " + webappID.slice(0, 3) + "***...";}
 	else{curWebappID.textContent = "Current: undefined";}
 	if(webappID != undefined){webappIDInput.value = webappID;}
-	
-	colorCheck.checked = colors;
 }
 
 function onError(error)

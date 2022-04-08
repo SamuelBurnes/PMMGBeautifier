@@ -2,6 +2,26 @@ import {Selector} from "./Selector";
 import {MaterialNames} from "./GameProperties";
 import {CategoryColors} from "./Style";
 
+export function createNode(htmlString) {
+  var div = document.createElement('div');
+  div.innerHTML = htmlString.trim();
+  return div.firstChild as HTMLElement;
+}
+
+export function createQuickRowButton(shortTextBold, shortTextNormal, longText, command) {
+    const template = `<div class="MApcsYEd7+wqIJTfbHP1yA== fTT52i+1oFauxHOjVfGTww== kWTH1-HkYCWeYyDRgZ7ozQ==">
+                          <span><span class="D+GJhIGmC2eFk59dvrY+Sg==">{{:shortBold}}</span>
+                              {{:shortNormal}}</span><span class="cKqzEDeyKbzb9nPry0Dkfw==">: {{:longText}}
+                          </span>
+                     </div>`;
+    let result = template.replace("{{:shortBold}}", shortTextBold)
+                         .replace("{{:shortNormal}}", shortTextNormal)
+                         .replace("{{:longText}}", longText);
+    let node = createNode(result) as HTMLElement;
+    node.onclick = () => { showBuffer(command); };
+    return node as HTMLElement;
+}
+
 /**
  * parse a duration into an actual ETA string
  * @param duration
@@ -278,7 +298,7 @@ function changeValue(input, value){
     nativeInputValueSetter.call(input, value);
 
     var inputEvent = new Event("input", { bubbles: true });
-    input.dispatchEvent(inputEvent);
+    input.dispatchEvent(inputEvent);	// Produces an error in FF
 }
 
 function monitorOnElementCreated(selector, callback, onlyOnce = true) {

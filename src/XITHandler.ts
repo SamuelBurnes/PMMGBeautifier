@@ -13,13 +13,17 @@ export class XITHandler implements Module {
   private burn;
   private burnSettings;
   private username;
-  constructor(username, apikey, webappID, burn, burnSettings)
+  private modules;
+  private result;
+  constructor(username, apikey, webappID, result, burn, burnSettings, modules)
   {  
 	this.username = username;
 	this.apikey = apikey;
 	this.webappID = webappID;
 	this.burn = burn;
 	this.burnSettings = burnSettings;
+	this.modules = modules;
+	this.result = result;
   }
   cleanup() {
     //genericCleanup(this.tag);	// Don't clean up because causes flashing when doing asynchronous requests
@@ -52,7 +56,7 @@ export class XITHandler implements Module {
 		}
 		if(parameters == undefined || parameters == null) return;
 		
-		if(tile.children[1] != undefined && tile.children[1].id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.children[1], parameters, this.apikey, this.webappID, this.username, burn, burnSettings);return;}
+		if(tile.children[1] != undefined && tile.children[1].id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.children[1], parameters, this.apikey, this.webappID, this.username, burn, burnSettings, this.modules, this.result);return;}
 		
 		tile.classList.add("xit-tile");
 		
@@ -88,9 +92,11 @@ export class XITHandler implements Module {
 			const apikey = this.apikey;
 			const webappID = this.webappID;
 			const username = this.username;
-			contentDiv.id = "pmmg-load-success";
-			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, apikey, webappID, username, burn, burnSettings);});
-			preFunc(contentDiv, parameters, this.apikey, this.webappID, username, burn, burnSettings);
+			const modules = this.modules;
+			var result = this.result;
+			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, apikey, webappID, username, burn, burnSettings, modules, result);});
+			tile.children[1].id = "pmmg-load-success";
+			preFunc(contentDiv, parameters, this.apikey, this.webappID, username, burn, burnSettings, modules, this.result);
 		}
 		return;
 		
