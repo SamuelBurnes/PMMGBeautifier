@@ -1,6 +1,6 @@
 PMMGBeautifier Extended adds all the features of the base PMMGBeautifier extension plus extra features including custom buffers via the XIT command.
 
-Thank you to yarekt for developing the base features of PMMGBeautifier that this extension is based on.
+Thank you to yarekt for developing the base features of PMMGBeautifier that this extension is based on. And thank you to Rynx for developing PrUN UI Enhancer, now integrated into PMMG Extended.
 
 # Base Features
 
@@ -21,9 +21,12 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * Implement custom buffers using the XIT commands
 * See Google web app template or contact PiBoy about setting up a web app for an individual or corporation: https://docs.google.com/spreadsheets/d/10ojMes08p3ZXKEEZTg_jDj166Bi8ZiuDrhajxp6GGak/edit?usp=sharing
 * Colorful notifications based on type
+* Custom sidebar hotkeys
+* Custom settings menu
 
 # XIT Commands
 
+* XIT SETTINGS - opens up the settings for PMMG Extended
 * XIT INV_{username}\_{planet} - gets the FIO inventory for a user and planet
 * XIT DISCORD_{serverID or shortlist server name}\_{channelID} - Opens a Discord chat window to Widget Bot connected servers
 * XIT SHEETS_{sheetID} - Opens a google sheets editor in a buffer
@@ -52,6 +55,10 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * Fill in your FIO api key
 * Fill in your Web app ID (if available)
 * Click configure
+
+# Setting up the sidebar
+
+* Enter the abbreviation you want to show up in the left hand box and the command it should run in the right hand box. To add another row, click the + button.
 
 # Installation
 
