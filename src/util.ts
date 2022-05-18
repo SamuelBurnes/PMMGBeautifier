@@ -287,7 +287,7 @@ export function showBuffer(command) {
 	button.click();
 }
 
-function changeValue(input, value){
+export function changeValue(input, value){
     var propDescriptor = Object.getOwnPropertyDescriptor(
       window["HTMLInputElement"].prototype,
       "value"
@@ -296,9 +296,12 @@ function changeValue(input, value){
 	var nativeInputValueSetter = propDescriptor.set;
 	if(nativeInputValueSetter == undefined){return;}
     nativeInputValueSetter.call(input, value);
-
-    var inputEvent = new Event("input", { bubbles: true });
-    input.dispatchEvent(inputEvent);	// Produces an error in FF
+	
+	var inputEvent = new Event('input');
+	
+	inputEvent.initEvent('input', true, false);	// This function is depracated, but is necessary for FF to work. Consider removing or changing.
+	//Object.defineProperty(inputEvent, 'explicitOriginalTarget', {writable: false, value: input});
+    input.dispatchEvent(inputEvent);
 }
 
 function monitorOnElementCreated(selector, callback, onlyOnce = true) {

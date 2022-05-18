@@ -27,5 +27,6 @@ export const Selector = {
   ScreenControls: "TOUR_TARGET_SCREEN_CONTROLS",
   TransferArea: "div[class~='B4ccCHhEh7W0xd-YYg3qTg==']",
   TransferField: "div[class~='xuy2wpBCdzgc8G3w3AlXTw==']",
-  LeftSidebar: "TOUR_TARGET_SIDEBAR_LEFT_02"
+  LeftSidebar: "TOUR_TARGET_SIDEBAR_LEFT_02",
+  BufferArea: "div[class~='ZaphVV+fyaIiLCJyBCsZCA==']"
 }

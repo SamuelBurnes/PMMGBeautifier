@@ -12,7 +12,10 @@ export const Style = {
   FontsRegular: ["CBorIbFC6Yt+FRYEHZyuaA=="],
   SidebarText: ["x-mLxEwC-ODh9MXDx4DxSQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
   SidebarSliver: ["ZPsRYCOj7pX59GYDIiOtKg==", "-dcYfbCWP72VS2OFhoDG-Q=="],
-  SidebarButton: ["GHCPyjs3bxhb+WZ2BGLWHw=="]
+  SidebarButton: ["GHCPyjs3bxhb+WZ2BGLWHw=="],
+  ContractLine: ["y84EUI8gCP-SV91X7vIihQ==", "fVd3aYJhFY-uuaH+QTByhA=="],
+  ContractName: ["zhixp408YF082IzA5KPvfA=="],
+  ContractView: ["kq5BrGKnTUTqCDYMpLQ90g=="]
 }
 
 export const WithStyles = (...style: string[][]): string[] => {
@@ -197,7 +200,7 @@ export const PMMGStyle = `.title {
 	color: #f7a600 !important;
 }
 .input-text{
-    padding: 5px 10px;
+    padding: 0px 5px;
     margin: 5px;
 	background-color: #42361d;
 	border-width: 0px;

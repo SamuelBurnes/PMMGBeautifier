@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "PMMG Extended",
   "description": "Improve and tweak the interface elements of PrUn website",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "icons": {
     "128": "icon128.png"
   },
@@ -14,7 +14,9 @@
 	"https://script.google.com/*",
 	"https://script.googleusercontent.com/*",
 	"https://rest.fnar.net/*",
-	"storage"
+	"storage",
+	"clipboardRead",
+	"clipboardWrite"
   ],
   "content_scripts": [
     {

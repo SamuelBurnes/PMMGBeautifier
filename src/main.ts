@@ -13,6 +13,7 @@ import { PMMGStyle, EnhancedColors } from "./Style";
 import { ProductionScroll } from "./ProductionScroll";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
+import { CommandCorrecter } from "./CommandCorrecter";
 
 
 try
@@ -74,6 +75,7 @@ function mainRun(result)
 		  new Notifications(),
 		  new ProductionScroll(),
 		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
+		  new CommandCorrecter(),
 		  new Sidebar(result["AHIBeautifier_Data"][6])
 	], result, burn, burnSettings);
 	
