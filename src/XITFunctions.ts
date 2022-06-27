@@ -387,7 +387,7 @@ function Repairs_post(tile, parameters, jsondata)
 			hr.appendChild(header);
 		}
 		var buildings = [] as any[];
-		repairData["Sites"].forEach(site => {
+		repairData.forEach(site => {
 			site["Buildings"].forEach(build => {
 				buildings.push([site["PlanetName"], build]);
 			});
@@ -412,7 +412,7 @@ function Repairs_post(tile, parameters, jsondata)
 		tile.appendChild(title);
 		
 		var siteData = undefined;
-		repairData["Sites"].forEach(site => {
+		repairData.forEach(site => {
 			if(site["PlanetName"].toUpperCase() == parameters[1].toUpperCase() || site["PlanetIdentifier"].toUpperCase() == parameters[1].toUpperCase())
 			{
 				siteData = site;
@@ -810,7 +810,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		if(fullBurn[username] != undefined && fullBurn[username].length > 0){burn = fullBurn[username];planet = parameters[1];}
 		else{unloaded = true;}
 	}
-	if(burnSettings.length == 0 || unloaded)
+	if(burnSettings[0] == "loading" || unloaded)
 	{
 		tile.textContent = "Loading Burn Data...";
 		tile.id = "pmmg-reload";
@@ -818,7 +818,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	}
 	
 	
-	
+	console.log(burn);
 	// Burn data is non-empty
 	tile.id = "pmmg-load-success";
 	var settings;

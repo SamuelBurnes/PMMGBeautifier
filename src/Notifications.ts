@@ -15,7 +15,9 @@ export class Notifications implements Module {
 	  const textContent = (element.children[1].children[0] as HTMLElement).textContent;
 	  if(textContent == null){continue;}
 	  const text = textContent.toLowerCase();
+	  var foundType = false;
 	  Searchers.forEach(search => {
+		if(foundType){return;}
 		  const match = text.match(new RegExp(search[0]));
 		  if(match != null)
 		  {
@@ -33,7 +35,6 @@ export class Notifications implements Module {
 			if(notText == null){return;}
 			
 			notText = notText.replace(/Chamber of Global Commerce/, "COGC");
-			
 			switch(search[0])
 			{
 				case "produced":
@@ -46,6 +47,7 @@ export class Notifications implements Module {
 					{
 						notText = notText.replace(new RegExp(matches[1]), Materials[matches[1]][0]);
 					}
+					foundType = true;
 					break;
 				case "trade":
 					matches = notText.match(/your ([A-z -]+) order/);
@@ -53,6 +55,7 @@ export class Notifications implements Module {
 					{
 						notText = notText.replace(new RegExp(matches[1]), Materials[matches[1]][0]);
 					}
+					foundType = true;
 				case "order filled":
 					notText = notText.replace(/ Commodity Exchange/, "");
 					matches = notText.match(/([A-z -]+) order/);
@@ -60,20 +63,25 @@ export class Notifications implements Module {
 					{
 						notText = notText.replace(new RegExp(matches[1]), Materials[matches[1]][0]);
 					}
+					foundType = true;
 					break;
 				case "accepted":
 					notText = notText.replace(/ the/, "");
 					notText = notText.replace(/ local market/, "");
+					foundType = true;
 					break;
 				case "contract":
 					notText = notText.replace(/Your partner /, "");
+					foundType = true;
 					break;
 				case "arrived at":
 					notText = notText.replace(/its destination /, "");
+					foundType = true;
 					break;
 				case "cogc":
 				case "chamber of global commerce":
 					notText = notText.replace(/ a new economic program/, "");
+					foundType = true;
 					break;
 			}
 			(element.children[1].children[1] as HTMLElement).textContent = notText;
@@ -88,6 +96,7 @@ export class Notifications implements Module {
 // Searches must be lower case
 const Searchers = [
 	["contract", "contract", "rgb(247, 166, 0)"],
+	["our corporation", "corp", "#8f52cc"],
 	["produced", "produced", "#3fa2de"],
 	["accepted", "advert", "#449c57"],
 	["expired", "advert", "#449c57"],
@@ -101,7 +110,6 @@ const Searchers = [
 	["cogc", "COGC", "#8f52cc"],
 	["chamber of global commerce", "COGC", "#8f52cc"],
 	["expert", "expert", "#ff8a00"],
-	["our corporation", "corp", "#8f52cc"],
 	["population infrastructure project", "POPI", "#8f52cc"],
 	["apex", "update", "#00aa77"],
 	["warehous", "war", "#cc2929"]

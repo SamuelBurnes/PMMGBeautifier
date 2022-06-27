@@ -378,3 +378,26 @@ export function getElementsByXPath(xpath: string): Array<Node> {
   }
   return output;
 }
+
+// Sort type is: alph, alphRev
+export function sortTable(table: HTMLTableElement, column: number, sortType: string)
+{
+	var sorter = [] as any[];
+	if(table.children[1] == null){return;}
+	const rows = Array.from(table.children[1].children);
+	for(var i = 0; i < rows.length; i++)
+	{
+		if(rows[i].children[column] == null || rows[i].children[column].firstChild == null){break;}
+		sorter.push([rows[i].children[column].firstChild.textContent, rows[i]);
+	}
+	if(sortType == "alph"){sorter.sort(tableSortAlph);}
+	console.log(sorter);
+	sorter.forEach(item => {
+		table.children[1].insertBefore(table.children[1].children[0], item[1]);
+	});
+}
+
+function tableSortAlph(a, b)
+{
+	return a[0].localeCompare(b[0]);
+}

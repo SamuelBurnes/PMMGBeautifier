@@ -28,5 +28,6 @@ export const Selector = {
   TransferArea: "div[class~='B4ccCHhEh7W0xd-YYg3qTg==']",
   TransferField: "div[class~='xuy2wpBCdzgc8G3w3AlXTw==']",
   LeftSidebar: "TOUR_TARGET_SIDEBAR_LEFT_02",
-  BufferArea: "div[class~='ZaphVV+fyaIiLCJyBCsZCA==']"
+  BufferArea: "div[class~='ZaphVV+fyaIiLCJyBCsZCA==']",
+  CXOSTable: "div[class~='gecI5uGBluvjP5GCRk3dHA==']"
 }

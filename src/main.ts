@@ -14,6 +14,7 @@ import { ProductionScroll } from "./ProductionScroll";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
+import { CXOSFiltering } from "./CXOSFiltering";
 
 
 try
@@ -76,6 +77,7 @@ function mainRun(result)
 		  new ProductionScroll(),
 		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
 		  new CommandCorrecter(),
+		  new CXOSFiltering(),
 		  new Sidebar(result["AHIBeautifier_Data"][6])
 	], result, burn, burnSettings);
 	

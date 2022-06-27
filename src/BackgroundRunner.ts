@@ -118,7 +118,7 @@ export function getGroupBurn(burn, groupid, apikey)
 export function getBurnSettings(burnSettings, username, apikey)
 {
 	if(apikey == undefined || apikey == null || username == undefined || username == null){return;}
-	
+	burnSettings.push("loading");
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
 		console.log("FIO Burn Settings Timeout");
@@ -132,6 +132,7 @@ export function getBurnSettings(burnSettings, username, apikey)
 			try
 			{
 				console.log("Retreived Burn Settings from FIO");
+				burnSettings[0] = "loaded";
 				var burnData = JSON.parse(xhr.responseText);
 				burnData.forEach(data => {
 					burnSettings.push(data);
