@@ -112,5 +112,7 @@ const Searchers = [
 	["expert", "expert", "#ff8a00"],
 	["population infrastructure project", "POPI", "#8f52cc"],
 	["apex", "update", "#00aa77"],
-	["warehous", "war", "#cc2929"]
+	["warehous", "war", "#cc2929"],
+	["shipbuilding project", "ship", "#8f52cc"],
+	["planetary project", "infra", "#8f52cc"]
 ]

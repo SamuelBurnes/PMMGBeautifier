@@ -16,7 +16,9 @@ export const XITPreFunctions = {
 	"BURN": EnhancedBurn_pre,
 	"SETTINGS": Settings_pre,
 	"CONTRACTS": Contracts_pre,
-	"REPAIRS": Repairs_pre
+	"REPAIRS": Repairs_pre,
+	"CALCULATOR": Calculator_pre,
+	"CALC": Calculator_pre
 }
 
 export const XITBufferTitles = {
@@ -31,7 +33,9 @@ export const XITBufferTitles = {
 	"BURN": "ENHANCED BURN",
 	"SETTINGS": "PMMG SETTINGS",
 	"CONTRACTS": "PENDING CONTRACTS",
-	"REPAIRS": "REPAIRS"
+	"REPAIRS": "REPAIRS",
+	"CALC": "CALCULATOR",
+	"CALCULATOR": "CALCULATOR"
 }
 
 const DiscordServers = {
@@ -177,9 +181,48 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 		result["AHIBeautifier_Data"][3] = colorCheck.checked;
 		setEnabledSettings(result);
 	});
-	
 	colorDiv.appendChild(colorCheck);
 	tile.appendChild(colorDiv);
+	
+	const burnDiv = document.createElement("div");
+	const burnLabel = document.createElement('h3');
+	burnLabel.appendChild(createTextSpan("Burn Settings"));
+	burnLabel.classList.add(...Style.SidebarSectionHead);
+	burnLabel.style.marginBottom = "4px";
+	burnDiv.appendChild(burnLabel);
+	
+	const setDiv = document.createElement("div");
+	burnDiv.appendChild(setDiv);
+	setDiv.style.display = "flex";
+	const redDiv = document.createElement("div");
+	setDiv.appendChild(redDiv);
+	redDiv.appendChild(createTextSpan("Red Threshold: "));
+	const redIn = document.createElement("input");
+	redIn.type = "number";
+	redIn.value = result["AHIBeautifier_Data"][7][0].toLocaleString(undefined, {maximumFractionDigits: 0});
+	redDiv.appendChild(redIn);
+	redIn.classList.add("input-text");
+	redIn.style.width = "50px";
+	redIn.addEventListener("input", function(){
+		result["AHIBeautifier_Data"][7][0] = parseFloat(redIn.value);
+		setEnabledSettings(result);
+	});
+	
+	const yelDiv = document.createElement("div");
+	setDiv.appendChild(yelDiv);
+	yelDiv.appendChild(createTextSpan("Yellow Threshold: "));
+	const yelIn = document.createElement("input");
+	yelIn.type = "number";
+	yelIn.value = result["AHIBeautifier_Data"][7][1].toLocaleString(undefined, {maximumFractionDigits: 0});
+	yelDiv.appendChild(yelIn);
+	yelIn.classList.add("input-text");
+	yelIn.style.width = "50px";
+	yelIn.addEventListener("input", function(){
+		result["AHIBeautifier_Data"][7][1] = parseFloat(yelIn.value);
+		setEnabledSettings(result);
+	});
+	
+	tile.appendChild(burnDiv);
 	
 	const screenUnpackHeader = document.createElement('h3');
     screenUnpackHeader.appendChild(document.createTextNode("Screen Unpack Exclusions"));
@@ -319,6 +362,261 @@ function setEnabledSettings(result)
 	catch(err)
 	{
 		chrome.storage.local.set(result, function(){console.log("Saved Configuration");});
+	}
+}
+
+export function Calculator_pre(tile, parameters)
+{
+	clearChildren(tile);
+	const calcDiv = document.createElement("div");
+	tile.appendChild(calcDiv);
+	tile.style.display = "flex";
+	tile.style.flexDirection = "row";
+	calcDiv.style.maxHeight = "400px";
+	const output = document.createElement("input");
+	output.classList.add("input-text");
+	output.style.fontSize = "20px";
+	output.readOnly = true;
+	output.style.textAlign = "right";
+	calcDiv.style.display = "flex";
+	calcDiv.style.flexDirection = "column";
+	calcDiv.style.alignItems = "center";
+	calcDiv.style.width = "60%";
+	calcDiv.style.minWidth = "180px";
+	
+	const historyDiv = document.createElement("div");
+	tile.appendChild(historyDiv);
+	historyDiv.style.width = "35%";
+	historyDiv.style.marginTop = "10px";
+	historyDiv.style.display = "block";
+	historyDiv.style.maxHeight = "195px";
+	historyDiv.style.backgroundColor = "rgb(35, 40, 43)";
+	historyDiv.style.borderColor = "rgb(43,72,90)";
+	historyDiv.style.borderWidth = "1px";
+	historyDiv.style.borderStyle = "solid";
+	const historyTable = document.createElement("table");
+	historyDiv.appendChild(historyTable);
+	const historyTableBody = document.createElement("tbody");
+	historyTable.appendChild(historyTableBody);
+	
+	output.style.display = "block";
+	output.style.width = "90%"
+	output.style.height = "36px";
+	output.style.margin = "10px";
+	output.style.cursor = "default";
+	calcDiv.appendChild(output);
+	var currentString = "";
+	var prevValue = null;
+	var currentOperation = null;
+	var clearOnNext = false;
+	var doubleClear = false;
+	const keypad = document.createElement("div");
+	calcDiv.appendChild(keypad);
+	keypad.style.width = "95%";
+	keypad.style.display = "grid";
+	keypad.style.gridTemplateColumns = "repeat(4, 1fr)"
+	const layout = [[7, null], [8, null], [9, null], ["÷", "#3fa2de"], [4, null], [5, null], [6, null], ["x", "#3fa2de"], [1, null], [2, null], [3, null], ["-", "#3fa2de"], [0, null], [".", null], ["±", null], ["+", "#3fa2de"]];
+	layout.forEach(opt => 
+	{
+		const button = document.createElement("button");
+		button.classList.add("refresh-button");
+		button.style.fontSize = "20px";
+		button.textContent = (opt[0] == 0 ? "0" : opt[0] || "").toString();
+		if(opt[1] != null){button.style.backgroundColor = opt[1] as string;}
+		keypad.appendChild(button);
+		
+		button.onclick = function()
+		{
+			if(opt[0] == "+" || opt[0] == "-" || opt[0] == "x" || opt[0] == "÷")
+			{
+				if(currentOperation != null)
+				{
+					currentString = calculate(prevValue, currentString, currentOperation);
+					currentOperation = null;
+					prevValue = null;
+				}
+				currentOperation = opt[0] as any;
+				clearOnNext = true;
+				output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+			}
+			else if(opt[0] == "±")
+			{
+				if(currentString.toString().charAt(0) == "-")
+				{
+					currentString = currentString.substring(1);
+				}
+				else
+				{
+					currentString = "-" + currentString;
+				}
+				output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+			}
+			else
+			{
+				if(clearOnNext){
+					prevValue = parseFloat(currentString) as any;
+					currentString = "";
+					clearOnNext = false;
+				}
+				currentString += (opt[0] == 0 ? "0" : opt[0] || "").toString();
+				output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+			}
+			doubleClear = false;
+		}
+	});
+	const bottomDiv = document.createElement("div");
+	calcDiv.appendChild(bottomDiv);
+	bottomDiv.style.width = "95%";
+	bottomDiv.style.display = "grid";
+	bottomDiv.style.gridTemplateColumns = "repeat(2, 1fr)"
+	const clear = document.createElement("button");
+	bottomDiv.appendChild(clear);
+	clear.textContent = "Clear";
+	clear.classList.add("refresh-button");
+	clear.style.fontSize = "20px";
+	clear.style.backgroundColor = "rgb(217, 83, 79)";
+	clear.onclick = function()
+	{
+		currentString = "" as string;
+		output.value = currentString
+		currentOperation = null as any;
+		prevValue = null as any;
+		clearOnNext = false;
+		if(doubleClear)
+		{
+			clearChildren(historyTableBody);
+		}
+		doubleClear = true;
+	}
+	
+	const enter = document.createElement("button");
+	enter.onclick = function()
+	{
+		if(currentOperation != null)
+		{
+			currentString = calculate(prevValue, currentString, currentOperation);
+			currentOperation = null;
+			prevValue = null;
+		}
+		output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+		const tr = document.createElement("tr");
+		const td = document.createElement("td");
+		td.textContent = output.value;
+		tr.appendChild(td);
+		if(historyTableBody.children.length > 11)
+		{
+			historyTableBody.removeChild(historyTableBody.children[historyTableBody.children.length - 1]);
+		}
+		if(historyTableBody.children.length > 0)
+		{
+			historyTableBody.insertBefore(tr, historyTableBody.firstChild);
+		}
+		else
+		{
+			historyTableBody.appendChild(tr);
+		}
+		doubleClear = false;
+	}
+	bottomDiv.appendChild(enter);
+	enter.textContent = "Enter";
+	enter.classList.add("refresh-button");
+	enter.style.fontSize = "20px";
+	enter.style.backgroundColor = "#5cb85c";
+	
+	tile.addEventListener("keydown", (e) => {
+		if(e.key === "1" || e.key === "2" || e.key === "3" || e.key === "4" || e.key === "5" || e.key === "6" || e.key === "7" || e.key === "8" || e.key === "9" || e.key === "0" || e.key === ".")
+		{
+			if(clearOnNext){
+				prevValue = parseFloat(currentString) as any;
+				currentString = "";
+				clearOnNext = false;
+			}
+			currentString += e.key;
+			output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+		}
+		else if(e.key === "+" || e.key === "-" || e.key === "x" || e.key === "*" || e.key === "/")
+		{
+			if(currentOperation != null)
+			{
+				currentString = calculate(prevValue, currentString, currentOperation);
+				currentOperation = null;
+				prevValue = null;
+			}
+			currentOperation = e.key;
+			clearOnNext = true;
+			output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+		}
+		else if(e.key === "Enter" || e.key === "=")
+		{
+			if(currentOperation != null)
+			{
+				currentString = calculate(prevValue, currentString, currentOperation);
+				currentOperation = null;
+				prevValue = null;
+			}
+			output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+			const tr = document.createElement("tr");
+			const td = document.createElement("td");
+			td.textContent = output.value;
+			tr.appendChild(td);
+			if(historyTableBody.children.length > 11)
+			{
+				historyTableBody.removeChild(historyTableBody.children[historyTableBody.children.length - 1]);
+			}
+			if(historyTableBody.children.length > 0)
+			{
+				historyTableBody.insertBefore(tr, historyTableBody.firstChild);
+			}
+			else
+			{
+				historyTableBody.appendChild(tr);
+			}
+			doubleClear = false;
+		}
+		else if(e.key === "Escape")
+		{
+			currentString = "";
+			output.value = currentString
+			currentOperation = null;
+			prevValue = null;
+			clearOnNext = false;
+			if(doubleClear)
+			{
+				clearChildren(historyTableBody);
+			}
+			doubleClear = true;
+		}
+		else if(e.key === "Backspace")
+		{
+			if(currentString.length > 0)
+			{
+				currentString = currentString.slice(0, -1);
+				output.value = parseFloat(currentString).toLocaleString(undefined, {maximumFractionDigits: 12});
+			}
+		}
+	});
+	
+	return parameters;
+}
+
+function calculate(prevValue, currentString, currentOperation)
+{
+	currentString = parseFloat(currentString);
+	if(currentOperation == "+")
+	{
+		return prevValue + currentString;
+	}
+	else if(currentOperation == "-")
+	{
+		return prevValue - currentString;
+	}
+	else if(currentOperation == "x" || currentOperation == "*")
+	{
+		return prevValue * currentString;
+	}
+	else if(currentOperation == "÷" || currentOperation == "/")
+	{
+		return prevValue / currentString;
 	}
 }
 
@@ -782,7 +1080,7 @@ function financialSort(a, b)
 	return a[3] < b[3] ? 1 : -1;
 }
 
-export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, fullBurn, burnSettings)
+export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, fullBurn, burnSettings, modules, result)
 {
 	clearChildren(tile);
 	var burn;
@@ -791,7 +1089,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		return [apikey, webappID];
+		return [apikey, webappID, modules];
 	}
 	else if(parameters.length == 3 && parameters[1].toLowerCase() == "group")
 	{
@@ -817,8 +1115,6 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		return;
 	}
 	
-	
-	console.log(burn);
 	// Burn data is non-empty
 	tile.id = "pmmg-load-success";
 	var settings;
@@ -926,7 +1222,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	const headRow = document.createElement("tr");
 	head.appendChild(headRow);
 	table.appendChild(head);
-	for(let title of ["Needs", "Production", "Inv", "Burn"])
+	for(let title of ["Needs", "Production", "Inv", "Amt. Needed", "Burn"])
 	{
 		const header = document.createElement("th");
 		header.textContent = title;
@@ -982,11 +1278,11 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		{
 			burnColumn.classList.add("burn-green");
 		}
-		else if(burn <= 3)
+		else if(burn <= result["AHIBeautifier_Data"][7][0])
 		{
 			burnColumn.classList.add("burn-red");
 		}
-		else if(burn <= 6)
+		else if(burn <= result["AHIBeautifier_Data"][7][1])
 		{
 			burnColumn.classList.add("burn-yellow");
 		}
@@ -994,6 +1290,12 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		{
 			burnColumn.classList.add("burn-green");
 		}
+		
+		const needColumn = document.createElement("td");
+		const needAmt = burn > 7 || cons[material] > 0 ? 0 : (burn - result["AHIBeautifier_Data"][7][1]) * cons[material];
+		needColumn.appendChild(createTextSpan(needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
+		
+		row.appendChild(needColumn);
 		row.appendChild(burnColumn);
 		
 	}
@@ -1128,11 +1430,17 @@ export function PRuN_pre(tile)
 	return;
 }
 
-export function Prosperity_pre(tile)
+export function Prosperity_pre(tile, parameters)
 {
 	clearChildren(tile);
+	var url = "https://prosperity-prun.netlify.app/";
+	if(parameters.length == 3)
+	{
+		url += "?from=" + parameters[1] + "&to=" + parameters[2];
+	}
+	
 	const prosp = document.createElement("iframe");
-		prosp.src = "https://prosperity-prun.netlify.app/";
+		prosp.src = url;
 		prosp.width = "100%";
 		prosp.height = "100%";
 		prosp.style.borderWidth = "0";

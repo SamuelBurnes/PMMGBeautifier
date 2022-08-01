@@ -387,8 +387,9 @@ export function sortTable(table: HTMLTableElement, column: number, sortType: str
 	const rows = Array.from(table.children[1].children);
 	for(var i = 0; i < rows.length; i++)
 	{
-		if(rows[i].children[column] == null || rows[i].children[column].firstChild == null){break;}
-		sorter.push([rows[i].children[column].firstChild.textContent, rows[i]);
+		var item = rows[i].children[column];
+		if(item == null || item.firstChild == null){break;}
+		sorter.push([item.firstChild.textContent, rows[i]]);
 	}
 	if(sortType == "alph"){sorter.sort(tableSortAlph);}
 	console.log(sorter);

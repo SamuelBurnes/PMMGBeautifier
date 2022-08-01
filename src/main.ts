@@ -14,7 +14,7 @@ import { ProductionScroll } from "./ProductionScroll";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
-import { CXOSFiltering } from "./CXOSFiltering";
+//import { CXOSFiltering } from "./CXOSFiltering";
 
 
 try
@@ -45,7 +45,10 @@ function mainRun(result)
 	{
 		result["AHIBeautifier_Data"][6] = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];
 	}
-	
+	if(result["AHIBeautifier_Data"][7] == undefined)
+	{
+		result["AHIBeautifier_Data"][7] = [3, 6];
+	}
 	if(result["AHIBeautifier_Data"][3] == true)
 	{
 		const colors = document.createElement("style");
@@ -71,13 +74,12 @@ function mainRun(result)
 		  new ShippingAds(),
 		  new PostLM(prices),
 		  new QueueLoad(),
-		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn),
+		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn, result["AHIBeautifier_Data"][7]),
 		  new FleetETAs(),
 		  new Notifications(),
 		  new ProductionScroll(),
 		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
 		  new CommandCorrecter(),
-		  new CXOSFiltering(),
 		  new Sidebar(result["AHIBeautifier_Data"][6])
 	], result, burn, burnSettings);
 	

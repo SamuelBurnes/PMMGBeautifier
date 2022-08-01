@@ -8,11 +8,13 @@ import {Selector} from "./Selector";
 export class ConsumableTimers implements Module {
 	private burn;
 	private username;
+	private thresholds;
 	
-	constructor(username, burn)
+	constructor(username, burn, thresholds)
 	{
 		this.burn = burn;
 		this.username = username;
+		this.thresholds = thresholds;
 	}
   private tag = "pb-consumable-timers";
   cleanup() {
@@ -25,7 +27,7 @@ export class ConsumableTimers implements Module {
     if (buffers == undefined || buffers == null){return};
 	
 	buffers.forEach(buffer => {
-		generateBurns(buffer, this.burn[this.username]);
+		generateBurns(buffer, this.burn[this.username], this.thresholds);
 	});
 	
 	return;
@@ -33,7 +35,7 @@ export class ConsumableTimers implements Module {
   
   
 }
-export function generateBurns(buffer, burn)
+export function generateBurns(buffer, burn, thresholds)
 {
 	const nameElem = buffer.querySelector(Selector.WorkforceConsumptionTable);
 	
@@ -63,12 +65,12 @@ export function generateBurns(buffer, burn)
 		if(burnAmount != 0)
 		{
 			daysLeft = Math.floor(inventoryAmount / burnAmount);
-			if(daysLeft <= 3)
+			if(daysLeft <= thresholds[0])
 			{
 				if(!outputData.classList.contains("burn-red"))
 					outputData.classList.add("burn-red");
 			}
-			else if(daysLeft <= 6)
+			else if(daysLeft <= thresholds[1])
 			{
 				if(!outputData.classList.contains("burn-yellow"))
 					outputData.classList.add("burn-yellow");

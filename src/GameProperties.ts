@@ -22,7 +22,7 @@ export const RatingColors = {
 	"A": "#f6a204"
 }
 
-export const PlanetCommands = ["ADM", "BSC", "COGC", "COGCPEX", "COGCU", "FLTP", "LR", "LMP", "LM", "PLI", "POPI", "POPR", "PPS", "SHY"];
+export const PlanetCommands = ["ADM", "BSC", "COGC", "COGCPEX", "COGCU", "FLTP", "LR", "LMP", "LM", "PLI", "POPI", "POPR", "PPS", "SHY", "WAR"];
 
 export const PlanetNames = [
 	["GALLUS","AM-783b"],
