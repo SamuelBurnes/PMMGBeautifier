@@ -25,7 +25,6 @@ export class LocalMarketAds implements Module {
 		}
 		else
 		{
-			(element.children[0].children[0] as HTMLElement).style.color = RatingColors[element.children[0].children[0].textContent || "P"];
 			const perItem = toFixed(totalCents / count / 100, 2);
 			
 			priceSpan.appendChild(createTextSpan(` (${perItem} ea)`, this.tag));
@@ -33,5 +32,6 @@ export class LocalMarketAds implements Module {
         
       }
     }
+	return;
   }
 }

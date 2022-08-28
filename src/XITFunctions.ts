@@ -69,8 +69,8 @@ function XITWebRequest(tile, parameters, callbackFunction, url, requestType: str
 	    if(xhr.readyState == XMLHttpRequest.DONE)
 	    {
 			callbackFunction(tile, parameters, xhr.responseText);
-			return;
 		}
+		return;
     };
 	xhr.timeout = 10000;
 	xhr.open(requestType, url, true);
@@ -364,6 +364,7 @@ function setEnabledSettings(result)
 	{
 		chrome.storage.local.set(result, function(){console.log("Saved Configuration");});
 	}
+	return;
 }
 
 export function Calculator_pre(tile, parameters)
@@ -619,6 +620,10 @@ function calculate(prevValue, currentString, currentOperation)
 	{
 		return prevValue / currentString;
 	}
+	else
+	{
+		return 0;
+	}
 }
 
 export function Repairs_pre(tile, parameters, apikey, webappID, username)
@@ -769,6 +774,7 @@ function Repairs_post(tile, parameters, jsondata)
 			generateRepairScreen(body, matDiv, siteData, thresholdInput);
 		});
 	}
+	return;
 }
 
 function generateRepairScreen(body, matDiv, siteData, thresholdInput)
@@ -973,6 +979,7 @@ function Chat_post(chatDiv, parameters, jsondata)
 				break;
 		}
 	});
+	return;
 }
 
 export function Fin_pre(tile, parameters, apikey, webappID)
@@ -1074,6 +1081,7 @@ function Fin_post(tile, parameters, jsondata)
 	}
 	
 	tile.appendChild(table);
+	return;
 }
 
 function financialSort(a, b)
@@ -1370,6 +1378,7 @@ function UpdateBurn(table, dispSettings)
 			row.style.height = dispSettings[0] ? "auto" : "0px";
 		}
 	});
+	return;
 }
 
 function CategorySort(a, b)
@@ -1393,6 +1402,7 @@ export function SheetTable_pre(tile, parameters, apikey, webappID)
 	}
 	
 	XITWebRequest(tile, parameters, SheetTable_post, url, "GET", undefined, undefined);
+	return;
 }
 
 function createSettingsButton(text, width, toggled, f)
@@ -1477,6 +1487,7 @@ function SheetTable_post(tile, parameters, jsondata)
 	}
 	
 	tile.appendChild(table);
+	return;
 }
 
 export function Contracts_pre(tile, parameters, apikey, webappID, username)

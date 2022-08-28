@@ -89,6 +89,7 @@ export class Notifications implements Module {
 	  });
       
     }
+	return;
   }
 }
 

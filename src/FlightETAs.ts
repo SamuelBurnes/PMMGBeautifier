@@ -21,5 +21,6 @@ export class FlightETAs implements Module {
 		  }
 		})
 	}
+	return;
   }
 }

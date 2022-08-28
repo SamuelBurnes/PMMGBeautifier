@@ -36,5 +36,6 @@ export class ShippingAds implements Module {
         priceSpan.appendChild(createTextSpan(` (${perItem}/${unit})`, this.tag));
       }
     }
+	return;
   }
 }
