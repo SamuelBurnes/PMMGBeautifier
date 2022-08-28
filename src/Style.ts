@@ -15,7 +15,11 @@ export const Style = {
   SidebarButton: ["GHCPyjs3bxhb+WZ2BGLWHw=="],
   ContractLine: ["y84EUI8gCP-SV91X7vIihQ==", "fVd3aYJhFY-uuaH+QTByhA=="],
   ContractName: ["zhixp408YF082IzA5KPvfA=="],
-  ContractView: ["kq5BrGKnTUTqCDYMpLQ90g=="]
+  ContractView: ["kq5BrGKnTUTqCDYMpLQ90g=="],
+  SettingsButton: ["A0Raxt0yS41ZQlnzmEvusg==", "ncHrIDsxNKH8LbMDigUiRg=="],
+  SettingsBarUntoggled: ["Z9jYD8LyLZoBPb7JsART1w==", "P6Arba53I7cRvxiH0-pDQg=="],
+  SettingsBarToggled: ["Z9jYD8LyLZoBPb7JsART1w==", "P6Arba53I7cRvxiH0-pDQg==", "V-75tb03enGVdcB+Sw-mRA==", "vKkB0W7jATtd8dSzgOYEKQ=="],
+  SettingsText: ["YGSoqZwqkaG2CVltxMwoOw==", "fTT52i+1oFauxHOjVfGTww==", "kWTH1-HkYCWeYyDRgZ7ozQ==", "P3sSQkCRUgkpmKUgieJQvg=="]
 }
 
 export const WithStyles = (...style: string[][]): string[] => {
@@ -66,7 +70,40 @@ export const CategoryColors = {
 	"utility": ["linear-gradient(135deg, rgb(161, 148, 136), rgb(186, 173, 161))", "rgb(255, 255, 255)"],
 }
 
-export const PMMGStyle = `.title {
+export const PMMGStyle = `
+.tooltip .tooltip-text {
+	visibility: hidden;
+	color: #fff;
+	text-align: left;
+	padding = 0;
+	border-radius: 5px;
+	opacity: 0;
+	transition: opacity 0.3s;
+	max-height: 0;
+	margin-top: -13px;
+	padding-left: 20px; 
+	left: 105%;
+	position: relative;
+	width: 1000px;
+}
+
+.tooltip:hover .tooltip-text{
+	visibility: visible;
+	opacity: 1;
+	padding = 5px;
+}
+
+.tooltip .tooltip-text::after {
+	content: " ";
+	position: absolute;
+	top: 50%;
+	right: 99%;
+	border-width: 5px;
+	border-style: solid;
+	border-color: transparent white transparent transparent;
+}
+
+.title {
 	font-weight: bold;
 	display: block;
 	font-size: 16px;
@@ -217,6 +254,18 @@ export const PMMGStyle = `.title {
 	padding: 0 !important;
 	margin: 0 !important;
 	font-size: 0px !important;
+}
+.button-upper-right{
+	background-color: transparent;
+	color: #bbb;
+	cursor: pointer;
+	display: block;
+	font-size: 24px !important;
+	margin-top: -8px;
+}
+.button-upper-right:hover{
+	color: #000 !important;
+	background-color: rgb(247, 166, 0);
 }`;
 
 export const EnhancedColors = `/* consumables (luxury) */

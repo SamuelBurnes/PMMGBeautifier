@@ -14,7 +14,8 @@ import { ProductionScroll } from "./ProductionScroll";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
-//import { CXOSFiltering } from "./CXOSFiltering";
+import { CalculatorButton } from "./CalculatorButton";
+import { ContractDrafts } from "./ContractDrafts";
 
 
 try
@@ -49,6 +50,10 @@ function mainRun(result)
 	{
 		result["AHIBeautifier_Data"][7] = [3, 6];
 	}
+	if(result["AHIBeautifier_Data"][8] == undefined)
+	{
+		result["AHIBeautifier_Data"][8] = {};
+	}
 	if(result["AHIBeautifier_Data"][3] == true)
 	{
 		const colors = document.createElement("style");
@@ -57,7 +62,6 @@ function mainRun(result)
 		colors.textContent = EnhancedColors;
 		if(doc != null){doc.appendChild(colors);}
 	}
-	
 	var prices = {};
 	getPrices(prices, result["AHIBeautifier_Data"][2]);
 	
@@ -73,6 +77,7 @@ function mainRun(result)
 		  new FlightETAs(),
 		  new ShippingAds(),
 		  new PostLM(prices),
+		  new ContractDrafts(prices),
 		  new QueueLoad(),
 		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn, result["AHIBeautifier_Data"][7]),
 		  new FleetETAs(),
@@ -80,6 +85,7 @@ function mainRun(result)
 		  new ProductionScroll(),
 		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
 		  new CommandCorrecter(),
+		  new CalculatorButton(),
 		  new Sidebar(result["AHIBeautifier_Data"][6])
 	], result, burn, burnSettings);
 	

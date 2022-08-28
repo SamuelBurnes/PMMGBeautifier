@@ -29,5 +29,8 @@ export const Selector = {
   TransferField: "div[class~='xuy2wpBCdzgc8G3w3AlXTw==']",
   LeftSidebar: "TOUR_TARGET_SIDEBAR_LEFT_02",
   BufferArea: "div[class~='ZaphVV+fyaIiLCJyBCsZCA==']",
-  CXOSTable: "div[class~='gecI5uGBluvjP5GCRk3dHA==']"
+  CXOSTable: "div[class~='gecI5uGBluvjP5GCRk3dHA==']", // Be warned, not unique to CXOS Table!
+  ScreenName: "span[class~='IuXoporrDf7qxIl-mkNWhA==']",
+  ContDForm: "div[class~='TIGJheNilTzuChc8+0E38A==']",
+  ConditionEditor: "div[class~='NLOrH7hF5fbKIesqW3uSkA==']"
 }

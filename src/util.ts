@@ -140,11 +140,11 @@ export function findCorrespondingPlanet(planet, data)
 {
 	for(var i = 0; i < data.length; i++)
 	{
-		if(data[i]["PlanetNaturalId"] == planet)
+		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase())
 		{
 			return data[i];
 		}
-		else if(data[i]["PlanetName"] == planet)
+		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase())
 		{
 			return data[i];
 		}

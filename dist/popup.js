@@ -13,6 +13,7 @@ var colors;
 var sidebarSettings;
 var exclusionSettings;
 var hotkeySettings;
+var resultFull;
 
 try
 {
@@ -60,14 +61,18 @@ function OnConfigure_Click()
 	if(newApikey != ""){apikey = newApikey;}
 	if(newWebappID != ""){webappID = newWebappID;}
 	
+	resultFull["AHIBeautifier_Data"][0] = newName;
+	resultFull["AHIBeautifier_Data"][1] = newApikey;
+	resultFull["AHIBeautifier_Data"][2] = newWebappID;
+	
 	try
 	{
-		browser.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings, exclusionSettings, hotkeySettings]});
+		browser.storage.local.set({"AHIBeautifier_Data" : resultFull["AHIBeautifier_Data"]});
 		browser.storage.local.get("AHIBeautifier_Data").then(setDisplayedValues, onError);
 	}
 	catch(err)
 	{
-		chrome.storage.local.set({"AHIBeautifier_Data" : [name, apikey, webappID, colors, sidebarSettings, exclusionSettings, hotkeySettings]}, function(){console.log("Saved Configuration");});
+		chrome.storage.local.set({"AHIBeautifier_Data" : resultFull["AHIBeautifier_Data"]}, function(){console.log("Saved Configuration");});
 		chrome.storage.local.get(["AHIBeautifier_Data"], function(result){
 		setDisplayedValues(result);
 		});
@@ -78,6 +83,7 @@ function OnConfigure_Click()
 
 function setDisplayedValues(result)
 {
+	resultFull = result;
 	if(result["AHIBeautifier_Data"] == null){
 		name = undefined;
 		apikey = undefined;

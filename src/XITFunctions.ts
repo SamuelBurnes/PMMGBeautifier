@@ -3,6 +3,7 @@ import {TextColors} from "./Style";
 import {MaterialNames} from "./GameProperties";
 import {getGroupBurn} from "./BackgroundRunner";
 import {Style, WithStyles} from "./Style";
+import {Selector} from "./Selector";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -1216,8 +1217,40 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 			inv[material["MaterialTicker"]] += material["MaterialAmount"]; 
 		}
 	}
+	const screenNameElem = document.querySelector(Selector.ScreenName);
+	const screenName = screenNameElem ? screenNameElem.textContent : "";
+	const dispSettings = result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] || [1, 1, 1, 1];
 	
 	const table = document.createElement("table");
+	const settingsDiv = document.createElement("div");
+	settingsDiv.style.display = "flex";
+	tile.appendChild(settingsDiv);
+	settingsDiv.appendChild(createSettingsButton("RED", 22.025, dispSettings[0], function(){
+		dispSettings[0] = dispSettings[0] ? 0 : 1;
+		UpdateBurn(table, dispSettings);
+		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
+		setEnabledSettings(result);
+	}));
+	settingsDiv.appendChild(createSettingsButton("YELLOW", 40.483, dispSettings[1], function(){
+		dispSettings[1] = dispSettings[1] ? 0 : 1;
+		UpdateBurn(table, dispSettings);
+		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
+		setEnabledSettings(result);
+	}));
+	settingsDiv.appendChild(createSettingsButton("GREEN", 34.65, dispSettings[2], function(){
+		dispSettings[2] = dispSettings[2] ? 0 : 1;
+		UpdateBurn(table, dispSettings);
+		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
+		setEnabledSettings(result);
+	}));
+	settingsDiv.appendChild(createSettingsButton("INF", 19.6, dispSettings[3], function(){
+		dispSettings[3] = dispSettings[3] ? 0 : 1;
+		UpdateBurn(table, dispSettings);
+		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
+		setEnabledSettings(result);
+	}));
+	
+	
 	const head = document.createElement("thead");
 	const headRow = document.createElement("tr");
 	head.appendChild(headRow);
@@ -1277,6 +1310,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		if(cons[material] >= 0)
 		{
 			burnColumn.classList.add("burn-green");
+			burnColumn.classList.add("burn-infinite");
 		}
 		else if(burn <= result["AHIBeautifier_Data"][7][0])
 		{
@@ -1292,16 +1326,50 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		}
 		
 		const needColumn = document.createElement("td");
-		const needAmt = burn > 7 || cons[material] > 0 ? 0 : (burn - result["AHIBeautifier_Data"][7][1]) * cons[material];
+		const needAmt = burn > result["AHIBeautifier_Data"][7][1] || cons[material] > 0 ? 0 : (burn - result["AHIBeautifier_Data"][7][1]) * cons[material];
 		needColumn.appendChild(createTextSpan(needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
 		
 		row.appendChild(needColumn);
 		row.appendChild(burnColumn);
 		
 	}
-	
+	UpdateBurn(table, dispSettings);
 	tile.appendChild(table);
 	return;
+}
+
+function UpdateBurn(table, dispSettings)
+{
+	(Array.from(table.children[1].children) as HTMLElement[]).forEach(row => {
+		if(row.children[5].classList.contains("burn-infinite"))
+		{
+			row.style.display = dispSettings[3] ? "table-row" :"flex";
+			row.style.visibility = dispSettings[3] ? "visible" : "hidden";
+			row.style.width = dispSettings[3] ? "auto" : "0px";
+			row.style.height = dispSettings[3] ? "auto" : "0px";
+		}
+		else if(row.children[5].classList.contains("burn-green"))
+		{
+			row.style.display = dispSettings[2] ? "table-row" :"flex";
+			row.style.visibility = dispSettings[2] ? "visible" : "hidden";
+			row.style.width = dispSettings[2] ? "auto" : "0px";
+			row.style.height = dispSettings[2] ? "auto" : "0px";
+		}
+		else if(row.children[5].classList.contains("burn-yellow"))
+		{
+			row.style.display = dispSettings[1] ? "table-row" :"flex";
+			row.style.visibility = dispSettings[1] ? "visible" : "hidden";
+			row.style.width = dispSettings[1] ? "auto" : "0px";
+			row.style.height = dispSettings[1] ? "auto" : "0px";
+		}
+		else if(row.children[5].classList.contains("burn-red"))
+		{
+			row.style.display = dispSettings[0] ? "table-row" :"flex";
+			row.style.visibility = dispSettings[0] ? "visible" : "hidden";
+			row.style.width = dispSettings[0] ? "auto" : "0px";
+			row.style.height = dispSettings[0] ? "auto" : "0px";
+		}
+	});
 }
 
 function CategorySort(a, b)
@@ -1325,6 +1393,44 @@ export function SheetTable_pre(tile, parameters, apikey, webappID)
 	}
 	
 	XITWebRequest(tile, parameters, SheetTable_post, url, "GET", undefined, undefined);
+}
+
+function createSettingsButton(text, width, toggled, f)
+{
+	const button = document.createElement("span");
+	const bar = document.createElement("div");
+	if(toggled)
+	{
+		bar.classList.add(...Style.SettingsBarToggled);
+	}
+	else
+	{
+		bar.classList.add(...Style.SettingsBarUntoggled);
+	}
+	const textBox = document.createElement("div");
+	textBox.classList.add(...Style.SettingsText);
+	textBox.textContent = text;
+	button.classList.add(...Style.SettingsButton);
+	bar.style.width = width + "px";
+	bar.style.maxWidth = width + "px";
+	button.appendChild(bar);
+	button.appendChild(textBox);
+	button.addEventListener("click", function() {
+		if(toggled)
+		{
+			bar.classList.remove(...Style.SettingsBarToggled);
+			bar.classList.add(...Style.SettingsBarUntoggled);
+			toggled = false;
+		}
+		else
+		{
+			bar.classList.remove(...Style.SettingsBarUntoggled);
+			bar.classList.add(...Style.SettingsBarToggled);
+			toggled = true;
+		}
+		f();
+	});
+	return button;
 }
 
 function SheetTable_post(tile, parameters, jsondata)
@@ -1402,12 +1508,31 @@ function Contracts_post(tile, parameters, jsondata)
 	tile.appendChild(pendingDiv);
 	const seenContracts = [] as string[];
 	contractData.forEach(contract => {
-		if(contract["Status"] === "FULFILLED" || contract["Status"] === "BREACHED"){return;}
+		if(contract["Status"] === "FULFILLED" || contract["Status"] === "BREACHED" || contract["Status"] === "TERMINATED" || contract["Status"] === "CANCELLED" || contract["Status"] === "REJECTED"){return;}
 		if(seenContracts.includes(contract["ContractLocalId"])){return;}
+		console.log(contract);
 		const line = document.createElement("div");
 		line.classList.add(...Style.ContractLine);
 		const contractName = createTextSpan(contract["ContractLocalId"]);
 		contractName.classList.add(...Style.ContractName);
+		contractName.classList.add("tooltip");
+		const tooltip = document.createElement("div");
+		tooltip.classList.add("tooltip-text");
+		var contText = "";
+		if(contract["Conditions"].length == 2)
+		{
+			contText += "Buying " + (contract["Conditions"][0]["MaterialAmount"] || contract["Conditions"][1]["MaterialAmount"]) + " " + (contract["Conditions"][0]["MaterialTicker"] || contract["Conditions"][1]["MaterialTicker"]) + " with " + contract["PartnerName"];
+		}
+		else if(contract["Conditions"].length == 3)
+		{
+			contText += "Selling " + (contract["Conditions"][0]["MaterialAmount"] || contract["Conditions"][1]["MaterialAmount"]) + " " + (contract["Conditions"][0]["MaterialTicker"] || contract["Conditions"][1]["MaterialTicker"]) + " with " + contract["PartnerName"];
+		}
+		else if(contract["Conditions"].length == 4)
+		{
+			contText += "Shipping with " + contract["PartnerName"];
+		}
+		tooltip.textContent = contText;
+		contractName.appendChild(tooltip);
 		line.appendChild(contractName);
 		seenContracts.push(contract["ContractLocalId"]);
 		const contractView = createLink("view", "CONT " + contract["ContractLocalId"]);
