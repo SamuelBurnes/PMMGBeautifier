@@ -68,6 +68,7 @@ export const CategoryColors = {
 	"software systems": ["linear-gradient(135deg, rgb(60, 53, 5), rgb(85, 78, 30))", "rgb(187, 180, 132)"],
 	"ship kits": ["linear-gradient(135deg, rgb(154, 84, 0), rgb(178, 109, 25))", "rgb(255, 211, 127)"],
 	"utility": ["linear-gradient(135deg, rgb(161, 148, 136), rgb(186, 173, 161))", "rgb(255, 255, 255)"],
+	"shipment": ["linear-gradient(135deg, #030303, #181818)", "#7f7f7f"]
 }
 
 export const PMMGStyle = `
@@ -260,7 +261,7 @@ export const PMMGStyle = `
 	color: #bbb;
 	cursor: pointer;
 	display: block;
-	font-size: 24px !important;
+	font-size: 24px;
 	margin-top: -8px;
 }
 .button-upper-right:hover{

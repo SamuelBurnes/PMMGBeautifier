@@ -14,7 +14,7 @@ export class CalculatorButton implements Module {
 			const calcDiv = document.createElement("div");
 			calcDiv.classList.add(this.tag);
 			calcDiv.classList.add("button-upper-right");
-			(buffer.children[3] || buffer.children[2]).insertBefore(calcDiv, (buffer.children[3] || buffer.children[2]).firstChild);
+			(buffer.children[3] || buffer.children[2]).insertBefore(calcDiv, ((buffer.children[3] || buffer.children[2]).firstChild as HTMLElement).id == "refresh" ? (buffer.children[3] || buffer.children[2]).children[1] : (buffer.children[3] || buffer.children[2]).firstChild);
 			calcDiv.appendChild(createTextSpan("🖩", this.tag));
 			calcDiv.addEventListener("click", function(){showBuffer("XIT CALCULATOR");});
 		});

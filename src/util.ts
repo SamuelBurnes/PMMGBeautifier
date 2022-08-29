@@ -178,9 +178,9 @@ export function parseBaseName(text)
 
 export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false, small: boolean = false)
 {
-	if(MaterialNames[ticker] == undefined){return null;}
-	const name = MaterialNames[ticker][0];	// GIVES AN ERROR IF SHIPMENT PRESENT
-	const category = MaterialNames[ticker][1];
+	if(MaterialNames[ticker] == undefined && ticker != "SHPT"){return null;}
+	const name = (MaterialNames[ticker] || ["Shipment"])[0];
+	const category = (MaterialNames[ticker] || [undefined, "shipment"])[1];
 	const totalPicture = document.createElement("div");
 	totalPicture.classList.add("T5C45pTOW9QTzokWPqLQJg==");
 	if(small)
@@ -337,13 +337,6 @@ export function genericCleanup(className: string = "prun-remove-js") {
 export function toFixed(value: number, precision: number = 2) {
   const power = Math.pow(10, precision || 0);
   return Math.round(value * power) / power;
-}
-
-// Return only 1 matching buffer (supplanted by getBuffers)
-export function getBuffer(bufferCode: string): HTMLElement {
-  return document.evaluate(
-    `//div[@class='${Selector.BufferHeader}'][starts-with(., '${bufferCode}')]/../..`,
-    document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLElement;
 }
 
 // Return all matching buffers

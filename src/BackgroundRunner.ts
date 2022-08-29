@@ -24,8 +24,8 @@ export function getPrices(prices, webappID)
 			{
 				console.log("Bad Data from Web App");
 			}
-			return;
 		}
+		return;
     };
     
 	xhr.timeout = 10000;
@@ -63,8 +63,8 @@ export function getBurn(burn, username, apikey)
 				console.log("Bad Data from FIO");
 				burn[username] = undefined;
 			}
-			return;
 		}
+		return;
     };
     
 	xhr.timeout = 20000;
@@ -104,8 +104,8 @@ export function getGroupBurn(burn, groupid, apikey)
 				console.log("Bad Data from FIO");
 				burn[groupid] = undefined;
 			}
-			return;
 		}
+		return;
     };
     
 	xhr.timeout = 20000;
@@ -143,8 +143,8 @@ export function getBurnSettings(burnSettings, username, apikey)
 				console.log("Bad Data from FIO");
 				console.log(xhr.responseText);
 			}
-			return;
 		}
+		return;
     };
     
 	xhr.timeout = 10000;

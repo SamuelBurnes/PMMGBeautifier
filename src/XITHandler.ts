@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers} from "./util";
+import {getBuffers, createTextSpan} from "./util";
 import {Selector} from "./Selector";
 import {XITPreFunctions, XITBufferTitles} from "./XITFunctions";
 
@@ -38,7 +38,7 @@ export class XITHandler implements Module {
 		if(tile == null){tile = buffer.querySelector(Selector.XITTileFloat) as HTMLElement;}
 		if(tile == null || tile == undefined){return;}
 		
-		if(tile.children[1] != undefined && tile.children[1].id == "pmmg-load-success"){return;}
+		if(tile.firstChild != undefined && (tile.firstChild as HTMLElement).id == "pmmg-load-success"){return;}
 		
 		const parametersRaw = Array.from(buffer.getElementsByClassName(Selector.BufferHeader))[0].textContent;
 		if(parametersRaw == undefined || parametersRaw == null) return;
@@ -56,24 +56,18 @@ export class XITHandler implements Module {
 		}
 		if(parameters == undefined || parameters == null) return;
 		
-		if(tile.children[1] != undefined && tile.children[1].id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.children[1], parameters, this.apikey, this.webappID, this.username, burn, burnSettings, this.modules, this.result);return;}
+		if(tile.firstChild != undefined && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.apikey, this.webappID, this.username, burn, burnSettings, this.modules, this.result);return;}
 		
 		tile.classList.add("xit-tile");
 		
-		const topDiv = document.createElement("div");
-		topDiv.style.display = "block";
-		topDiv.style.width = "100%";
-		topDiv.classList.add(this.tag);
-		
-		
-		tile.appendChild(topDiv);
-		
-		const refreshButton = document.createElement("button");
-			refreshButton.textContent = "⟳";
-			refreshButton.classList.add("refresh-button");
-			
-		topDiv.appendChild(refreshButton);
-		
+		const refreshButton = document.createElement("div");
+			refreshButton.appendChild(createTextSpan("⟳"));
+			refreshButton.classList.add("button-upper-right");
+			refreshButton.classList.add(this.tag);
+			refreshButton.style.fontSize = "16px";
+			refreshButton.style.paddingTop = "12px";
+			refreshButton.id = "refresh";
+			(buffer.children[3] || buffer.children[2]).insertBefore(refreshButton, (buffer.children[3] || buffer.children[2]).firstChild);
 		
 		const contentDiv = document.createElement("div");
 			contentDiv.style.height = "100%";
@@ -95,7 +89,7 @@ export class XITHandler implements Module {
 			const modules = this.modules;
 			var result = this.result;
 			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, apikey, webappID, username, burn, burnSettings, modules, result);});
-			tile.children[1].id = "pmmg-load-success";
+			(tile.firstChild as HTMLElement).id = "pmmg-load-success";
 			preFunc(contentDiv, parameters, this.apikey, this.webappID, username, burn, burnSettings, modules, this.result);
 		}
 		return;
