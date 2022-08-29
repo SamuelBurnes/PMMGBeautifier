@@ -1510,6 +1510,17 @@ function Contracts_post(tile, parameters, jsondata)
 		tile.textContent = "Error! Could Not Load Data!";
 		return;
 	}
+	
+	const validContracts = [] as any[];
+	contractData.forEach(contract => {
+		if(!(contract["Status"] === "FULFILLED" || contract["Status"] === "BREACHED" || contract["Status"] === "TERMINATED" || contract["Status"] === "CANCELLED" || contract["Status"] === "REJECTED"))
+		{
+			validContracts.push(contract);
+		}
+		return;
+	});
+	validContracts.sort(ContractSort);
+	
 	const buyHeader = document.createElement("h3");
 	buyHeader.appendChild(document.createTextNode("Buying"));
 	buyHeader.classList.add(...Style.SidebarSectionHead);
@@ -1532,19 +1543,28 @@ function Contracts_post(tile, parameters, jsondata)
 	buyTable.appendChild(buyBody);
 	
 	var seenContracts = [] as string[];
-	contractData.forEach(contract => {
-		if(contract["Status"] === "FULFILLED" || contract["Status"] === "BREACHED" || contract["Status"] === "TERMINATED" || contract["Status"] === "CANCELLED" || contract["Status"] === "REJECTED"){return;}
+	validContracts.forEach(contract => {
 		if(seenContracts.includes(contract["ContractLocalId"])){return;}
 		
-		const offset = contract["Conditions"].length - 2;
 		if((contract["Conditions"].length == 2 && contract["Party"] === "PROVIDER") || (contract["Conditions"].length == 3 && contract["Party"] === "CUSTOMER"))
 		{
+			const conditions = [] as any[];
+			for(let condType of [contract["Conditions"].length == 2 ? "DELIVERY" : "PROVISION", "PAYMENT", "COMEX_PURCHASE_PICKUP"])
+			{
+				contract["Conditions"].forEach(condition => {
+					if(condition["Type"] === condType)
+					{
+						conditions.push(condition);
+						return;
+					}
+				});
+			}
 			const line = document.createElement("tr");
 			buyBody.appendChild(line);
 			const materialColumn = document.createElement("td");
 			materialColumn.style.width = "32px";
 			materialColumn.style.paddingLeft = "10px";
-			const matElem = createMaterialElement(contract["Conditions"][1 + offset]["MaterialTicker"], "prun-remove-js", contract["Conditions"][1 + offset]["MaterialAmount"], false, true);
+			const matElem = createMaterialElement(conditions[0]["MaterialTicker"], "prun-remove-js", conditions[0]["MaterialAmount"], false, true);
 			if(matElem){materialColumn.appendChild(matElem);}
 			line.appendChild(materialColumn);
 			const nameColumn = document.createElement("td");
@@ -1555,27 +1575,28 @@ function Contracts_post(tile, parameters, jsondata)
 			line.appendChild(partnerColumn);
 			const pendingColumn = document.createElement("td");
 			const pendingCheck = createTextSpan("⬤");
-			pendingCheck.style.color = contract["Conditions"][offset]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+			pendingCheck.style.color = conditions[1]["Status"] === "FULFILLED" && (!conditions[2] || conditions[2]["Status"] === "FULFILLED")? TextColors.Success : TextColors.Failure;
 			pendingCheck.style.fontWeight = "bold";
 			pendingColumn.style.textAlign = "center";
 			pendingColumn.appendChild(pendingCheck);
 			line.appendChild(pendingColumn);
 			const provColumn = document.createElement("td");
-			const provCheck = createTextSpan(contract["Conditions"][1 + offset]["Status"] === "FULFILLED" ? "✓" : "X");
-			provCheck.style.color = contract["Conditions"][1 + offset]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
+			const provCheck = createTextSpan(conditions[0]["Status"] === "FULFILLED" ? "✓" : "X");
+			provCheck.style.color = conditions[0]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
 			provCheck.style.fontWeight = "bold";
 			provColumn.style.textAlign = "center";
 			provColumn.appendChild(provCheck);
 			line.appendChild(provColumn);
 			const payColumn = document.createElement("td");
-			const payCheck = createTextSpan(contract["Conditions"][1 + offset]["Status"] === "FULFILLED" ? "✓" : "X");
-			payCheck.style.color = contract["Conditions"][1 + offset]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+			const payCheck = createTextSpan(conditions[1]["Status"] === "FULFILLED" ? "✓" : "X");
+			payCheck.style.color = conditions[1]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 			payCheck.style.fontWeight = "bold";
 			payColumn.style.textAlign = "center";
 			payColumn.appendChild(payCheck);
 			line.appendChild(payColumn);
 			const pickUp = document.createElement("td");
-			const pickUpCheck = createTextSpan(offset == 1 ? (contract["Conditions"][2]["Status"] === "FULFILLED" ? "✓" : "X") : "");
+			const pickUpCheck = createTextSpan(conditions.length == 3 ? (conditions[2]["Status"] === "FULFILLED" ? "✓" : "X") : "");
+			pickUpCheck.style.color = conditions[2] == undefined || conditions[2]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 			pickUpCheck.style.fontWeight = "bold";
 			pickUp.style.textAlign = "center";
 			pickUp.appendChild(pickUpCheck);
@@ -1606,20 +1627,29 @@ function Contracts_post(tile, parameters, jsondata)
 	sellTable.appendChild(sellBody);
 	
 	seenContracts = [] as string[];
-	contractData.forEach(contract => {
-		if(contract["Status"] === "FULFILLED" || contract["Status"] === "BREACHED" || contract["Status"] === "TERMINATED" || contract["Status"] === "CANCELLED" || contract["Status"] === "REJECTED"){return;}
+	validContracts.forEach(contract => {
 		if(seenContracts.includes(contract["ContractLocalId"])){return;}
 		
-		const offset = contract["Conditions"].length - 2;
 		if((contract["Conditions"].length == 2 && contract["Party"] === "CUSTOMER") || (contract["Conditions"].length == 3 && contract["Party"] === "PROVIDER"))
 		{
+			const conditions = [] as any[];
+			for(let condType of [contract["Conditions"].length == 2 ? "DELIVERY" : "PROVISION", "PAYMENT", "COMEX_PURCHASE_PICKUP"])
+			{
+				contract["Conditions"].forEach(condition => {
+					if(condition["Type"] === condType)
+					{
+						conditions.push(condition);
+						return;
+					}
+				});
+			}
 			
 			const line = document.createElement("tr");
 			sellBody.appendChild(line);
 			const materialColumn = document.createElement("td");
 			materialColumn.style.width = "32px";
 			materialColumn.style.paddingLeft = "10px";
-			const matElem = createMaterialElement(contract["Conditions"][0]["MaterialTicker"], "prun-remove-js", contract["Conditions"][0]["MaterialAmount"], false, true);
+			const matElem = createMaterialElement(conditions[0]["MaterialTicker"], "prun-remove-js", conditions[0]["MaterialAmount"], false, true);
 			if(matElem){materialColumn.appendChild(matElem);}
 			line.appendChild(materialColumn);
 			const nameColumn = document.createElement("td");
@@ -1630,28 +1660,28 @@ function Contracts_post(tile, parameters, jsondata)
 			line.appendChild(partnerColumn);
 			const pendingColumn = document.createElement("td");
 			const pendingCheck = createTextSpan("⬤");
-			pendingCheck.style.color = contract["Conditions"][2 * offset]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+			pendingCheck.style.color = conditions[0]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 			pendingCheck.style.fontWeight = "bold";
 			pendingColumn.style.textAlign = "center";
 			pendingColumn.appendChild(pendingCheck);
 			line.appendChild(pendingColumn);
 			const provColumn = document.createElement("td");
-			const provCheck = createTextSpan(contract["Conditions"][offset]["Status"] === "FULFILLED" ? "✓" : "X");
-			provCheck.style.color = contract["Conditions"][offset]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
+			const provCheck = createTextSpan(conditions[0]["Status"] === "FULFILLED" ? "✓" : "X");
+			provCheck.style.color = conditions[0]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
 			provCheck.style.fontWeight = "bold";
 			provColumn.style.textAlign = "center";
 			provColumn.appendChild(provCheck);
 			line.appendChild(provColumn);
 			const payColumn = document.createElement("td");
-			const payCheck = createTextSpan(contract["Conditions"][1]["Status"] === "FULFILLED" ? "✓" : "X");
-			payCheck.style.color = contract["Conditions"][1]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+			const payCheck = createTextSpan(conditions[1]["Status"] === "FULFILLED" ? "✓" : "X");
+			payCheck.style.color = conditions[1]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 			payCheck.style.fontWeight = "bold";
 			payColumn.style.textAlign = "center";
 			payColumn.appendChild(payCheck);
 			line.appendChild(payColumn);
 			const pickUp = document.createElement("td");
-			const pickUpCheck = createTextSpan(offset == 1 ? (contract["Conditions"][2]["Status"] === "FULFILLED" ? "✓" : "X") : "");
-			pickUpCheck.style.color = offset == 1 ? (contract["Conditions"][2]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure) : TextColors.Standard;
+			const pickUpCheck = createTextSpan(conditions.length == 3 ? (conditions[2]["Status"] === "FULFILLED" ? "✓" : "X") : "");
+			pickUpCheck.style.color = conditions.length == 3 ? (conditions[2]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure) : TextColors.Standard;
 			pickUpCheck.style.fontWeight = "bold";
 			pickUp.style.textAlign = "center";
 			pickUp.appendChild(pickUpCheck);
@@ -1682,8 +1712,7 @@ function Contracts_post(tile, parameters, jsondata)
 	shipTable.appendChild(shipBody);
 	
 	seenContracts = [] as string[];
-	contractData.forEach(contract => {
-		if(contract["Status"] === "FULFILLED" || contract["Status"] === "BREACHED" || contract["Status"] === "TERMINATED" || contract["Status"] === "CANCELLED" || contract["Status"] === "REJECTED"){return;}
+	validContracts.forEach(contract => {
 		if(seenContracts.includes(contract["ContractLocalId"])){return;}
 		
 		if(contract["Conditions"].length == 4)
@@ -1753,6 +1782,11 @@ function Contracts_post(tile, parameters, jsondata)
 		}
 	});
 	return parameters;
+}
+
+function ContractSort(a, b)
+{
+	return a["DueDateEpochMs"] > b["DueDateEpochMs"] ? 1 : -1;
 }
 
 export function PRuN_pre(tile)
