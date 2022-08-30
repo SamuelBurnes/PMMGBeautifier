@@ -1667,7 +1667,7 @@ function Contracts_post(tile, parameters, jsondata)
 			line.appendChild(pendingColumn);
 			const provColumn = document.createElement("td");
 			const provCheck = createTextSpan(conditions[0]["Status"] === "FULFILLED" ? "✓" : "X");
-			provCheck.style.color = conditions[0]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
+			provCheck.style.color = conditions[0]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 			provCheck.style.fontWeight = "bold";
 			provColumn.style.textAlign = "center";
 			provColumn.appendChild(provCheck);
