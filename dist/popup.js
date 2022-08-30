@@ -33,7 +33,7 @@ function OnClear_Click()
 	name = undefined;
 	apikey = undefined;
 	webappID = undefined;
-	colors = false;
+	colors = true;
 	sidebarSettings = [];
 	exclusionSettings = [];
 	hotkeySettings = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];
@@ -61,6 +61,10 @@ function OnConfigure_Click()
 	if(newApikey != ""){apikey = newApikey;}
 	if(newWebappID != ""){webappID = newWebappID;}
 	
+	if(!resultFull["AHIBeautifier_Data"])
+	{
+		resultFull["AHIBeautifier_Data"] = [];
+	}
 	resultFull["AHIBeautifier_Data"][0] = newName;
 	resultFull["AHIBeautifier_Data"][1] = newApikey;
 	resultFull["AHIBeautifier_Data"][2] = newWebappID;

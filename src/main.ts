@@ -40,7 +40,7 @@ function mainRun(result)
 	const doc = document.querySelector("html");
 	if(doc != null){doc.appendChild(style);}
 	
-	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, false, [], [], [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]]]};}
+	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, true, [], [], [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]]]};}
 	
 	if(result["AHIBeautifier_Data"][6] == undefined)
 	{

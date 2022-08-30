@@ -48,6 +48,7 @@ export class XITHandler implements Module {
 			const keyValues = parametersRaw.slice(4).split(" ");
 			keyValues.forEach(key => {
 				parameters.push(key.slice(2));
+				return;
 			});
 		}
 		else
@@ -95,6 +96,7 @@ export class XITHandler implements Module {
 		return;
 		
 	});
+	return;
   }
   
   

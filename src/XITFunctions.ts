@@ -161,6 +161,7 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 		const cleanup = makePushButton("x", () => mp.module.cleanup());
 		cleanup.style.marginRight = "8px";
 		right.appendChild(cleanup);
+		return;
 	});
 	
 	const enhancedColorHeader = document.createElement('h3');
@@ -251,6 +252,7 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	result["AHIBeautifier_Data"][6].forEach(hotkey => {
 		const div = createInputPair(hotkey, result, hotkeyInputDiv);
 		if(div != null){hotkeyInputDiv.appendChild(div);}
+		return;
 	});
 	
 	const addButton = makePushButton("+", function(){
@@ -284,7 +286,7 @@ function createInputPair(hotkey, result, fullDiv)
 		command.value = "";
 		
 		displayedValue.dispatchEvent(new Event("input"));
-		(Array.from(div.children) as HTMLElement[]).forEach(elem => {div.removeChild(elem);});
+		(Array.from(div.children) as HTMLElement[]).forEach(elem => {div.removeChild(elem);return;});
 	}, Style.ButtonDanger);
 	remove.style.display = "inline-block";
 	div.appendChild(remove);
@@ -299,6 +301,7 @@ function createInputPair(hotkey, result, fullDiv)
 			{
 				hotkeys.push([(option.children[0] as HTMLInputElement).value, (option.children[1] as HTMLInputElement).value] as string[]);
 			}
+			return;
 		});
 		result["AHIBeautifier_Data"][6] = hotkeys;
 		setEnabledSettings(result);
@@ -311,6 +314,7 @@ function createInputPair(hotkey, result, fullDiv)
 			{
 				hotkeys.push([(option.children[0] as HTMLInputElement).value, (option.children[1] as HTMLInputElement).value] as string[]);
 			}
+			return;
 		});
 		result["AHIBeautifier_Data"][6] = hotkeys;
 		setEnabledSettings(result);
@@ -465,6 +469,7 @@ export function Calculator_pre(tile, parameters)
 			}
 			doubleClear = false;
 		}
+		return;
 	});
 	const bottomDiv = document.createElement("div");
 	calcDiv.appendChild(bottomDiv);
@@ -694,7 +699,9 @@ function Repairs_post(tile, parameters, jsondata)
 		repairData.forEach(site => {
 			site["Buildings"].forEach(build => {
 				buildings.push([site["PlanetName"], build]);
+				return;
 			});
+			return;
 		});
 		buildings.sort(globalBuildingSort);
 		
@@ -720,8 +727,8 @@ function Repairs_post(tile, parameters, jsondata)
 			if(site["PlanetName"].toUpperCase() == parameters[1].toUpperCase() || site["PlanetIdentifier"].toUpperCase() == parameters[1].toUpperCase())
 			{
 				siteData = site;
-				return;
 			}
+			return;
 		});
 		if(siteData == undefined){return;}
 		
@@ -791,6 +798,7 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 		building["RepairMaterials"].forEach(mat => {
 			if(materials[mat["MaterialTicker"]] == undefined){materials[mat["MaterialTicker"]] = mat["MaterialAmount"];}
 			else{materials[mat["MaterialTicker"]] += mat["MaterialAmount"];}
+			return;
 		});
 		
 		var rowData = [building["BuildingTicker"], date.toLocaleString(undefined, {maximumFractionDigits: 1}), (building["Condition"] * 100).toLocaleString(undefined, {maximumFractionDigits: 1}) + "%"];
@@ -800,7 +808,7 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 			row.appendChild(tableElem);
 			tableElem.appendChild(createTextSpan(point));
 		}
-		
+		return;
 	});
 	
 	clearChildren(matDiv);
@@ -831,7 +839,7 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 			row.appendChild(tableElem);
 			tableElem.appendChild(createTextSpan(point));
 		}
-		
+		return;
 	});
 	return;
 }
@@ -859,7 +867,7 @@ function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)
 			row.appendChild(tableElem);
 			tableElem.appendChild(createTextSpan(point));
 		}
-		
+		return;
 	});
 	
 	clearChildren(matDiv);
@@ -890,7 +898,7 @@ function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)
 			row.appendChild(tableElem);
 			tableElem.appendChild(createTextSpan(point));
 		}
-		
+		return;
 	});
 	return;
 }
@@ -978,6 +986,7 @@ function Chat_post(chatDiv, parameters, jsondata)
 				messageDiv.style.fontStyle = "italic";
 				break;
 		}
+		return;
 	});
 	return;
 }
@@ -1143,6 +1152,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 					{
 						inv[material["MaterialTicker"]] += material["MaterialAmount"];
 					}
+					return;
 				});
 				
 				planetData["OrderConsumption"].forEach(material => {
@@ -1165,6 +1175,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 					{
 						cons[material["MaterialTicker"]] -= material["DailyAmount"];
 					}
+					return;
 				});
 				
 				planetData["OrderProduction"].forEach(material => {
@@ -1176,8 +1187,10 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 					{
 						cons[material["MaterialTicker"]] += material["DailyAmount"];
 					}
+					return;
 				});
 			}
+			return;
 		});
 	} else
 	{
@@ -1284,6 +1297,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		{
 			settings["MaterialExclusions"].forEach((mat) => {
 				if(mat["MaterialTicker"] == material){included = false;return;}
+				return;
 			});
 		}
 		if(!included){continue;}
@@ -1377,6 +1391,7 @@ function UpdateBurn(table, dispSettings)
 			row.style.width = dispSettings[0] ? "auto" : "0px";
 			row.style.height = dispSettings[0] ? "auto" : "0px";
 		}
+		return;
 	});
 	return;
 }
@@ -1555,8 +1570,8 @@ function Contracts_post(tile, parameters, jsondata)
 					if(condition["Type"] === condType)
 					{
 						conditions.push(condition);
-						return;
 					}
+					return;
 				});
 			}
 			const line = document.createElement("tr");
@@ -1603,6 +1618,7 @@ function Contracts_post(tile, parameters, jsondata)
 			line.appendChild(pickUp);
 			seenContracts.push(contract["ContractLocalId"]);
 		}
+		return;
 	});
 	
 	const sellHeader = document.createElement("h3");
@@ -1641,6 +1657,7 @@ function Contracts_post(tile, parameters, jsondata)
 						conditions.push(condition);
 						return;
 					}
+					return;
 				});
 			}
 			
@@ -1688,6 +1705,7 @@ function Contracts_post(tile, parameters, jsondata)
 			line.appendChild(pickUp);
 			seenContracts.push(contract["ContractLocalId"]);
 		}
+		return;
 	});
 	
 	const shipHeader = document.createElement("h3");
@@ -1724,8 +1742,8 @@ function Contracts_post(tile, parameters, jsondata)
 					if(condition["Type"] === condType)
 					{
 						conditions.push(condition);
-						return;
 					}
+					return;
 				});
 			}
 			const line = document.createElement("tr");
@@ -1780,6 +1798,7 @@ function Contracts_post(tile, parameters, jsondata)
 			line.appendChild(delivColumn);
 			seenContracts.push(contract["ContractLocalId"]);
 		}
+		return;
 	});
 	return parameters;
 }
@@ -1996,6 +2015,7 @@ function FIOInv_getAllStorages(tile, parameters, jsondata)
 	var usernames = [] as string[];
 	userJSON["GroupUsers"].forEach(user => {
 		usernames.push(user["GroupUserName"]);
+		return;
 	});
 	
 	parameters.push(userJSON["GroupName"]);
@@ -2032,10 +2052,11 @@ function FIOInv_allDisplay(tile, parameters, jsondata)
 		(playerDiv.firstChild as HTMLElement).style.fontWeight = "bold";
 		player["Locations"].forEach(location => {
 			playerDiv.appendChild(createLink(location["LocationName"], "XIT INV_" + player["UserName"] + "_" + location["LocationName"].replace(/ /, "_")));
+			return;
 		});
 		
 		bodyDiv.appendChild(playerDiv);
-		
+		return;
 	});
 	parameters.pop();
 	parameters.pop();
