@@ -10,7 +10,6 @@ import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors } from "./Style";
-import { ProductionScroll } from "./ProductionScroll";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
@@ -82,7 +81,6 @@ function mainRun(result)
 		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn, result["AHIBeautifier_Data"][7]),
 		  new FleetETAs(),
 		  new Notifications(),
-		  new ProductionScroll(),
 		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),

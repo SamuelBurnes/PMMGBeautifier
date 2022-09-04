@@ -285,6 +285,7 @@ export function showBuffer(command) {
     const button = document.getElementById(Selector.NewBFRButton);
 	if(button == null){console.log("Button Null");return;}
 	button.click();
+	return;
 }
 
 export function changeValue(input, value){
@@ -302,6 +303,7 @@ export function changeValue(input, value){
 	inputEvent.initEvent('input', true, false);	// This function is depracated, but is necessary for FF to work. Consider removing or changing.
 	//Object.defineProperty(inputEvent, 'explicitOriginalTarget', {writable: false, value: input});
     input.dispatchEvent(inputEvent);
+	return;
 }
 
 function monitorOnElementCreated(selector, callback, onlyOnce = true) {
@@ -324,14 +326,16 @@ function monitorOnElementCreated(selector, callback, onlyOnce = true) {
     let MutationObserver = window["MutationObserver"] || window["WebKitMutationObserver"];
     let observer = new MutationObserver(onMutationsObserved);
     observer.observe(target, config);
-	
+	return;
 }
 
 export function genericCleanup(className: string = "prun-remove-js") {
   // remove all elements added in the last run
   Array.from(document.getElementsByClassName(className)).forEach((elem) => {
     elem.parentNode && elem.parentNode.removeChild(elem);
+	return;
   });
+  return;
 }
 
 export function toFixed(value: number, precision: number = 2) {
