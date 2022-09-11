@@ -1585,7 +1585,11 @@ function Contracts_post(tile, parameters, jsondata)
 
 			return contract;
 		}
-	}).filter(x => x !== undefined).sort(ContractSort);	
+	}).filter(x => x !== undefined);
+
+	validContracts["buying"].sort(ContractSort);
+	validContracts["selling"].sort(ContractSort);
+	validContracts["shipping"].sort(ContractSort);
 	
 	const buyTable = createTable(tile, ["Material", "Name", "Partner", "Fulfilled", "Provis.", "Paid", "Pick Up"], `Buying ${validContracts["shipping"].length}`);
 	
