@@ -400,8 +400,8 @@ function tableSortAlph(a, b)
 	return a[0].localeCompare(b[0]);
 }
 
-export function createTable(tile, headers: Array<string>, sectionHeaderTitle = null) {
-	if (sectionHeaderTitle !== null){
+export function createTable(tile, headers: Array<string>, sectionHeaderTitle = "") {
+	if (sectionHeaderTitle !== ""){
 		const sectionHeader = document.createElement("h3");
 		sectionHeader.appendChild(document.createTextNode(sectionHeaderTitle));
 		sectionHeader.classList.add(...Style.SidebarSectionHead);
