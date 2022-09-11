@@ -1722,7 +1722,8 @@ function CreateContractRow(contract) {
 
 	const pendingColumn = document.createElement("td");
 	const pendingCheck = createTextSpan("⬤");
-	pendingCheck.style.color = conditions[1]["Status"] === "FULFILLED" && (!conditions[2] || conditions[2]["Status"] === "FULFILLED")? TextColors.Success : TextColors.Failure;
+	let viewersCondition = conditions[0]["Party"] === contract["Party"] ? conditions[0] : conditions[1];
+	pendingCheck.style.color = viewersCondition["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 	pendingCheck.style.fontWeight = "bold";
 	pendingColumn.style.textAlign = "center";
 	pendingColumn.appendChild(pendingCheck);
