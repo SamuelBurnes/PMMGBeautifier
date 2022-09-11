@@ -1596,145 +1596,30 @@ function Contracts_post(tile, parameters, jsondata)
 	
 	const buyTable = createTable(tile, ["Material", "Name", "Partner", "Fulfilled", "Provis.", "Paid", "Pick Up"], "Buying");	
 	if (validContracts["buying"].length === 0){
-		const line = document.createElement("tr");
+		const line = CreateNoContractsRow(7);
 		buyTable.appendChild(line);
-
-		const textColumn = document.createElement("td");
-		textColumn.setAttribute('colspan', '7');
-		textColumn.textContent = "No contracts";
-		line.appendChild(textColumn);
 	} else {
 		validContracts["buying"].forEach(contract => {		
-			const conditions = contract["Conditions"];
-
-			const line = document.createElement("tr");
+			const line = CreateContractRow(contract);
 			buyTable.appendChild(line);
-
-			const materialColumn = document.createElement("td");
-			materialColumn.style.width = "32px";
-			materialColumn.style.paddingLeft = "10px";
-
-			const matElem = createMaterialElement(conditions[0]["MaterialTicker"], "prun-remove-js", conditions[0]["MaterialAmount"], false, true);
-			if(matElem){materialColumn.appendChild(matElem);}
-			line.appendChild(materialColumn);
-
-			const nameColumn = document.createElement("td");
-			nameColumn.appendChild(createLink(contract["Name"] || contract["ContractLocalId"], "CONT " + contract["ContractLocalId"]));
-			line.appendChild(nameColumn);
-
-			const partnerColumn = document.createElement("td");
-			partnerColumn.appendChild(createLink(contract["PartnerName"], "CO " + contract["PartnerCompanyCode"]));
-			line.appendChild(partnerColumn);
-
-			const pendingColumn = document.createElement("td");
-			const pendingCheck = createTextSpan("⬤");
-			pendingCheck.style.color = conditions[1]["Status"] === "FULFILLED" && (!conditions[2] || conditions[2]["Status"] === "FULFILLED")? TextColors.Success : TextColors.Failure;
-			pendingCheck.style.fontWeight = "bold";
-			pendingColumn.style.textAlign = "center";
-			pendingColumn.appendChild(pendingCheck);
-			line.appendChild(pendingColumn);
-
-			const provColumn = document.createElement("td");
-			const provCheck = createTextSpan(conditions[0]["Status"] === "FULFILLED" ? "✓" : "X");
-			provCheck.style.color = conditions[0]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
-			provCheck.style.fontWeight = "bold";
-			provColumn.style.textAlign = "center";
-			provColumn.appendChild(provCheck);
-			line.appendChild(provColumn);
-
-			const payColumn = document.createElement("td");
-			const payCheck = createTextSpan(conditions[1]["Status"] === "FULFILLED" ? "✓" : "X");
-			payCheck.style.color = conditions[1]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
-			payCheck.style.fontWeight = "bold";
-			payColumn.style.textAlign = "center";
-			payColumn.appendChild(payCheck);
-			line.appendChild(payColumn);
-
-			const pickUp = document.createElement("td");
-			const pickUpCheck = createTextSpan(conditions.length == 3 ? (conditions[2]["Status"] === "FULFILLED" ? "✓" : "X") : "");
-			pickUpCheck.style.color = conditions[2] == undefined || conditions[2]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
-			pickUpCheck.style.fontWeight = "bold";
-			pickUp.style.textAlign = "center";
-			pickUp.appendChild(pickUpCheck);
-			line.appendChild(pickUp);
 		});
 	}
-	
+
 	const sellTable = createTable(tile, ["Material", "Name", "Partner", "Fulfilled", "Provis.", "Paid", "Pick Up"], "Selling");	
 	if (validContracts["selling"].length === 0){
-		const line = document.createElement("tr");
+		const line = CreateNoContractsRow(7);
 		sellTable.appendChild(line);
-
-		const textColumn = document.createElement("td");
-		textColumn.setAttribute('colspan', '7');
-		textColumn.textContent = "No contracts";
-		line.appendChild(textColumn);
 	} else {
 		validContracts["selling"].forEach(contract => {	
-			const conditions = contract["Conditions"];
-				
-			const line = document.createElement("tr");
+			const line = CreateContractRow(contract);
 			sellTable.appendChild(line);
-
-			const materialColumn = document.createElement("td");
-			materialColumn.style.width = "32px";
-			materialColumn.style.paddingLeft = "10px";
-
-			const matElem = createMaterialElement(conditions[0]["MaterialTicker"], "prun-remove-js", conditions[0]["MaterialAmount"], false, true);
-			if(matElem){materialColumn.appendChild(matElem);}
-			line.appendChild(materialColumn);
-
-			const nameColumn = document.createElement("td");
-			nameColumn.appendChild(createLink(contract["Name"] || contract["ContractLocalId"], "CONT " + contract["ContractLocalId"]));
-			line.appendChild(nameColumn);
-
-			const partnerColumn = document.createElement("td");
-			partnerColumn.appendChild(createLink(contract["PartnerName"], "CO " + contract["PartnerCompanyCode"]));
-			line.appendChild(partnerColumn);
-
-			const pendingColumn = document.createElement("td");
-			const pendingCheck = createTextSpan("⬤");
-			pendingCheck.style.color = conditions[0]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
-			pendingCheck.style.fontWeight = "bold";
-			pendingColumn.style.textAlign = "center";
-			pendingColumn.appendChild(pendingCheck);
-			line.appendChild(pendingColumn);
-
-			const provColumn = document.createElement("td");
-			const provCheck = createTextSpan(conditions[0]["Status"] === "FULFILLED" ? "✓" : "X");
-			provCheck.style.color = conditions[0]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
-			provCheck.style.fontWeight = "bold";
-			provColumn.style.textAlign = "center";
-			provColumn.appendChild(provCheck);
-			line.appendChild(provColumn);
-
-			const payColumn = document.createElement("td");
-			const payCheck = createTextSpan(conditions[1]["Status"] === "FULFILLED" ? "✓" : "X");
-			payCheck.style.color = conditions[1]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
-			payCheck.style.fontWeight = "bold";
-			payColumn.style.textAlign = "center";
-			payColumn.appendChild(payCheck);
-			line.appendChild(payColumn);
-
-			const pickUp = document.createElement("td");
-			const pickUpCheck = createTextSpan(conditions.length == 3 ? (conditions[2]["Status"] === "FULFILLED" ? "✓" : "X") : "");
-			pickUpCheck.style.color = conditions.length == 3 ? (conditions[2]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure) : TextColors.Standard;
-			pickUpCheck.style.fontWeight = "bold";
-			pickUp.style.textAlign = "center";
-			pickUp.appendChild(pickUpCheck);
-			line.appendChild(pickUp);
 		});
 	}	
 	
 	const shipTable = createTable(tile, ["Material", "Name", "Partner", "Fulfilled", "Provis.", "Paid", "Pick Up", "Deliver"], "Shipping");	
 	if (validContracts["shipping"].length === 0){
-		const line = document.createElement("tr");
+		const line = CreateNoContractsRow(8);
 		shipTable.appendChild(line);
-
-		const textColumn = document.createElement("td");
-		textColumn.setAttribute('colspan', '7');
-		textColumn.textContent = "No contracts";
-		line.appendChild(textColumn);
 	} else {
 		validContracts["shipping"].forEach(contract => {
 			const conditions = contract["Conditions"];
@@ -1803,6 +1688,72 @@ function Contracts_post(tile, parameters, jsondata)
 	
 	return parameters;
 }
+
+const CreateNoContractsRow = (colspan) => {
+	var line = document.createElement("tr");
+	const textColumn = document.createElement("td");
+	textColumn.setAttribute('colspan', `${colspan}`);
+	textColumn.textContent = "No contracts";
+	line.appendChild(textColumn);
+	return line;
+}
+
+function CreateContractRow(contract) {
+	const conditions = contract["Conditions"];
+
+	var line = document.createElement("tr");
+	
+
+	const materialColumn = document.createElement("td");
+	materialColumn.style.width = "32px";
+	materialColumn.style.paddingLeft = "10px";
+
+	const matElem = createMaterialElement(conditions[0]["MaterialTicker"], "prun-remove-js", conditions[0]["MaterialAmount"], false, true);
+	if(matElem){materialColumn.appendChild(matElem);}
+	line.appendChild(materialColumn);
+
+	const nameColumn = document.createElement("td");
+	nameColumn.appendChild(createLink(contract["Name"] || contract["ContractLocalId"], "CONT " + contract["ContractLocalId"]));
+	line.appendChild(nameColumn);
+
+	const partnerColumn = document.createElement("td");
+	partnerColumn.appendChild(createLink(contract["PartnerName"], "CO " + contract["PartnerCompanyCode"]));
+	line.appendChild(partnerColumn);
+
+	const pendingColumn = document.createElement("td");
+	const pendingCheck = createTextSpan("⬤");
+	pendingCheck.style.color = conditions[1]["Status"] === "FULFILLED" && (!conditions[2] || conditions[2]["Status"] === "FULFILLED")? TextColors.Success : TextColors.Failure;
+	pendingCheck.style.fontWeight = "bold";
+	pendingColumn.style.textAlign = "center";
+	pendingColumn.appendChild(pendingCheck);
+	line.appendChild(pendingColumn);
+
+	const provColumn = document.createElement("td");
+	const provCheck = createTextSpan(conditions[0]["Status"] === "FULFILLED" ? "✓" : "X");
+	provCheck.style.color = conditions[0]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
+	provCheck.style.fontWeight = "bold";
+	provColumn.style.textAlign = "center";
+	provColumn.appendChild(provCheck);
+	line.appendChild(provColumn);
+
+	const payColumn = document.createElement("td");
+	const payCheck = createTextSpan(conditions[1]["Status"] === "FULFILLED" ? "✓" : "X");
+	payCheck.style.color = conditions[1]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+	payCheck.style.fontWeight = "bold";
+	payColumn.style.textAlign = "center";
+	payColumn.appendChild(payCheck);
+	line.appendChild(payColumn);
+
+	const pickUp = document.createElement("td");
+	const pickUpCheck = createTextSpan(conditions.length == 3 ? (conditions[2]["Status"] === "FULFILLED" ? "✓" : "X") : "");
+	pickUpCheck.style.color = conditions[2] == undefined || conditions[2]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+	pickUpCheck.style.fontWeight = "bold";
+	pickUp.style.textAlign = "center";
+	pickUp.appendChild(pickUpCheck);
+	line.appendChild(pickUp);
+
+	return line;
+};
 
 function ContractSort(a, b)
 {
