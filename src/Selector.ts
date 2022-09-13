@@ -32,5 +32,9 @@ export const Selector = {
   CXOSTable: "div[class~='gecI5uGBluvjP5GCRk3dHA==']", // Be warned, not unique to CXOS Table!
   ScreenName: "span[class~='IuXoporrDf7qxIl-mkNWhA==']",
   ContDForm: "div[class~='TIGJheNilTzuChc8+0E38A==']",
-  ConditionEditor: "div[class~='NLOrH7hF5fbKIesqW3uSkA==']"
+  ConditionEditor: "div[class~='NLOrH7hF5fbKIesqW3uSkA==']",
+  ChatMessage: "div[class~='bY8qSPcFFLkiKNEqOrKHiA==']",
+  ChatWindow: "div[class~='tvLh70IeyzjPBXlNSDYokg==']",
+  ChatInput: "div[class~='BArxa2yGz-u5GgiT-uvI9Q==']",
+  ChatTile: "div[class~='_8MZs-piY-+t2NOXRPhMM6A==']"
 }

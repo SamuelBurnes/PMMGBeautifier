@@ -15,6 +15,7 @@ import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
 import { CalculatorButton } from "./CalculatorButton";
 import { ContractDrafts } from "./ContractDrafts";
+import { Checklists } from "./Checklists";
 
 
 try
@@ -84,6 +85,7 @@ function mainRun(result)
 		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
+		  new Checklists(),
 		  new Sidebar(result["AHIBeautifier_Data"][6])
 	], result, burn, burnSettings);
 	
