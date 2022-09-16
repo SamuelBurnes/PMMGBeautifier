@@ -1,6 +1,6 @@
 import {Selector} from "./Selector";
 import {MaterialNames} from "./GameProperties";
-import {CategoryColors} from "./Style";
+import {Style, CategoryColors} from "./Style";
 
 export function createNode(htmlString) {
   var div = document.createElement('div');
@@ -398,4 +398,35 @@ export function sortTable(table: HTMLTableElement, column: number, sortType: str
 function tableSortAlph(a, b)
 {
 	return a[0].localeCompare(b[0]);
+}
+
+export function createTable(tile, headers: Array<string>, sectionHeaderTitle = "") {
+	if (sectionHeaderTitle !== ""){
+		const sectionHeader = document.createElement("h3");
+		sectionHeader.appendChild(document.createTextNode(sectionHeaderTitle));
+		sectionHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(sectionHeader);
+	}
+
+	let table = document.createElement("table");
+	tile.appendChild(table);
+
+	const thead = document.createElement("thead");
+	table.appendChild(thead);
+	
+	const headerRow = document.createElement("tr");
+	thead.appendChild(headerRow);
+
+	for(let title of headers)
+	{
+		const header = document.createElement("th");
+		header.textContent = title;
+		header.style.paddingTop = "0";
+		headerRow.appendChild(header);
+	}
+
+	const tbody = document.createElement("tbody");
+	table.appendChild(tbody);
+
+	return tbody;
 }
