@@ -31,7 +31,8 @@ export const WithStyles = (...style: string[][]): string[] => {
 export const TextColors = {
 	Failure: "#d9534f",
 	Success: "#5cb85c",
-	Standard: "#bbbbbb"
+	Standard: "#bbbbbb",
+	Yellow: "#f7a600"
 }
 
 export const CategoryColors = {
