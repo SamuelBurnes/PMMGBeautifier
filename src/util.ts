@@ -273,6 +273,9 @@ export function createLink(text, command)
 }
 
 export function showBuffer(command) {
+	const button = document.getElementById(Selector.NewBFRButton);
+	if(button == null){return false;}
+
     const addSubmitCommand = (input, cmd) => {
         changeValue(input, cmd);
         input.parentElement.parentElement.requestSubmit();
@@ -282,10 +285,8 @@ export function showBuffer(command) {
     monitorOnElementCreated(Selector.BufferTextField, (elem) => addSubmitCommand(elem, command));
 
     // Create new Buffer
-    const button = document.getElementById(Selector.NewBFRButton);
-	if(button == null){console.log("Button Null");return;}
 	button.click();
-	return;
+	return true;
 }
 
 export function changeValue(input, value){

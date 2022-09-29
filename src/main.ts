@@ -15,24 +15,99 @@ import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
 import { CalculatorButton } from "./CalculatorButton";
 import { ContractDrafts } from "./ContractDrafts";
-import { Checklists } from "./Checklists";
-
 
 try
 {
-	browser.storage.local.get("AHIBeautifier_Data").then(mainRun, onError);
+	browser.storage.local.get("AHIBeautifier_Data").then(restructure_ff, onError);
 	console.log("FireFox detected");
 } catch(err)
 {
 	console.log("Chromium detected");
 	chrome.storage.local.get(["AHIBeautifier_Data"], function(result)
 	{
-		mainRun(result);
+		restructure_chrome(result);
 	});
+}
+
+function restructure_chrome(result)
+{
+	if(result["AHIBeautifier_Data"] != undefined)
+	{
+		console.log("Transitioning to new data structure! No data loss should occur, contact PiBoy314 if it does.");
+		var restructured = {};
+		restructured["username"] = result["AHIBeautifier_Data"][0];
+		restructured["apikey"] = result["AHIBeautifier_Data"][1];
+		restructured["webappid"] = result["AHIBeautifier_Data"][2];
+		restructured["color_scheme"] = (result["AHIBeautifier_Data"][3] || true) ? "enhanced" : undefined;
+		restructured["disabled"] = result["AHIBeautifier_Data"][4];
+		restructured["unpack_exceptions"] = result["AHIBeautifier_Data"][5];
+		restructured["sidebar"] = result["AHIBeautifier_Data"][6];
+		restructured["burn_thresholds"] = result["AHIBeautifier_Data"][7];
+		restructured["burn_display_settings"] = result["AHIBeautifier_Data"][8];
+		restructured["loaded_before"] = true;
+		
+		chrome.storage.local.set({"PMMGExtended": restructured}, function(){
+			console.log("Success!");
+			chrome.storage.local.remove("AHIBeautifier_Data");
+			console.log("Deleted Old Data");
+			mainRun({"PMMGExtended": restructured});
+		});
+		
+	}
+	else
+	{
+		chrome.storage.local.get(["PMMGExtended"], function(r)
+		{
+			mainRun(r);
+		});
+	}
+	return;
+}
+
+function restructure_ff(result)
+{
+	if(result["AHIBeautifier_Data"] != undefined)
+	{
+		console.log("Transitioning to new data structure! No data loss should occur, contact PiBoy314 if it does.");
+		var restructured = {};
+		restructured["username"] = result["AHIBeautifier_Data"][0];
+		restructured["apikey"] = result["AHIBeautifier_Data"][1];
+		restructured["webappid"] = result["AHIBeautifier_Data"][2];
+		restructured["color_scheme"] = (result["AHIBeautifier_Data"][3] || true) ? "enhanced" : undefined;
+		restructured["unpack_exceptions"] = result["AHIBeautifier_Data"][4];
+		restructured["sidebar"] = result["AHIBeautifier_Data"][6];
+		restructured["burn_thresholds"] = result["AHIBeautifier_Data"][7];
+		restructured["burn_display_settings"] = result["AHIBeautifier_Data"][8];
+		restructured["loaded_before"] = true;
+		
+		browser.storage.local.set({"PMMGExtended": restructured}, function(){
+			console.log("Success!");
+			browser.storage.local.remove("AHIBeautifier_Data");
+			console.log("Deleted Old Data");
+			mainRun({"PMMGExtended": restructured});
+		});
+		
+	}
+	else
+	{
+		browser.storage.local.get(["PMMGExtended"], function(r)
+		{
+			mainRun(r);
+		});
+	}
+	return;
 }
 
 function mainRun(result)
 {
+	console.log(result);
+	if(!result["PMMGExtended"]){result["PMMGExtended"] = {};}
+	
+	if(!result["PMMGExtended"]["loaded_before"])
+	{
+		console.log("First Time Loading PMMG");
+	}
+	
 	const style = document.createElement("style");
 	style.type = "text/css";
 	style.id = "pmmg-style";
@@ -40,21 +115,7 @@ function mainRun(result)
 	const doc = document.querySelector("html");
 	if(doc != null){doc.appendChild(style);}
 	
-	if(result["AHIBeautifier_Data"] == undefined){result = {"AHIBeautifier_Data": [undefined, undefined, undefined, true, [], [], [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]]]};}
-	
-	if(result["AHIBeautifier_Data"][6] == undefined)
-	{
-		result["AHIBeautifier_Data"][6] = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];
-	}
-	if(result["AHIBeautifier_Data"][7] == undefined)
-	{
-		result["AHIBeautifier_Data"][7] = [3, 6];
-	}
-	if(result["AHIBeautifier_Data"][8] == undefined)
-	{
-		result["AHIBeautifier_Data"][8] = {};
-	}
-	if(result["AHIBeautifier_Data"][3] == true)
+	if(result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"])
 	{
 		const colors = document.createElement("style");
 		colors.type = "text/css";
@@ -63,13 +124,13 @@ function mainRun(result)
 		if(doc != null){doc.appendChild(colors);}
 	}
 	var prices = {};
-	getPrices(prices, result["AHIBeautifier_Data"][2]);
+	getPrices(prices, result["PMMGExtended"]["webappid"]);
 	
 	var burn = [];
-	getBurn(burn, result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]);
+	getBurn(burn, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
 	
 	var burnSettings = [];
-	getBurnSettings(burnSettings, result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1]);
+	getBurnSettings(burnSettings, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
 	
 	const runner = new ModuleRunner([
 		  new LocalMarketAds(),
@@ -79,14 +140,13 @@ function mainRun(result)
 		  new PostLM(prices),
 		  new ContractDrafts(prices),
 		  new QueueLoad(),
-		  new ConsumableTimers(result["AHIBeautifier_Data"][0], burn, result["AHIBeautifier_Data"][7]),
+		  new ConsumableTimers(result["PMMGExtended"]["username"], burn, result["PMMGExtended"]["burn_thresholds"]),
 		  new FleetETAs(),
 		  new Notifications(),
-		  new ScreenUnpack(result["AHIBeautifier_Data"][5]),
+		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
-		  new Checklists(),
-		  new Sidebar(result["AHIBeautifier_Data"][6])
+		  new Sidebar(result["PMMGExtended"]["sidebar"])
 	], result, burn, burnSettings);
 	
 	(function () {

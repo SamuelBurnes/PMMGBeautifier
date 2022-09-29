@@ -1,4 +1,5 @@
 import {XITHandler} from "./XITHandler";
+import { showBuffer } from "./util";
 
 export interface Module {
   run();
@@ -17,18 +18,20 @@ interface ModuleEntry {
 export class ModuleRunner {
   private readonly modules: ModuleEntry[];
   private readonly xit: XITHandler;
+  private result;
   constructor(modules: Module[], result, burn, burnSettings) {
     this.modules = modules.map(m => this.moduleToME(m));
-	this.xit = new XITHandler(result["AHIBeautifier_Data"][0], result["AHIBeautifier_Data"][1], result["AHIBeautifier_Data"][2], result, burn, burnSettings, this.modules);
+	this.xit = new XITHandler(result, burn, burnSettings, this.modules);
+	this.result = result;
 	
 	this.updateActiveModules(result);
   }
   
   private updateActiveModules(result)
   {
-	if(result["AHIBeautifier_Data"][4] == undefined){return;}
+	if(result["PMMGExtended"]["disabled"] == undefined){return;}
 	this.modules.forEach(mp => {
-		if(result["AHIBeautifier_Data"][4] != undefined && result["AHIBeautifier_Data"][4].includes(mp.name))
+		if(result["PMMGExtended"]["disabled"] != undefined && result["PMMGExtended"]["disabled"].includes(mp.name))
 		{
 			mp.enabled = false;
 		}
@@ -48,6 +51,17 @@ export class ModuleRunner {
 
   loop() {
 	this.xit.run();
+	
+	// Run intro if it hasn't run already
+	if(!this.result["PMMGExtended"]["loaded_before"])
+	{
+		this.result["PMMGExtended"]["loaded_before"] = showBuffer("XIT START");
+		if(this.result["PMMGExtended"]["loaded_before"])
+		{
+			setSettings(this.result);
+		}
+	}
+	
     this.modules.map(entry => {
       if (entry.enabled) {
         const t0 = performance.now();
@@ -66,4 +80,18 @@ export class ModuleRunner {
     // @TODO: Vary the interval based on module performance
     window.setTimeout(() => this.loop(), 1000);
   }
+}
+
+function setSettings(result)
+{
+	try
+	{
+		browser.storage.local.set(result);
+	}
+	catch(err)
+	{
+		chrome.storage.local.set(result, function(){
+		});
+	}
+	return;
 }

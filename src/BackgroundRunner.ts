@@ -4,7 +4,7 @@ export function getPrices(prices, webappID)
 	
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
-		console.log("Web App Timeout");
+		console.log("PMMG: Web App Timeout");
 	};
 	
 	xhr.onreadystatechange = function()
@@ -13,7 +13,7 @@ export function getPrices(prices, webappID)
 	    {
 			try
 			{
-				console.log("Retreived Prices from Web App");
+				console.log("PMMG: Retreived Prices from Web App");
 				var priceData = JSON.parse(xhr.responseText);
 				const keys = Object.keys(priceData);
 				keys.forEach(key => {
@@ -22,7 +22,7 @@ export function getPrices(prices, webappID)
 			}
 			catch(SyntaxError)
 			{
-				console.log("Bad Data from Web App");
+				console.log("PMMG: Bad Data from Web App");
 			}
 		}
 		return;
@@ -41,7 +41,7 @@ export function getBurn(burn, username, apikey)
 	burn[username] = [];
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
-		console.log("FIO Burn Timeout");
+		console.log("PMMG: FIO Burn Timeout");
 		burn[username] = undefined;
 		getBurn(burn, username, apikey);
 	};
@@ -52,7 +52,7 @@ export function getBurn(burn, username, apikey)
 	    {
 			try
 			{
-				console.log("Retreived Burn from FIO");
+				console.log("PMMG: Retreived Burn from FIO");
 				var burnData = JSON.parse(xhr.responseText);
 				burnData.forEach(data => {
 					burn[username].push(data);
@@ -60,7 +60,7 @@ export function getBurn(burn, username, apikey)
 			}
 			catch(SyntaxError)
 			{
-				console.log("Bad Data from FIO");
+				console.log("PMMG: Bad Data from FIO");
 				burn[username] = undefined;
 			}
 		}
@@ -81,7 +81,7 @@ export function getGroupBurn(burn, groupid, apikey)
 	
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
-		console.log("FIO Burn Timeout");
+		console.log("PMMG: FIO Burn Timeout");
 		burn[groupid] = undefined;
 		getGroupBurn(burn, groupid, apikey);
 	};
@@ -92,7 +92,7 @@ export function getGroupBurn(burn, groupid, apikey)
 	    {
 			try
 			{
-				console.log("Retreived Group Burn from FIO");
+				console.log("PMMG: Retreived Group Burn from FIO");
 				var burnData = JSON.parse(xhr.responseText);
 				burn[groupid] = [];
 				burnData.forEach(data => {
@@ -101,7 +101,7 @@ export function getGroupBurn(burn, groupid, apikey)
 			}
 			catch(SyntaxError)
 			{
-				console.log("Bad Data from FIO");
+				console.log("PMMG: Bad Data from FIO");
 				burn[groupid] = undefined;
 			}
 		}
@@ -121,7 +121,7 @@ export function getBurnSettings(burnSettings, username, apikey)
 	burnSettings.push("loading");
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
-		console.log("FIO Burn Settings Timeout");
+		console.log("PMMG: FIO Burn Settings Timeout");
 		getBurnSettings(burnSettings, username, apikey);
 	};
 	
@@ -131,7 +131,7 @@ export function getBurnSettings(burnSettings, username, apikey)
 	    {
 			try
 			{
-				console.log("Retreived Burn Settings from FIO");
+				console.log("PMMG: Retreived Burn Settings from FIO");
 				burnSettings[0] = "loaded";
 				var burnData = JSON.parse(xhr.responseText);
 				burnData.forEach(data => {
@@ -140,8 +140,7 @@ export function getBurnSettings(burnSettings, username, apikey)
 			}
 			catch(SyntaxError)
 			{
-				console.log("Bad Data from FIO");
-				console.log(xhr.responseText);
+				console.log("PMMG: Bad Data from FIO");
 			}
 		}
 		return;

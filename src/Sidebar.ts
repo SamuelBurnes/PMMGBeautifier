@@ -18,7 +18,8 @@ export class Sidebar implements Module {
   run()
   {
 	const sidebar = document.getElementById(Selector.LeftSidebar);
-	if(sidebar == null){return;}
+	if(!this.buttons){this.buttons = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];}
+	if(!sidebar){return;}
 	this.defaultButtons.forEach(defaultButton => {
 		var enabled = false;
 		for(let option of this.buttons)

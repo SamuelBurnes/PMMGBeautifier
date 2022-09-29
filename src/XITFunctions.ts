@@ -19,7 +19,8 @@ export const XITPreFunctions = {
 	"CONTRACTS": Contracts_pre,
 	"REPAIRS": Repairs_pre,
 	"CALCULATOR": Calculator_pre,
-	"CALC": Calculator_pre
+	"CALC": Calculator_pre,
+	"START": Start_pre
 }
 
 export const XITBufferTitles = {
@@ -36,7 +37,8 @@ export const XITBufferTitles = {
 	"CONTRACTS": "PENDING CONTRACTS",
 	"REPAIRS": "REPAIRS",
 	"CALC": "CALCULATOR",
-	"CALCULATOR": "CALCULATOR"
+	"CALCULATOR": "CALCULATOR",
+	"START": "STARTING WITH PMMG"
 }
 
 const DiscordServers = {
@@ -96,13 +98,62 @@ function clearChildren(elem)
 	return;
 }
 
-export function Settings_pre(tile, parameters, apikey, webappID, username, fullBurn, burnSettings, modules, result)
+export function Settings_pre(tile, parameters, result, fullBurn, burnSettings, modules)
 {
 	clearChildren(tile);
 	const warningDiv = document.createElement("div");
 	tile.appendChild(warningDiv);
 	warningDiv.style.marginTop = "4px";
 	warningDiv.appendChild(createTextSpan("Settings changes require a refresh to take effect."));
+	
+	const authenticationHeader = document.createElement('h3');
+    authenticationHeader.appendChild(document.createTextNode("Authentication Settings"));
+	authenticationHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(authenticationHeader);
+	const usernameDiv = document.createElement("div");
+	const usernameLabel = createTextSpan("FIO Username: ");
+	const usernameInput = document.createElement("input");
+	usernameInput.value = result["PMMGExtended"]["username"] || "";
+	usernameInput.addEventListener("input", function(){
+		result["PMMGExtended"]["username"] = !usernameInput.value || usernameInput.value == "" ? undefined : usernameInput.value;
+		setSettings(result);
+	});
+	usernameInput.classList.add("input-text");
+	usernameDiv.appendChild(usernameLabel);
+	usernameDiv.appendChild(usernameInput);
+	tile.appendChild(usernameDiv);
+	
+	const apiDiv = document.createElement("div");
+	const apiLabel = createTextSpan("FIO API Key: ");
+	apiLabel.style.minWidth = "77px";
+	apiLabel.style.display = "inline-block";
+	const apiInput = document.createElement("input");
+	apiInput.value = result["PMMGExtended"]["apikey"] || "";
+	apiInput.addEventListener("input", function(){
+		result["PMMGExtended"]["apikey"] = !apiInput.value || apiInput.value == "" ? undefined : apiInput.value;
+		setSettings(result);
+	});
+	apiInput.classList.add("input-text");
+	apiInput.type = "password";
+	apiDiv.appendChild(apiLabel);
+	apiDiv.appendChild(apiInput);
+	tile.appendChild(apiDiv);
+	
+	const webDiv = document.createElement("div");
+	const webLabel = createTextSpan("Web App ID: ");
+	webLabel.style.minWidth = "77px";
+	webLabel.style.display = "inline-block";
+	const webInput = document.createElement("input");
+	webInput.value = result["PMMGExtended"]["webappid"] || "";
+	webInput.addEventListener("input", function(){
+		result["PMMGExtended"]["webappid"] = !webInput.value || webInput.value == "" ? undefined : webInput.value;
+		setSettings(result);
+	});
+	webInput.classList.add("input-text");
+	webDiv.appendChild(webLabel);
+	webDiv.appendChild(webInput);
+	tile.appendChild(webDiv);
+	
 	const moduleSettingsHeader = document.createElement('h3');
     moduleSettingsHeader.appendChild(document.createTextNode("Module Settings"));
     moduleSettingsHeader.classList.add(...Style.SidebarSectionHead);
@@ -126,17 +177,17 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
         right.style.textAlign = "right";
         line.appendChild(right);
 		
-	    if(result["AHIBeautifier_Data"][4] == undefined){result["AHIBeautifier_Data"][4] = [];}
+	    if(result["PMMGExtended"]["disabled"] == undefined){result["PMMGExtended"]["disabled"] = [];}
         const toggle = makeToggleButton("On", "Off", () => {
 			mp.enabled = !mp.enabled;
-			if(result["AHIBeautifier_Data"][4].includes(mp.name))
+			if(result["PMMGExtended"]["disabled"].includes(mp.name))
 			{
 				if(mp.enabled){
-					for(var i = 0; i < result["AHIBeautifier_Data"][4].length; i++)
+					for(var i = 0; i < result["PMMGExtended"]["disabled"].length; i++)
 					{
-						if(result["AHIBeautifier_Data"][4][i] == mp.name)
+						if(result["PMMGExtended"]["disabled"][i] == mp.name)
 						{
-							result["AHIBeautifier_Data"][4].splice(i, 1);
+							result["PMMGExtended"]["disabled"].splice(i, 1);
 							i--;
 						}
 					}
@@ -144,11 +195,11 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 			}
 			else
 			{
-				if(!mp.enabled){result["AHIBeautifier_Data"][4].push(mp.name);}	// Was just disabled, add disabled label
+				if(!mp.enabled){result["PMMGExtended"]["disabled"].push(mp.name);}	// Was just disabled, add disabled label
 			}
-			setEnabledSettings(result);
+			setSettings(result);
 		}, mp.enabled);
-		if(result["AHIBeautifier_Data"][4].includes(mp.name))
+		if(result["PMMGExtended"]["disabled"].includes(mp.name))
 		{
 			toggle.setAttribute("data-state", "false");
 			mp.enabled = false;
@@ -177,11 +228,11 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	
 	const colorCheck = document.createElement("input");
 	colorCheck.type = "checkbox";
-	colorCheck.checked = result["AHIBeautifier_Data"][3];
+	colorCheck.checked = result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"];
 	colorCheck.style.display = "inline-block";
 	colorCheck.addEventListener("click", function(){
-		result["AHIBeautifier_Data"][3] = colorCheck.checked;
-		setEnabledSettings(result);
+		result["PMMGExtended"]["color_scheme"] = colorCheck.checked ? "enhanced" : "default";
+		setSettings(result);
 	});
 	colorDiv.appendChild(colorCheck);
 	tile.appendChild(colorDiv);
@@ -193,6 +244,7 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	burnLabel.style.marginBottom = "4px";
 	burnDiv.appendChild(burnLabel);
 	
+	if(!result["PMMGExtended"]["burn_thresholds"]){result["PMMGExtended"]["burn_thresholds"] = [3, 7];}
 	const setDiv = document.createElement("div");
 	burnDiv.appendChild(setDiv);
 	setDiv.style.display = "flex";
@@ -201,13 +253,13 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	redDiv.appendChild(createTextSpan("Red Threshold: "));
 	const redIn = document.createElement("input");
 	redIn.type = "number";
-	redIn.value = result["AHIBeautifier_Data"][7][0].toLocaleString(undefined, {maximumFractionDigits: 0});
+	redIn.value = (result["PMMGExtended"]["burn_thresholds"] || [3])[0].toLocaleString(undefined, {maximumFractionDigits: 0});
 	redDiv.appendChild(redIn);
 	redIn.classList.add("input-text");
 	redIn.style.width = "50px";
 	redIn.addEventListener("input", function(){
-		result["AHIBeautifier_Data"][7][0] = parseFloat(redIn.value);
-		setEnabledSettings(result);
+		result["PMMGExtended"]["burn_thresholds"][0] = parseFloat(redIn.value);
+		setSettings(result);
 	});
 	
 	const yelDiv = document.createElement("div");
@@ -215,13 +267,13 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	yelDiv.appendChild(createTextSpan("Yellow Threshold: "));
 	const yelIn = document.createElement("input");
 	yelIn.type = "number";
-	yelIn.value = result["AHIBeautifier_Data"][7][1].toLocaleString(undefined, {maximumFractionDigits: 0});
+	yelIn.value = (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1].toLocaleString(undefined, {maximumFractionDigits: 0});
 	yelDiv.appendChild(yelIn);
 	yelIn.classList.add("input-text");
 	yelIn.style.width = "50px";
 	yelIn.addEventListener("input", function(){
-		result["AHIBeautifier_Data"][7][1] = parseFloat(yelIn.value);
-		setEnabledSettings(result);
+		result["PMMGExtended"]["burn_thresholds"][1] = parseFloat(yelIn.value);
+		setSettings(result);
 	});
 	
 	tile.appendChild(burnDiv);
@@ -235,10 +287,10 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	notifDiv.appendChild(createTextSpan("List screen names separated by commas, no spaces."));
 	const exclusionInput = document.createElement("input");
 	exclusionInput.classList.add("input-text");
-	exclusionInput.value = result["AHIBeautifier_Data"][5] == undefined ? "" : result["AHIBeautifier_Data"][5].join(",");
+	exclusionInput.value = result["PMMGExtended"]["unpack_exceptions"] == undefined ? "" : result["PMMGExtended"]["unpack_exceptions"].join(",");
 	exclusionInput.addEventListener("input", function(){
-		result["AHIBeautifier_Data"][5] = exclusionInput.value.split(",");
-		setEnabledSettings(result);
+		result["PMMGExtended"]["unpack_exceptions"] = exclusionInput.value.split(",");
+		setSettings(result);
 	});
 	
 	tile.appendChild(exclusionInput);
@@ -249,7 +301,8 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	tile.appendChild(hotkeyHeader);
 	const hotkeyInputDiv = document.createElement("div");
 	tile.appendChild(hotkeyInputDiv);
-	result["AHIBeautifier_Data"][6].forEach(hotkey => {
+	if(!result["PMMGExtended"]["sidebar"]){result["PMMGExtended"]["sidebar"] = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];}
+	result["PMMGExtended"]["sidebar"].forEach(hotkey => {
 		const div = createInputPair(hotkey, result, hotkeyInputDiv);
 		if(div != null){hotkeyInputDiv.appendChild(div);}
 		return;
@@ -266,9 +319,22 @@ export function Settings_pre(tile, parameters, apikey, webappID, username, fullB
 	
 	
 	
-	return [parameters, apikey, webappID, username, fullBurn, burnSettings];
+	return [parameters, fullBurn, burnSettings];
 }
-
+function setSettings(result)
+{
+	try
+	{
+		browser.storage.local.set(result);
+	}
+	catch(err)
+	{
+		chrome.storage.local.set(result, function(){
+			console.log("PMMG: Configuration Saved.");
+		});
+	}
+	return;
+}
 function createInputPair(hotkey, result, fullDiv)
 {
 	if(hotkey.length != 2){return null;}
@@ -303,8 +369,8 @@ function createInputPair(hotkey, result, fullDiv)
 			}
 			return;
 		});
-		result["AHIBeautifier_Data"][6] = hotkeys;
-		setEnabledSettings(result);
+		result["PMMGExtended"]["sidebar"] = hotkeys;
+		setSettings(result);
 	});
 	
 	command.addEventListener("input", function(){
@@ -316,8 +382,8 @@ function createInputPair(hotkey, result, fullDiv)
 			}
 			return;
 		});
-		result["AHIBeautifier_Data"][6] = hotkeys;
-		setEnabledSettings(result);
+		result["PMMGExtended"]["sidebar"] = hotkeys;
+		setSettings(result);
 	});
 	return div;
 }
@@ -358,20 +424,71 @@ function makeToggleButton(on: string, off: string, f: () => void, state: boolean
 	return toggle;
 }
 
-function setEnabledSettings(result)
+export function Start_pre(tile)
 {
-	try
-	{
-		browser.storage.local.set(result);
-	}
-	catch(err)
-	{
-		chrome.storage.local.set(result, function(){console.log("Saved Configuration");});
-	}
+	clearChildren(tile);
+	tile.style.fontSize = "12px";
+	tile.style.paddingLeft = "2px";
+	const welcome = createTextSpan("Thank you for using PMMG Extended!");
+	welcome.classList.add("title");
+	welcome.style.paddingLeft = "0";
+	tile.appendChild(welcome);
+	tile.appendChild(createTextSpan("This is a short tutorial on how to get the most out of the extension."));
+	const websiteLinkDiv = document.createElement("div");
+	websiteLinkDiv.style.paddingTop = "20px";
+	tile.appendChild(websiteLinkDiv);
+	websiteLinkDiv.appendChild(createTextSpan("Details on what PMMG offers can be found here: "));
+	const websiteLink = document.createElement("a");
+	websiteLink.href = "https://sites.google.com/view/pmmgextended/home?authuser=0";
+	websiteLink.target = "_blank";
+	websiteLink.style.display = "inline-block";
+	websiteLink.classList.add("link");
+	websiteLink.textContent = "PMMG Extended";
+	websiteLinkDiv.appendChild(websiteLink);
+	
+	const settingsDiv = document.createElement("div");
+	tile.appendChild(settingsDiv);
+	settingsDiv.style.paddingTop = "20px";
+	settingsDiv.appendChild(createTextSpan("Start by opening a new buffer and entering "));
+	const settingsLink = createLink("XIT SETTINGS", "XIT SETTINGS");
+	settingsLink.style.display = "inline-block";
+	settingsDiv.appendChild(settingsLink);
+	
+	const fioDiv = document.createElement("div");
+	tile.appendChild(fioDiv);
+	fioDiv.style.paddingTop = "20px";
+	fioDiv.appendChild(createTextSpan("FIO is a browser extension that gathers data from your game. PMMG Extended uses that data to display useful information. You can learn more about installing FIO here: "));
+	const fioLink = document.createElement("a");
+	fioLink.href = "https://fio.fnar.net/";
+	fioLink.target = "_blank";
+	fioLink.style.display = "inline-block";
+	fioLink.classList.add("link");
+	fioLink.textContent = "FIO Website";
+	fioDiv.appendChild(fioLink);
+	
+	const fioDiv2 = document.createElement("div");
+	tile.appendChild(fioDiv2);
+	fioDiv2.style.paddingTop = "20px";
+	fioDiv2.appendChild(createTextSpan("If you already have a FIO account, add your username and API Key to the text boxes on XIT SETTINGS. You can generate an API Key "));
+	const fioLink2 = document.createElement("a");
+	fioLink2.href = "https://fio.fnar.net/settings";
+	fioLink2.target = "_blank";
+	fioLink2.style.display = "inline-block";
+	fioLink2.classList.add("link");
+	fioLink2.textContent = "here.";
+	fioDiv2.appendChild(fioLink2);
+	
+	const webAppDiv = document.createElement("div");
+	tile.appendChild(webAppDiv);
+	webAppDiv.style.paddingTop = "20px";
+	webAppDiv.style.paddingBottom = "20px";
+	webAppDiv.appendChild(createTextSpan("If your corporation has a web app (AHI, FOWL, KAWA), enter that in the Web App ID field."));
+	
+	tile.appendChild(createTextSpan("You can explore other settings to enable or disable features, change the color scheme, and customize the left sidebar. Contact PiBoy314 in game or on Discord if you have questions."));
 	return;
 }
 
-export function Calculator_pre(tile, parameters)
+export function Calculator_pre(tile)
 {
 	clearChildren(tile);
 	const calcDiv = document.createElement("div");
@@ -603,7 +720,7 @@ export function Calculator_pre(tile, parameters)
 		}
 	});
 	
-	return parameters;
+	return;
 }
 
 function calculate(prevValue, currentString, currentOperation)
@@ -631,12 +748,22 @@ function calculate(prevValue, currentString, currentOperation)
 	}
 }
 
-export function Repairs_pre(tile, parameters, apikey, webappID, username)
+export function Repairs_pre(tile, parameters, result)
 {
 	clearChildren(tile);
-	XITWebRequest(tile, parameters, Repairs_post, "https://rest.fnar.net/sites/"+username, "GET", ["Authorization", apikey], undefined);
+	if(!result["PMMGExtended"]["username"])
+	{
+		tile.textContent = "Error! Missing Username";
+		return;
+	}
+	if(!result["PMMGExtended"]["apikey"])
+	{
+		tile.textContent = "Error! Missing API Key";
+		return;
+	}
+	XITWebRequest(tile, parameters, Repairs_post, "https://rest.fnar.net/sites/"+ result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
 	
-	return webappID;
+	return;
 }
 
 function Repairs_post(tile, parameters, jsondata)
@@ -991,15 +1118,16 @@ function Chat_post(chatDiv, parameters, jsondata)
 	return;
 }
 
-export function Fin_pre(tile, parameters, apikey, webappID)
+export function Fin_pre(tile, parameters, result)
 {
 	clearChildren(tile);
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		return apikey;
+		return;
 	}
-	const url = "https://script.google.com/macros/s/" + webappID + "/exec?mode=%22fin%22&param=%22" + parameters[1] + "%22";
+	if(!result["PMMGExtended"]["webappid"]){return;}
+	const url = "https://script.google.com/macros/s/" + result["PMMGExtended"]["webappid"] + "/exec?mode=%22fin%22&param=%22" + parameters[1] + "%22";
 	
 	XITWebRequest(tile, parameters, Fin_post, url, "GET", undefined, undefined);
 	return;
@@ -1098,16 +1226,23 @@ function financialSort(a, b)
 	return a[3] < b[3] ? 1 : -1;
 }
 
-export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, fullBurn, burnSettings, modules, result)
+export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSettings)
 {
 	clearChildren(tile);
+	if(!result["PMMGExtended"]["apikey"])
+	{
+		tile.textContent = "Error! No API Key!";
+		return;
+	}
+	const apikey = result["PMMGExtended"]["apikey"];
+	const username = result["PMMGExtended"]["username"];
 	var burn;
 	var unloaded = false;
 	var planet;
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		return [apikey, webappID, modules];
+		return;
 	}
 	else if(parameters.length == 3 && parameters[1].toLowerCase() == "group")
 	{
@@ -1240,7 +1375,9 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	}
 	const screenNameElem = document.querySelector(Selector.ScreenName);
 	const screenName = screenNameElem ? screenNameElem.textContent : "";
-	const dispSettings = result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] || [1, 1, 1, 1];
+	if(!result["PMMGExtended"]["burn_display_settings"]){result["PMMGExtended"]["burn_display_settings"] = [];}
+	var settingsIndex = FindBurnSettings(result["PMMGExtended"]["burn_display_settings"], screenName + parameters[1]);
+	const dispSettings = settingsIndex == -1 ? [1, 1, 1, 1] : result["PMMGExtended"]["burn_display_settings"][settingsIndex][1];
 	
 	const table = document.createElement("table");
 	const settingsDiv = document.createElement("div");
@@ -1249,26 +1386,58 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	settingsDiv.appendChild(createSettingsButton("RED", 22.025, dispSettings[0], function(){
 		dispSettings[0] = dispSettings[0] ? 0 : 1;
 		UpdateBurn(table, dispSettings);
-		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
-		setEnabledSettings(result);
+		if(settingsIndex == -1)
+		{
+			result["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
+			settingsIndex = result["PMMGExtended"]["burn_display_settings"].length - 1;
+		}
+		else
+		{
+			result["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
+		}
+		setSettings(result);
 	}));
 	settingsDiv.appendChild(createSettingsButton("YELLOW", 40.483, dispSettings[1], function(){
 		dispSettings[1] = dispSettings[1] ? 0 : 1;
 		UpdateBurn(table, dispSettings);
-		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
-		setEnabledSettings(result);
+		if(settingsIndex == -1)
+		{
+			result["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
+			settingsIndex = result["PMMGExtended"]["burn_display_settings"].length - 1;
+		}
+		else
+		{
+			result["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
+		}
+		setSettings(result);
 	}));
 	settingsDiv.appendChild(createSettingsButton("GREEN", 34.65, dispSettings[2], function(){
 		dispSettings[2] = dispSettings[2] ? 0 : 1;
 		UpdateBurn(table, dispSettings);
-		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
-		setEnabledSettings(result);
+		if(settingsIndex == -1)
+		{
+			result["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
+			settingsIndex = result["PMMGExtended"]["burn_display_settings"].length - 1;
+		}
+		else
+		{
+			result["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
+		}
+		setSettings(result);
 	}));
 	settingsDiv.appendChild(createSettingsButton("INF", 19.6, dispSettings[3], function(){
 		dispSettings[3] = dispSettings[3] ? 0 : 1;
 		UpdateBurn(table, dispSettings);
-		result["AHIBeautifier_Data"][8][screenName + parameters[1] + (parameters[2] || "")] = dispSettings;
-		setEnabledSettings(result);
+		if(settingsIndex == -1)
+		{
+			result["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
+			settingsIndex = result["PMMGExtended"]["burn_display_settings"].length - 1;
+		}
+		else
+		{
+			result["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
+		}
+		setSettings(result);
 	}));
 	
 	
@@ -1334,11 +1503,11 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 			burnColumn.classList.add("burn-green");
 			burnColumn.classList.add("burn-infinite");
 		}
-		else if(burn <= result["AHIBeautifier_Data"][7][0])
+		else if(burn <= (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[0])
 		{
 			burnColumn.classList.add("burn-red");
 		}
-		else if(burn <= result["AHIBeautifier_Data"][7][1])
+		else if(burn <= (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1])
 		{
 			burnColumn.classList.add("burn-yellow");
 		}
@@ -1348,7 +1517,7 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 		}
 		
 		const needColumn = document.createElement("td");
-		const needAmt = burn > result["AHIBeautifier_Data"][7][1] || cons[material] > 0 ? 0 : (burn - result["AHIBeautifier_Data"][7][1]) * cons[material];
+		const needAmt = burn > (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] || cons[material] > 0 ? 0 : (burn - (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1]) * cons[material];
 		needColumn.appendChild(createTextSpan(needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
 		
 		row.appendChild(needColumn);
@@ -1358,6 +1527,18 @@ export function EnhancedBurn_pre(tile, parameters, apikey, webappID, username, f
 	UpdateBurn(table, dispSettings);
 	tile.appendChild(table);
 	return;
+}
+
+function FindBurnSettings(array, matchString)
+{
+	for(var i = 0; i < array.length; i++)
+	{
+		if(matchString == array[i][0])
+		{
+			return i;
+		}
+	}
+	return -1;
 }
 
 function UpdateBurn(table, dispSettings)
@@ -1402,15 +1583,16 @@ function CategorySort(a, b)
 	return MaterialNames[a][1].localeCompare(MaterialNames[b][1]);
 }
 
-export function SheetTable_pre(tile, parameters, apikey, webappID)
+export function SheetTable_pre(tile, parameters, result)
 {
 	clearChildren(tile);
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
-		return apikey;
+		return;
 	}
-	var url = "https://script.google.com/macros/s/" + webappID + "/exec?mode=%22" + parameters[1] + "%22";
+	if(result["PMMGExtended"]["webappid"] == undefined){return;}
+	var url = "https://script.google.com/macros/s/" + result["PMMGExtended"]["webappid"] + "/exec?mode=%22" + parameters[1] + "%22";
 	if(parameters[2] != undefined)
 	{
 		url += "&param=%22" + parameters[2] + "%22";
@@ -1505,11 +1687,21 @@ function SheetTable_post(tile, parameters, jsondata)
 	return;
 }
 
-export function Contracts_pre(tile, parameters, apikey, webappID, username)
+export function Contracts_pre(tile, parameters, result)
 {
 	clearChildren(tile);
-	XITWebRequest(tile, parameters, Contracts_post, "https://rest.fnar.net/contract/allcontracts/" + username, "GET", ["Authorization", apikey], undefined);
-	return [webappID];
+	if(!result["PMMGExtended"]["username"])
+	{
+		tile.textContent = "Error! Missing Username!";
+		return;
+	}
+	if(!result["PMMGExtended"]["apikey"])
+	{
+		tile.textContent = "Error! Missing API Key!";
+		return;
+	}
+	XITWebRequest(tile, parameters, Contracts_post, "https://rest.fnar.net/contract/allcontracts/" + result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
+	return;
 }
 
 function Contracts_post(tile, parameters, jsondata)
@@ -1850,9 +2042,10 @@ export function Discord_pre(tile, parameters)
 	return;
 }
 
-export function FIOInv_pre(tile, parameters, apikey)
+export function FIOInv_pre(tile, parameters, result)
 {
 	clearChildren(tile);
+	const apikey = result["PMMGExtended"]["apikey"];
 	if(parameters.length < 2)
 	{
 		tile.textContent = "Error! Not Enough Parameters!";
