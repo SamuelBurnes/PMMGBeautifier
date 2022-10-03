@@ -31,6 +31,7 @@ try
 
 function restructure_chrome(result)
 {
+	console.log(result);
 	if(result["AHIBeautifier_Data"] != undefined)
 	{
 		console.log("Transitioning to new data structure! No data loss should occur, contact PiBoy314 if it does.");
@@ -43,7 +44,11 @@ function restructure_chrome(result)
 		restructured["unpack_exceptions"] = result["AHIBeautifier_Data"][5];
 		restructured["sidebar"] = result["AHIBeautifier_Data"][6];
 		restructured["burn_thresholds"] = result["AHIBeautifier_Data"][7];
-		restructured["burn_display_settings"] = result["AHIBeautifier_Data"][8];
+		restructured["burn_display_settings"] = [];
+		// Iterate over old data structure, translate to new data structure
+		Object.keys(result["AHIBeautifier_Data"][8]).forEach(key => {
+			restructured["burn_display_settings"] = [key, result["AHIBeautifier_Data"][8][key]];
+		});
 		restructured["loaded_before"] = true;
 		
 		chrome.storage.local.set({"PMMGExtended": restructured}, function(){
@@ -77,7 +82,11 @@ function restructure_ff(result)
 		restructured["unpack_exceptions"] = result["AHIBeautifier_Data"][4];
 		restructured["sidebar"] = result["AHIBeautifier_Data"][6];
 		restructured["burn_thresholds"] = result["AHIBeautifier_Data"][7];
-		restructured["burn_display_settings"] = result["AHIBeautifier_Data"][8];
+		restructured["burn_display_settings"] = [];
+		// Iterate over old data structure, translate to new data structure
+		Object.keys(result["AHIBeautifier_Data"][8]).forEach(key => {
+			restructured["burn_display_settings"] = [key, result["AHIBeautifier_Data"][8][key]];
+		});
 		restructured["loaded_before"] = true;
 		
 		browser.storage.local.set({"PMMGExtended": restructured}, function(){
