@@ -18,98 +18,19 @@ import { ContractDrafts } from "./ContractDrafts";
 
 try
 {
-	browser.storage.local.get("AHIBeautifier_Data").then(restructure_ff, onError);
+	browser.storage.local.get("PMMGExtended").then(mainRun, onError);
 	console.log("FireFox detected");
 } catch(err)
 {
 	console.log("Chromium detected");
-	chrome.storage.local.get(["AHIBeautifier_Data"], function(result)
+	chrome.storage.local.get(["PMMGExtended"], function(result)
 	{
-		restructure_chrome(result);
+		mainRun(result);
 	});
-}
-
-function restructure_chrome(result)
-{
-	console.log(result);
-	if(result["AHIBeautifier_Data"] != undefined)
-	{
-		console.log("Transitioning to new data structure! No data loss should occur, contact PiBoy314 if it does.");
-		var restructured = {};
-		restructured["username"] = result["AHIBeautifier_Data"][0];
-		restructured["apikey"] = result["AHIBeautifier_Data"][1];
-		restructured["webappid"] = result["AHIBeautifier_Data"][2];
-		restructured["color_scheme"] = (result["AHIBeautifier_Data"][3] || true) ? "enhanced" : undefined;
-		restructured["disabled"] = result["AHIBeautifier_Data"][4];
-		restructured["unpack_exceptions"] = result["AHIBeautifier_Data"][5];
-		restructured["sidebar"] = result["AHIBeautifier_Data"][6];
-		restructured["burn_thresholds"] = result["AHIBeautifier_Data"][7];
-		restructured["burn_display_settings"] = [];
-		// Iterate over old data structure, translate to new data structure
-		Object.keys(result["AHIBeautifier_Data"][8]).forEach(key => {
-			restructured["burn_display_settings"] = [key, result["AHIBeautifier_Data"][8][key]];
-		});
-		restructured["loaded_before"] = true;
-		
-		chrome.storage.local.set({"PMMGExtended": restructured}, function(){
-			console.log("Success!");
-			chrome.storage.local.remove("AHIBeautifier_Data");
-			console.log("Deleted Old Data");
-			mainRun({"PMMGExtended": restructured});
-		});
-		
-	}
-	else
-	{
-		chrome.storage.local.get(["PMMGExtended"], function(r)
-		{
-			mainRun(r);
-		});
-	}
-	return;
-}
-
-function restructure_ff(result)
-{
-	if(result["AHIBeautifier_Data"] != undefined)
-	{
-		console.log("Transitioning to new data structure! No data loss should occur, contact PiBoy314 if it does.");
-		var restructured = {};
-		restructured["username"] = result["AHIBeautifier_Data"][0];
-		restructured["apikey"] = result["AHIBeautifier_Data"][1];
-		restructured["webappid"] = result["AHIBeautifier_Data"][2];
-		restructured["color_scheme"] = (result["AHIBeautifier_Data"][3] || true) ? "enhanced" : undefined;
-		restructured["unpack_exceptions"] = result["AHIBeautifier_Data"][4];
-		restructured["sidebar"] = result["AHIBeautifier_Data"][6];
-		restructured["burn_thresholds"] = result["AHIBeautifier_Data"][7];
-		restructured["burn_display_settings"] = [];
-		// Iterate over old data structure, translate to new data structure
-		Object.keys(result["AHIBeautifier_Data"][8]).forEach(key => {
-			restructured["burn_display_settings"] = [key, result["AHIBeautifier_Data"][8][key]];
-		});
-		restructured["loaded_before"] = true;
-		
-		browser.storage.local.set({"PMMGExtended": restructured}, function(){
-			console.log("Success!");
-			browser.storage.local.remove("AHIBeautifier_Data");
-			console.log("Deleted Old Data");
-			mainRun({"PMMGExtended": restructured});
-		});
-		
-	}
-	else
-	{
-		browser.storage.local.get(["PMMGExtended"], function(r)
-		{
-			mainRun(r);
-		});
-	}
-	return;
 }
 
 function mainRun(result)
 {
-	console.log(result);
 	if(!result["PMMGExtended"]){result["PMMGExtended"] = {};}
 	
 	if(!result["PMMGExtended"]["loaded_before"])
