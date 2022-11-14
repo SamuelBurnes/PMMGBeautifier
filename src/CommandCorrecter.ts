@@ -21,10 +21,10 @@ export class CommandCorrecter implements Module {
 			if(PlanetCommands.includes(bufferText.split(" ")[0]))
 			{
 				var replaced = false;
-				PlanetNames.forEach(namePair => {
-					if(bufferText.includes(" " + namePair[0]))
+				Object.keys(PlanetNames).forEach(name => {
+					if(bufferText.includes(" " + name))
 					{
-						bufferText = bufferText.replace(" " + namePair[0], " " + namePair[1]);
+						bufferText = bufferText.replace(" " + name, " " + PlanetNames[name]);
 						replaced = true;
 					}
 				});

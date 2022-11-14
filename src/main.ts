@@ -9,7 +9,7 @@ import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
-import { PMMGStyle, EnhancedColors } from "./Style";
+import { PMMGStyle, EnhancedColors, IconStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
@@ -51,6 +51,14 @@ function mainRun(result)
 		colors.type = "text/css";
 		colors.id = "pmmg-enhanced-colors";
 		colors.textContent = EnhancedColors;
+		if(doc != null){doc.appendChild(colors);}
+	}
+	else if(result["PMMGExtended"]["color_scheme"] == "icons")	// Use allocater's icons
+	{
+		const colors = document.createElement("style");
+		colors.type = "text/css";
+		colors.id = "pmmg-icon-colors";
+		colors.textContent = IconStyle;
 		if(doc != null){doc.appendChild(colors);}
 	}
 	var prices = {};

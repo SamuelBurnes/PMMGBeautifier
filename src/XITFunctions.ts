@@ -1,4 +1,4 @@
-import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet, createLink, showBuffer, createTable} from "./util";
+import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet, createLink, showBuffer, createTable, createSelectOption, downloadFile} from "./util";
 import {TextColors} from "./Style";
 import {MaterialNames} from "./GameProperties";
 import {getGroupBurn} from "./BackgroundRunner";
@@ -20,7 +20,8 @@ export const XITPreFunctions = {
 	"REPAIRS": Repairs_pre,
 	"CALCULATOR": Calculator_pre,
 	"CALC": Calculator_pre,
-	"START": Start_pre
+	"START": Start_pre,
+	"DEBUG": Debug_pre
 }
 
 export const XITBufferTitles = {
@@ -38,7 +39,8 @@ export const XITBufferTitles = {
 	"REPAIRS": "REPAIRS",
 	"CALC": "CALCULATOR",
 	"CALCULATOR": "CALCULATOR",
-	"START": "STARTING WITH PMMG"
+	"START": "STARTING WITH PMMG",
+	"DEBUG": "DEBUG"
 }
 
 const DiscordServers = {
@@ -76,8 +78,8 @@ function XITWebRequest(tile, parameters, callbackFunction, url, requestType: str
     };
 	xhr.timeout = 10000;
 	xhr.open(requestType, url, true);
-	if(header != undefined){xhr.setRequestHeader(header[0], header[1]);}
-	if(content != undefined)
+	if(header){xhr.setRequestHeader(header[0], header[1]);}
+	if(content)
 	{
 		xhr.send(content);
 	}
@@ -216,25 +218,43 @@ export function Settings_pre(tile, parameters, result, fullBurn, burnSettings, m
 	});
 	
 	const enhancedColorHeader = document.createElement('h3');
-    enhancedColorHeader.appendChild(document.createTextNode("Enhanced Colors"));
+    enhancedColorHeader.appendChild(document.createTextNode("Color Scheme"));
     enhancedColorHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(enhancedColorHeader);
 	
 	const colorDiv = document.createElement("div");
 	
-	const colorLabel = createTextSpan("Enhanced Colors");
+	const colorLabel = createTextSpan("Color Scheme:");
 	colorLabel.style.marginBottom = "4px";
 	colorDiv.appendChild(colorLabel);
 	
-	const colorCheck = document.createElement("input");
-	colorCheck.type = "checkbox";
-	colorCheck.checked = result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"];
-	colorCheck.style.display = "inline-block";
-	colorCheck.addEventListener("click", function(){
-		result["PMMGExtended"]["color_scheme"] = colorCheck.checked ? "enhanced" : "default";
+	const colorSelect = document.createElement("select");
+	colorSelect.name = "colors-select";
+	colorSelect.id = "colors-select";
+	colorSelect.appendChild(createSelectOption("Enhanced", "enhanced"));
+	colorSelect.appendChild(createSelectOption("Icons", "icons"));
+	colorSelect.appendChild(createSelectOption("Default", "default"));
+	colorSelect.classList.add("select");
+	colorSelect.style.marginLeft = "4px";
+	
+	if(result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"])
+	{
+		(colorSelect.children[0] as HTMLOptionElement).selected = true;
+	}
+	else if(result["PMMGExtended"]["color_scheme"] == "icons")
+	{
+		(colorSelect.children[1] as HTMLOptionElement).selected = true;
+	}
+	else
+	{
+		(colorSelect.children[2] as HTMLOptionElement).selected = true;
+	}
+	colorSelect.style.display = "inline-block";
+	colorSelect.addEventListener("change", function(){
+		result["PMMGExtended"]["color_scheme"] = colorSelect.selectedOptions[0].value || undefined;
 		setSettings(result);
 	});
-	colorDiv.appendChild(colorCheck);
+	colorDiv.appendChild(colorSelect);
 	tile.appendChild(colorDiv);
 	
 	const burnDiv = document.createElement("div");
@@ -317,7 +337,85 @@ export function Settings_pre(tile, parameters, result, fullBurn, burnSettings, m
 	
 	tile.appendChild(addButton);
 	
+	const importHeader = document.createElement('h3');
+    importHeader.appendChild(document.createTextNode("Import/Export Settings"));
+    importHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(importHeader);
 	
+	const importDiv = document.createElement("div");
+	
+	const importButton = document.createElement("button");
+	importButton.textContent = "Import Settings";
+	importButton.classList.add(...Style.Button);
+	importButton.classList.add(...Style.ButtonPrimary);
+	importButton.style.marginLeft = "4px";
+	importButton.style.marginBottom = "4px";
+	importDiv.appendChild(importButton);
+	const importFileInput = document.createElement("input");
+	importFileInput.type = "file";
+	importFileInput.accept = ".json";
+	importFileInput.style.display = "none";
+	importDiv.appendChild(importFileInput);
+	importButton.addEventListener("click", function() {
+		importFileInput.click()
+		return;
+	});
+	const errorTextBox = createTextSpan("Error Loading File!");
+	errorTextBox.style.display = "none";
+	importDiv.appendChild(errorTextBox);
+	importFileInput.addEventListener("change", function() {
+		if(!this.files){return;}
+		const file = this.files[0];
+		if(!file){return;}
+		const reader = new FileReader();
+		reader.onload = function(e){
+			if(!e || !e.target){return;}
+			try
+			{
+				const fileOutput = JSON.parse(e.target.result);
+				console.log(fileOutput);
+				const exclude = ["username", "apikey", "webappid"];	// Don't overwrite username, apikey, and webappid
+				Object.keys(fileOutput).forEach(key => {
+					if(!exclude.includes(key))
+					{
+						result["PMMGExtended"][key] = fileOutput[key];
+					}
+				});
+				setSettings(result);
+				errorTextBox.style.display = "none";
+			} catch(ex)
+			{
+				console.log("PMMG: Error encountered processing file!");
+				errorTextBox.style.display = "inline-block";
+			}
+			
+		}
+		reader.readAsText(file);
+		return;
+	});
+	
+	const exportButton = document.createElement("button");
+	exportButton.textContent = "Export Settings";
+	exportButton.classList.add(...Style.Button);
+	exportButton.classList.add(...Style.ButtonPrimary);
+	exportButton.style.marginLeft = "4px";
+	exportButton.style.marginBottom = "4px";
+	importDiv.appendChild(exportButton);
+	
+	exportButton.addEventListener("click", function(){
+		const output = {};
+		const exclude = ["username", "apikey", "webappid"];	// Don't export username, apikey, and webappid
+		Object.keys(result["PMMGExtended"]).forEach(key => {
+			if(!exclude.includes(key))
+			{
+				output[key] = result["PMMGExtended"][key];
+			}
+		});
+		
+		downloadFile(output, "pmmg-settings" + Date.now().toString() + ".json");
+	});
+	
+	tile.appendChild(importDiv);
 	
 	return [parameters, fullBurn, burnSettings];
 }
@@ -486,6 +584,63 @@ export function Start_pre(tile)
 	
 	tile.appendChild(createTextSpan("You can explore other settings to enable or disable features, change the color scheme, and customize the left sidebar. Contact PiBoy314 in game or on Discord if you have questions."));
 	return;
+}
+
+export function Debug_pre(tile, parameters, result, fullBurn, burnSettings)
+{
+	clearChildren(tile);
+	const downloadButtons = document.createElement("div");
+	tile.appendChild(downloadButtons);
+	downloadButtons.appendChild(createDownloadButton(result["PMMGExtended"], "Download Full Settings", "pmmg-settings" + Date.now().toString() + ".json"));
+	downloadButtons.appendChild(createDownloadButton(fullBurn[result["PMMGExtended"]["username"]], "Download Burn", "pmmg-burn" + Date.now().toString() + ".json"));
+	downloadButtons.appendChild(createDownloadButton(burnSettings, "Download Burn Settings", "pmmg-burn-settings" + Date.now().toString() + ".json"));
+	const endpointLabel = document.createElement("div");
+	endpointLabel.textContent = "Get FIO Endpoint (ex: /infrastructure/Proxion)";
+	endpointLabel.style.display = "block";
+	endpointLabel.style.marginLeft = "4px";
+	downloadButtons.appendChild(endpointLabel);
+	const endpointInput = document.createElement("input");
+	endpointInput.classList.add("input-text");
+	endpointInput.style.display = "block";
+	downloadButtons.appendChild(endpointInput);
+	const endpointButton = document.createElement("button");
+	endpointButton.textContent = "Download FIO Endpoint";
+	endpointButton.classList.add(...Style.Button);
+	endpointButton.classList.add(...Style.ButtonPrimary);
+	endpointButton.style.marginLeft = "4px";
+	endpointButton.style.marginBottom = "4px";
+	endpointButton.style.display = "block";
+	endpointButton.addEventListener("click", function() {
+		const url = "https://rest.fnar.net" + (endpointInput.value.charAt(0) == "/" ? "" : "/") + endpointInput.value;
+	    XITWebRequest(tile, parameters, Debug_post, url, "GET", ["Authorization", result["PMMGExtended"]["apikey"]], null);
+	});
+	downloadButtons.appendChild(endpointButton);
+	return parameters;
+}
+export function Debug_post(tile, parameters, jsondata)
+{
+	try
+	{
+		console.log(JSON.parse(jsondata));
+	} catch(ex){}
+	downloadFile(jsondata, "fio-endpoint" + Date.now().toString() + ".json", false);
+	return [tile, parameters];
+}
+export function createDownloadButton(data, buttonName, fileName)
+{
+	const downloadButton = document.createElement("button");
+	downloadButton.textContent = buttonName;
+	downloadButton.classList.add(...Style.Button);
+	downloadButton.classList.add(...Style.ButtonPrimary);
+	downloadButton.style.marginLeft = "4px";
+	downloadButton.style.marginBottom = "4px";
+	downloadButton.style.display = "block";
+	downloadButton.addEventListener("click", function() {
+		console.log(data);
+		downloadFile(data, fileName);
+	});
+	return downloadButton;
+	
 }
 
 export function Calculator_pre(tile)

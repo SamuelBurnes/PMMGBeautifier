@@ -1,11 +1,33 @@
 import {Selector} from "./Selector";
-import {MaterialNames} from "./GameProperties";
+import {MaterialNames, PlanetNames} from "./GameProperties";
 import {Style, CategoryColors} from "./Style";
+
+export function downloadFile(fileData, fileName, isJSON: boolean = true)
+{
+	const blob = new Blob([isJSON ? JSON.stringify(fileData) : fileData], {type: "text/plain"});
+	const url = URL.createObjectURL(blob);
+	
+	const urlElement = document.createElement("a");
+	urlElement.setAttribute("download", fileName);
+	urlElement.href = url;
+	urlElement.setAttribute("target", "_blank");
+	urlElement.click();
+	URL.revokeObjectURL(url);
+	return;
+}
 
 export function createNode(htmlString) {
   var div = document.createElement('div');
   div.innerHTML = htmlString.trim();
   return div.firstChild as HTMLElement;
+}
+
+export function createSelectOption(optionLabel, optionValue) 
+{
+	const option = document.createElement("option");
+	option.value = optionValue;
+	option.textContent = optionLabel;
+	return option;
 }
 
 export function createQuickRowButton(shortTextBold, shortTextNormal, longText, command) {
@@ -145,6 +167,10 @@ export function findCorrespondingPlanet(planet, data)
 			return data[i];
 		}
 		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase())
+		{
+			return data[i];
+		}
+		else if(planet && data[i]["PlanetNaturalId"] && PlanetNames[planet] && PlanetNames[planet].toLowerCase() == data[i]["PlanetNaturalId"].toLowerCase())
 		{
 			return data[i];
 		}

@@ -41,15 +41,19 @@ export class OrderETAs implements Module {
 					
 					duration = parseDuration(prodItem.children[0].children[1].children[0].textContent);
 					lineTimes.push(duration);
-					
-					prodItem.children[0].children[1].appendChild(createTextSpan(` (${convertDurationToETA(duration + timeElapsed)})`, this.tag));
+					if(!isNaN(duration + timeElapsed))
+					{
+						prodItem.children[0].children[1].appendChild(createTextSpan(` (${convertDurationToETA(duration + timeElapsed)})`, this.tag));
+					}
 				  }
 				  else
 				  {
 					  duration = parseDuration(prodItem.children[1].children[1].children[0].textContent);
 					  lineTimes.push(duration);
-					  
-					  prodItem.children[1].children[1].appendChild(createTextSpan(` (${convertDurationToETA(duration)})`, this.tag));
+					  if(!isNaN(duration))
+					  {
+						prodItem.children[1].children[1].appendChild(createTextSpan(` (${convertDurationToETA(duration)})`, this.tag));
+					  }
 				  }
 			  } catch(TypeError)
 			  {

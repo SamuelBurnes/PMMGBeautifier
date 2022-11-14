@@ -34,6 +34,52 @@ export function getPrices(prices, webappID)
 	return;
 }
 
+export function getCXPrices(cxPrices)
+{
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {
+		console.log("PMMG: CX Price Timeout");
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			try
+			{
+				console.log("PMMG: Retreived CX Prices");
+				var priceData = JSON.parse(xhr.responseText);
+				const wantedResults = ["AskPrice", "BidPrice", "Average", "AskAvail", "BidAvail"];
+				const CXs = ["AI1", "CI1", "CI2", "IC1", "NC1", "NC2"];
+				priceData.forEach(mat => {
+					cxPrices[mat["Ticker"]] = {};
+					CXs.forEach(CX => {
+						cxPrices[mat["Ticker"]][CX] = {};
+						wantedResults.forEach(wanted => {
+							cxPrices[mat["Ticker"]][CX][wanted] = mat[CX + "-" + wanted];
+							return;
+						});
+						return;
+					});
+					return;
+				});
+				cxPrices["Age"] = Date.now();
+				console.log(cxPrices);
+			}
+			catch(SyntaxError)
+			{
+				console.log("PMMG: Bad Data from Rain Prices");
+			}
+		}
+		return;
+    };
+    
+	xhr.timeout = 10000;
+	xhr.open("GET", "https://rest.fnar.net" + "/rain/prices", true);
+	xhr.send(null);
+	return;
+}
+
 export function getBurn(burn, username, apikey)
 {
 	if(burn == undefined){burn = {};}

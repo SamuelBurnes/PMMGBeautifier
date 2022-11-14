@@ -73,36 +73,30 @@ export const CategoryColors = {
 }
 
 export const PMMGStyle = `
-.tooltip .tooltip-text {
-	visibility: hidden;
-	color: #fff;
-	text-align: left;
-	padding = 0;
-	border-radius: 5px;
-	opacity: 0;
-	transition: opacity 0.3s;
-	max-height: 0;
-	margin-top: -13px;
-	padding-left: 20px; 
-	left: 105%;
-	position: relative;
-	width: 1000px;
+.tooltip-base{
+display:flex;
+position:absolute!important;
+font-family:"Droid Sans",sans-serif;
+font-size:10px;
+color:#bbb
 }
-
-.tooltip:hover .tooltip-text{
-	visibility: visible;
-	opacity: 1;
-	padding = 5px;
+.tooltip
+{
+	display: none;
+	margin-left: 100px;
 }
-
-.tooltip .tooltip-text::after {
-	content: " ";
+.tooltip-base:hover .tooltip
+{
+	display: block;
+	background-color: #23282b;
 	position: absolute;
-	top: 50%;
-	right: 99%;
-	border-width: 5px;
-	border-style: solid;
-	border-color: transparent white transparent transparent;
+}
+.select {
+	border: 0px;
+	border-bottom: 1px solid #8d6411;
+	background-color: #42361d;
+	color: #bbb;
+	outline: none;
 }
 
 .title {
@@ -251,6 +245,7 @@ export const PMMGStyle = `
 	outline: none;
 }
 .hidden-element{
+	display: none !important;
 	visibility: false !important;
 	max-height: 0 !important;
 	padding: 0 !important;
@@ -273,22 +268,32 @@ export const PMMGStyle = `
 export const EnhancedColors = `/* consumables (luxury) */
 div[title="Stellar Pale Ale"],
 div[data-tooltip-content="#tooltip_ALE"],
+.tooltip_ALE,
 div[title="Caffeinated Infusion"],
 div[data-tooltip-content="#tooltip_COF"],
+.tooltip_COF,
 div[title="Einsteinium-Infused Gin"],
 div[data-tooltip-content="#tooltip_GIN"],
+.tooltip_GIN,
 div[title="Kombucha"],
 div[data-tooltip-content="#tooltip_KOM"],
+.tooltip_KOM,
 div[title="NeuroStimulants"],
 div[data-tooltip-content="#tooltip_NST"],
+.tooltip_NST,
 div[title="Padded Work Overall"],
 div[data-tooltip-content="#tooltip_PWO"],
+.tooltip_PWO,
 div[title="Repair Kit"],
 div[data-tooltip-content="#tooltip_REP"],
+.tooltip_REP,
 div[title="Stem Cell Treatment"],
 div[data-tooltip-content="#tooltip_SC"],
+.tooltip_SC,
 div[title="VitaGel"],
 div[data-tooltip-content="#tooltip_VG"],
+.tooltip_VG,
+.tooltip_WIN,
 div[title="Smart Zinfandel"],
 div[data-tooltip-content="#tooltip_WIN"]
 {
@@ -296,6 +301,25 @@ background: linear-gradient(135deg, #680000, #7b0012) !important;
 color: #db9191 !important;
 }
 /* agricultural products */
+.tooltip_FOD,
+.tooltip_CAF,
+.tooltip_HOP,
+.tooltip_GRN,
+.tooltip_MAI,
+.tooltip_HCP,
+.tooltip_MTP,
+.tooltip_PIB,
+.tooltip_PPA,
+.tooltip_ALG,
+.tooltip_BEA,
+.tooltip_MUS,
+.tooltip_RCO,
+.tooltip_RSI,
+.tooltip_HER,
+.tooltip_VEG,
+.tooltip_NUT,
+.tooltip_VIT,
+.tooltip_GRA,
 div[title="Protein-Rich Algae"],
 div[data-tooltip-content="#tooltip_ALG"],
 div[title="Protein-Rich Beans"],
@@ -339,6 +363,14 @@ background: linear-gradient(135deg, #003800, #0a4708) !important;
 color: #8bb37b !important;
 }
 /* plastics */
+.tooltip_DCL,
+.tooltip_DCM,
+.tooltip_DCS,
+.tooltip_PE,
+.tooltip_PG,
+.tooltip_PSL,
+.tooltip_PSM,
+.tooltip_PSS,
 div[title="Durable Casing L"],
 div[data-tooltip-content="#tooltip_DCL"],
 div[title="Durable Casing M"],
@@ -360,6 +392,21 @@ background: linear-gradient(135deg, #791f62, #92387b) !important;
 color: #f89ee1 !important;
 }
 /* consumables (basic) */
+.tooltip_DW,
+.tooltip_EXO,
+.tooltip_FIM,
+.tooltip_HMS,
+.tooltip_HSS,
+.tooltip_LC,
+.tooltip_MEA,
+.tooltip_MED,
+.tooltip_OVE,
+.tooltip_PDA,
+.tooltip_PT,
+.tooltip_RAT,
+.tooltip_SCN,
+.tooltip_WS,
+
 div[title="Drinking Water"],
 div[data-tooltip-content="#tooltip_DW"],
 div[title="Exoskeleton Work Suit"],
@@ -393,6 +440,8 @@ background: linear-gradient(135deg, #a62c2a, #ba363c) !important;
 color: #ff989e !important;
 }
 /* fuels */
+.tooltip_SF,
+.tooltip_FF,
 div[title="FTL Fuel"],
 div[data-tooltip-content="#tooltip_FF"],
 div[title="STL Fuel"],
@@ -402,6 +451,10 @@ background: linear-gradient(135deg, #548d22, #6ba23c) !important;
 color: #cbfaa3 !important;
 }
 /* liquids */
+.tooltip_HEX,
+.tooltip_LES,
+.tooltip_BTS,
+.tooltip_H2O,
 div[title="Heliotrope Extract"],
 div[data-tooltip-content="#tooltip_HEX"],
 div[title="Liquid Einsteinium"],
@@ -413,4 +466,2292 @@ div[data-tooltip-content="#tooltip_H2O"]
 {
 background: linear-gradient(135deg, #67a8da, #6098c3) !important;
 color: #f1ffff !important;
+}
+/* full item name centering */
+.YCp8jhRg4EBG3aQxcizskQ\=\= {
+  display: block;
+  text-align: center;
+  padding-top: 1px;
+  width: 100%;
+}`;
+
+export const IconStyle = `/* PrUnIcon v0.7
+* ===============
+*
+* Install Chrome addon: StyleBot 
+* goto: apex.prosperousuniverse.com
+* right-click anywhere, select: StyleBot -> Style Element
+* Copy&Paste this file into the StyleBot window
+*/
+ 
+/* item ticker color. This is such a bad work around. */
+div[title^="A"] div span,
+div[title^="B"] div span,
+div[title^="C"] div span,
+div[title^="D"] div span,
+div[title^="E"] div span,
+div[title^="F"] div span,
+div[title^="G"] div span,
+div[title^="H"] div span,
+div[title^="I"] div span,
+div[title^="J"] div span,
+div[title^="K"] div span,
+div[title^="L"] div span,
+div[title^="M"] div span,
+div[title^="N"] div span,
+div[title^="O"] div span,
+div[title^="P"] div span,
+div[title^="Q"] div span,
+div[title^="R"] div span,
+div[title^="S"] div span,
+div[title^="T"] div span,
+div[title^="U"] div span,
+div[title^="V"] div span,
+div[title^="W"] div span,
+div[title^="X"] div span,
+div[title^="Y"] div span,
+div[title^="Z"] div span
+{
+    color: #cccccc;
+}
+ 
+/* table color */
+table tbody td:nth-child(odd)
+{
+  background-color: #21252e;
+}
+ 
+div[title="gold ore"i] div:before 
+{
+  content: "🥔";
+  text-shadow: 0 0 0 gold;
+  position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  font-size: 20pt;
+  opacity: 0.1;
+}
+ 
+div[title="iron ore"i] div:before 
+{
+  content: "🥔";
+  text-shadow: 0 0 0 aqua;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  font-size: 20pt;
+  opacity: 0.1;
+}
+ 
+div[title="aluminium ore"i] div:before 
+{
+  content: "🥔";
+  text-shadow: 0 0 0 grey;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  font-size: 20pt;
+  opacity: 0.1;
+}
+ 
+div[title="silicon ore"i] div:before 
+{
+  content: "🥔";
+  text-shadow: 0 0 0 white;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  font-size: 20pt;
+  opacity: 0.1;
+}
+ 
+div[title="titanium ore"i] div:before 
+{
+  content: "🥔";
+  text-shadow: 0 0 0 blue;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  font-size: 20pt;
+  opacity: 0.1;
+}
+ 
+div[title="lithium ore"i] div:before 
+{
+  content: "🥔";
+  text-shadow: 0 0 0 green;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  font-size: 20pt;
+  opacity: 0.1;
+}
+ 
+div[title="copper ore"i] div:before 
+{
+  content: "🥔";
+  text-shadow: 0 0 0 red;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  font-size: 20pt;
+  opacity: 0.1;
+}
+ 
+div[title="ferro-titanium"i] div:before 
+{
+  content: "🟦";
+  font-size: 15px;
+  color: rgba(1,1,1,1);
+  opacity: 0.3;
+    position: absolute;
+  z-index: -1;
+}
+ 
+div[title="alpha-stabilized titanium"i] div:before 
+{
+  content: "⬜";
+  font-size: 15px;
+  color: rgba(1,1,1,1);
+  opacity: 0.3;
+    position: absolute;
+  z-index: -1;
+}
+ 
+div[title="ferrominium"i] div:before 
+{
+  content: "⬜";
+  font-size: 15px;
+  color: rgba(1,1,1,1);
+  opacity: 0.3;
+    position: absolute;
+  z-index: -1;
+}
+ 
+div[title="alpha-stabilized tungsten"i] div:before 
+{
+  content: "⬜";
+  font-size: 15px;
+  color: rgba(1,1,1,1);
+  opacity: 0.3;
+    position: absolute;
+  z-index: -1;
+}
+ 
+div[title^="Basic Thermal"i] div:before 
+{
+  content: "🔥";
+  font-size: 15px;
+  color: rgba(1,1,1,1);
+  opacity: 0.2;
+    position: absolute;
+  z-index: -1;
+}
+ 
+div[title^="Advanced Thermal"i] div:before 
+{
+  content: "🔥";
+  font-size: 20px;
+  color: rgba(1,1,1,1);
+  opacity: 0.2;
+    position: absolute;
+  z-index: -1;
+}
+ 
+div[title*="Anti-Rad"i] div:before 
+{
+  content: "⚛";
+  font-size: 20px;
+  color: rgba(1,1,1,1);
+  opacity: 0.4;
+    position: absolute;
+  z-index: -1;
+}
+ 
+div[title^="Advanced Anti-Rad"i] div:before 
+{
+  font-size: 25px;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  opacity: 0.1;
+}
+ 
+div[title^="Specialized Anti-Rad"i] div:before 
+{
+  font-size: 30px;
+    position: absolute;
+  z-index: -1;
+  color: rgba(100%, 0%, 0%, 0);
+  opacity: 0.1;
+}
+ 
+/* non-category color special hacks*/
+ 
+div[title="High-Capacity Connectors"],
+div[title="Red Gold"]
+{
+  background: linear-gradient(135deg, rgb(145 129 43), rgb(120 72 7))
+}
+ 
+div[title="Shielded Connectors"],
+div[title="Blue Gold"]
+{
+  background: linear-gradient(135deg, rgb(145 129 43), rgb(70 72 200))
+}
+ 
+div[title="Air Scrubber"]
+{
+  background: linear-gradient(135deg, rgb(30 96 58),  rgb(51, 26, 76));
+}
+ 
+ 
+/* "normal" icons and colors */
+/* ------------------------- */
+ 
+/* RAT inputs */
+div[title^="High-Carb"],
+div[title^="Protein-Rich"],
+div[title^="Triglyceride"]
+{
+  background: linear-gradient(135deg, rgb(145 129 43), rgb(70 72 7))
+}
+ 
+div[content="Io-dine"]
+{
+  background: linear-gradient(135deg, rgb(153 87 1), rgb(86 40 0))
+}
+ 
+/* other Argriculture */
+div[title="Hydrocarbon Plants"],
+div[title="Spicy Herbs"],
+div[title="All-Purpose Fodder"],
+div[title="Flowery Hops"],
+div[title="Caffeinated Beans"],
+div[title="Raw Cotton Fiber"],
+div[title="Wine-Quality Grapes"],
+div[title="Meat Tissue Patties"],
+div[title="Pineberries"],
+div[title="Raw Silk Strains"],
+div[title="Vita Essence"],
+div[title="Protein Paste"] {
+  background: linear-gradient(135deg, rgb(153 87 1), rgb(86 40 0))
+}
+ 
+div[title^="Drink"],
+div[title^="Basic Ra"] {
+  background: linear-gradient(135deg, rgb(71 126 174), rgb(46 66 149))
+}
+ 
+div[title^="Water"] {
+  background: linear-gradient(135deg, rgb(122 80 55), rgb(18 74 124))
+}
+ 
+/* chemicals bg colors */
+div[title*="Substance"], 
+div[title*="Chemical"], 
+div[title="Liquid Crystals"], 
+div[title*="Agent"], 
+div[title*="Flux"], 
+div[title*="Resin"], 
+div[title*="Colorant"],
+div[title*="Acid"], 
+div[title*="Bacteria"], 
+div[title*="Soil"],
+div[title*="Stabilizer"],
+div[title*="Fertilizer"],
+div[title*="ThermoFluid"],
+div[title*="Solution"] {
+  background: linear-gradient(135deg, rgb(183, 46, 91), rgb(114 37 62))
+}
+ 
+/* construction bg colors */
+div[title="InsuFoam"],
+div[title="Epoxy Resin"],
+div[title="MegaTube Coating"],
+div[title="Nano-Carbon Sheeting"],
+div[title="Nano Fiber"],
+div[title="Nano-Coated Glass"],
+div[title="Reinforced Glass"],
+div[title="Poly-Sulfite Sealant"],
+div[title="Glass"],
+div[title="Mineral Construction Granulate"] {
+  background: linear-gradient(135deg, rgb(72 125 221), rgb(0 64 179))
+}
+ 
+/* construction parts */
+div[title="Aerostat Foundation"],
+div[title="Air Scrubber"],
+div[title="Decorative Elements"],
+div[title="Floating Tank"],
+div[title="Flow Control Device"],
+div[title="Fluid Piping"],
+div[title="Cylindrical Gas Container"],
+div[title="Gas Vent"],
+div[title="Magnetic Ground Cover"],
+div[title="Metal-Halide Lighting System"],
+div[title="Neon Lighting System"],
+div[title="Pressure Shielding"],
+div[title="Radiation Shielding"],
+div[title="Stabilized Technetium"],
+div[title="Thermal Shielding"],
+div[title="Truss"] {
+  background: linear-gradient(135deg, rgb(66, 102, 132), rgb(41, 77, 107))
+}
+ 
+div[title="STL Fuel"],
+div[title="FTL Fuel"] {
+  background: linear-gradient(135deg, rgb(30, 123, 30), rgb(32 90 32))
+}
+ 
+ 
+/* electronic systems bg color */
+div[title="Audio Distribution System"],
+div[title="Automated Cooling System"],
+div[title="Climate Controller"],
+div[title="Communication System"],
+div[title="FTL Field Controller"],
+div[title="Life Support System"],
+div[title="Logistics System"],
+div[title="Stability Support System"],
+div[title="Targeting Computer"],
+div[title="Cryogenic Unit"]
+{
+  background: linear-gradient(135deg, rgb(76, 51, 141),  rgb(51, 26, 76));
+}
+ 
+/* life related electronics systems bg color*/
+div[title="Water Reclaimer"],
+div[title="Life Support System"]
+{
+  background: linear-gradient(135deg, rgb(30 96 58),  rgb(51, 26, 76));
+}
+ 
+ 
+/* prefabs */
+div[title^="Basic Str"],
+div[title^="Basic Deck"],
+div[title^="Basic Bulk"],
+div[title^="Basic Trans"] {
+  background: linear-gradient(135deg, rgb(51 54 66 ), rgb(15, 30, 98))
+}
+div[title^="Lightweight"] {
+  background: linear-gradient(135deg, rgb(85 94 35), rgb(15, 30, 98))
+}
+div[title^="Hardened"], 
+div[title^="Reinforced"] {
+  background: linear-gradient(135deg, rgb(78 44 27), rgb(15, 30, 98))
+}
+div[title^="Advanced Deck"],
+div[title^="Advanced Transp"],
+div[title^="Advanced Str"],
+div[title^="Advanced Bulk"] {
+  background: linear-gradient(135deg, rgb(71 35 94), rgb(15, 30, 98))
+}
+ 
+div[title*="ium"]:before, 
+div[title*="site"]:before, 
+div[title*="mineral"i]:before {
+  content: "⛰"; opacity: 0.4;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title*="controller"i]:before {
+  content: "🎛"; opacity: 0.6;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title*="filter"i]:before,
+div[title*="device"i]:before,
+div[title*=" MK"i]:before {
+  content: "📻";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="glass"i]:before {
+  content: "🔲";
+  font-size: 25px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="headphone"i]:before {
+  content: "🎧";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="holographic glasses"i]:before {
+  content: "👓";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="diode"i]:before {
+  content: "▶";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[data-tooltip-content*="SAR"i]:before,
+div[title*="scanner"i]:before,
+div[title*="sensor"i]:before {
+  content: "🔭";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Foundation"]:before {
+  content: "🧇";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+/* 🧮🎫🎟 */
+div[title*="memory"i]:before,
+div[title*="process"i]:before,
+div[title*="transistor"i]:before,
+div[title*="circuit"i]:before {
+  content: "🎟";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+/*🧧🎟💿📼*/
+div[title="Non-Volatile Memory"i]:before
+{
+  content: "📀";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="system"i]:before,
+div[title*="computer"i]:before,
+div[title*="mainframe"i]:before {
+  content: "🖥"; 
+  opacity: 0.6;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+/* 🎛🎚💾💽💿📀 */
+div[title*="Navigation"]:before,
+div[title*="Artificial"]:before,
+div[title*="Data"]:before,
+div[title*="Network"]:before,
+div[title*="Database"]:before,
+div[title*="Framework"]:before,
+div[title*="Management"]:before,
+div[title*="Operating"]:before,
+div[title*="Interface"]:before,
+div[title*="Algorithm"]:before,
+div[title*="Manager"]:before {
+  content: "💾";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="motherboard"i]:before,
+div[title*="wafer"i]:before {
+  content: "🎫";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="broadcasting"i]:before,
+div[title*="antenna"i]:before,
+div[title*="emitter"i]:before {
+  content: "📡";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="library"i]:before {
+  content: "📖";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Workstation"]:before,
+div[title*="Display"]:before {
+  content: "💻";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Light"]:before {
+  content: "💡";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Rock"]:before {
+  content: "🥯";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Liquid"]:before, 
+div[title*="Fluid"]:before {
+  content: "💧";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Air"]:before, 
+div[title*="Gas"]:before,
+ div[title*="Aero"]:before {
+  content: "☁";
+     position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Audio"]:before {
+  content: "🔊";
+  opacity: 0.3; /* system override */
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title*="Power"]:before, 
+div[title*="Capacitor"]:before {
+  content: "🔋";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Kit"]:before {
+  content: "🛠";
+  font-size: 35px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="Tank"]:before {
+  content: "🛢";
+  font-size: 35px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="Protection"]:before,
+div[title*="Plate"]:before,
+div[title*="Shield"]:before {
+  content: "🛡";
+  font-size: 40px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="Connectors"]:before {
+  content: "🔌";
+  font-size: 30px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="Seats"]:before {
+  content: "🪑";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Substance"]:before, 
+div[title*="Chemical"]:before, 
+div[title*="Agent"]:before, 
+div[title*="Flux"]:before, 
+div[title*="Resin"]:before, 
+div[title*="Colorant"]:before {
+  content: "🧪";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Acid"]:before {
+  content: "☣";
+  font-size: 40px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="Bacteria"]:before {
+  content: "🧫";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Cryo"]:before {
+  content: "❄";
+  font-size: 40px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="Soil"]:before {
+  content: "🥔";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+/* 🧰🔪🩺 */
+div[title*="Surgical"i]:before,
+div[title*="Medical"i]:before {
+  content: "🩺";
+  font-size: 30px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="Magnet"]:before {
+  content: "🧲";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Deco"]:before {
+  content: "🖼";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Solar"]:before {
+  content: "⚡";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+/* alloys ♒ 🟪*/
+div[title*="-Titanium"]::before,
+div[title*=" Titanium"]::before
+{
+  content: "🟪";
+  font-size: 25px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+ 
+div[title="Ferrominium"]::before
+{
+  content: "🟦";
+  font-size: 25px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+ 
+ 
+/* ---- Medical ------ */
+div[title="Auto-Doc"],
+div[title="Bandages"],
+div[title="Medical Stretcher"],
+div[title="Painkillers"],
+div[title="Surgical Equipment"],
+div[title="Test Tubes"]
+{
+  background: linear-gradient(135deg, rgb(64 133 64), rgb(48 86 48))
+}
+ 
+div[title="Auto-Doc"]:before {
+  content: "👨‍⚕️";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Bandages"]:before {
+  content: "🧻";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Painkillers"]:before {
+  content: "💊";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Surgical Equipment"]:before {
+  content: "🩺";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Tube"]:before {
+  content: "🧪";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+/* 🛌 */
+div[title*="Crew Quarters"]:before,
+div[title*="Trauma Care"]:before {
+  content: "🛏";
+  font-size: 40px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+/* ---------- */
+ 
+div[title*="Iodine"]:before {
+  content: "🩸";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Sodium"]:before {
+  content: "🧂";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Carbon"]:before {
+  content: "🎩";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+/* 🧂💿🍙🍥⛰🏔 */
+div[title="Chlorine"]:before {
+  content: "🍥";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Sulfur"]:before {
+  content: "🟡";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Tantalum"]:before {
+  content: "🔘";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Calcium"]:before {
+  content: "⛰";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Beryllium"]:before {
+  content: "⛰";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Magnesium"]:before {
+  content: "⛰";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title="Gold"]:before {
+  content: "🟨";
+  font-size: 25px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+ 
+/* 〰🧈🧊🟤🟦 */
+ 
+div[title="Aluminium"]:before {
+  content: "⬜";
+  font-size: 25px; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title="Steel"]:before {
+  content: "🧊";
+  font-size: 25px; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title="Titanium"]:before {
+  content: "🟪";
+  font-size: 25px; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title~="Tungsten"]:before
+{
+  content: "🟫";
+  font-size: 25px; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title="Silicon"]:before{
+  content: "〰"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+div[title="Copper"]:before {
+  content: "🟧";
+  font-size: 25px; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+/* 🟥 */
+div[title="Iron"]:before {
+  content: "🟦";
+  font-size: 25px; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+/* alloys */
+ 
+div[title="Red Gold"]:before {
+  content: "🔶";
+  font-size: 25px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+ 
+div[title="Blue Gold"]:before {
+  content: "🔷";
+  font-size: 25px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+ 
+div[title="Bronze"]:before {
+  content: "🔺";
+  font-size: 25px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+ 
+div[title="Borosilicate"]:before {
+  content: "〰";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+/* ---- */
+ 
+/* 🖊❗➖💈 🌠🥖🍡🧨 */
+div[title*="fuel rod"i]:before {
+  content: "🧨";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="basic fuel rod"i]:before {
+  content: "➖";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*=" reactor"i]:before,
+div[title*=" generator"i]:before {
+  content: "🎆";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="fission reactor"i]:before {
+  font-size: 20px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title*="radioisotope generator"i]:before {
+  font-size: 20px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+ 
+/* ---- */
+ 
+div[title="Limestone"]:before {
+  content: "🥯";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title*="Drone"]:before {
+  content: "✈";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title*="Ore"]:before {
+  content: "🥔";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title*="Crystals"]:before {
+  content: "💎";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+/* ---------- */
+ 
+div[title$="Grains"]:before {
+  content: "🌾";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Maize"]:before {
+  content: "🌽";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title^="Drink"]:before {
+  content: "🧃";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title^="Protein-Rich Beans"]:before {
+  content: "🥒";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title^="Basic Ra"]:before {
+  content: "🥫";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Nuts"]:before {
+  content: "🥜";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Fruits"]:before {
+  content: "🍅";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Plants"]:before {
+  content: "🌲";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title^="Caffeinated Beans"]:before {
+  content: "🌿";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Algae"]:before {
+  content: "🍃";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Grapes"]:before {
+  content: "🍇";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Herbs"]:before {
+  content: "🌶";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Fodder"]:before {
+  content: "💊";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Hops"]:before {
+  content: "🌾";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Cotton Fiber"]:before {
+  content: "🧶";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Patties"]:before {
+  content: "🧫";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Mushrooms"]:before {
+  content: "🍄";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Pineberries"]:before {
+  content: "🍓";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Paste"]:before {
+  content: "🥣";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Solution"]:before {
+  content: "🧪";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title^="Vita Essence"]:before {
+  content: "🍶";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+ 
+div[title^="Water"]:before {
+  content: "💧";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+/* 🎨🏀🏐⚾ */
+div[title="Polymer Granulate"]:before {
+  content: "🏐";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Poly-Ethylene"]:before {
+  content: "⚾";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title*="Sheet Type"]:before {
+  content: "🧻";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title*="Foam"]:before,
+div[title*="Seal"]:before {
+  content: "🌫";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Fiber"]:before,
+div[title*="Fabric"]:before {
+  content: "🧵";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Raw Silk Strains"]:before,
+div[title="Raw Cotton Fiber"]:before {
+  content: "🧶";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Supplies"]:before {
+  content: "📠";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title$="Uniform"]:before {
+  content: "👖";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title$="Toolset"]:before {
+  content: "🛠"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+div[title^="FTL"]:before {
+  content: "☀";
+  font-size: 40px; opacity: 0.5;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title^="STL"]:before {
+  content: "🛢";
+  font-size: 40px; opacity: 0.5;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title$="Construction Granulate"]:before {
+  content: "🧱";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title*="Casing"]:before {
+  content: "🧊";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title$="Deck Elements"]:before {
+  content: "🎞";
+  font-size: 40px;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+}
+div[title$="Structural Elements"]:before {
+  content: "⛓";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+/* 🛎 */
+div[title$="Bulkhead"]:before {
+  content: "🛸";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+/* 🏗🧭🌫☀🌀 */
+div[title$="Aperture"]:before {
+  content: "🏗";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Truss"]:before {
+  content: "🗼";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+/* ----- gasses------ */
+/* 💨🕳〰🌊🌫💥🛢🧳🧴☄ */
+ 
+div[title="Ammonia"]:before {
+  content: "🩸";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Argon"]:before {
+  content: "☁";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Fluorine"]:before {
+  content: "☁";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Neon"]:before {
+  content: "☁";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Nitrogen"]:before {
+  content: "💧";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Oxygen"]:before {
+  content: "💨";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title*="Helium"]:before {
+  content: "🌌";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title^="Hydrogen"]:before {
+  content: "💫";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+div[title="Helium-3 Isotope"]:before,
+div[title="Heliotrope Extract"]:before{
+  content: "💦";
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  opacity: .3;
+  font-size: 30px;
+}
+ 
+div[title="Caffeinated Infusion"]:before {
+  content: "☕"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Basic Overalls"]:before {
+  content: "🧥"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title$="Work Overall"]:before {
+  content: "🦺"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Basic Overalls"] { background: linear-gradient(135deg, rgb(64 97 104), rgb(57 73 147)) }
+div[title="Caffeinated Infusion"], 
+div[title$="Work Overall"] { background: linear-gradient(135deg, rgb(64 97 104), rgb(105 30 145)) }
+ 
+div[title="Kombucha"]:before {
+  content: "🍯"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title^="Exos"]:before {
+  content: "👷‍♀️"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title^="Power Tools"]:before {
+  content: "🔌"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title^="Exos"], 
+div[title="Power Tools"] { background: linear-gradient(135deg, rgb(42 122 54), rgb(57 73 147)) }
+div[title="Kombucha"],
+div[title="Repair Kit"] { background: linear-gradient(135deg, rgb(42 122 54), rgb(105 30 145)) }
+ 
+div[title$="Ale"]:before {
+  content: "🍺"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Stem Cell Treatment"]:before {
+  content: "💉"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="HazMat Work Suit"]:before {
+  content: "👩‍🚒"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Multi-Purpose Scanner"]:before {
+  content: "🔭"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Basic Medical Kit"], 
+div[title="HazMat Work Suit"], 
+div[title="Multi-Purpose Scanner"] { background: linear-gradient(135deg, rgb(116 124 27), rgb(57 73 147)) 
+}
+div[title$="Ale"], 
+div[title="Stem Cell Treatment"] { background: linear-gradient(135deg, rgb(116 124 27), rgb(105 30 145)) 
+}
+ 
+div[title$="Gin"]:before {
+  content: "🥃"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title$="Meal"]:before {
+  content: "🥡"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="VitaGel"]:before {
+  content: "🧪"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Smart Space Suit"]:before {
+  content: "👨‍🚀"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title*="personal"i]:before {
+  content: "📱"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Flavoured Insta-Meal"], 
+div[title="Personal Data Assistant"], 
+div[title="Smart Space Suit"] { background: linear-gradient(135deg, rgb(52 93 159), rgb(57 73 147)) }
+div[title$="Gin"], 
+div[title="VitaGel"] { background: linear-gradient(135deg, rgb(52 93 159), rgb(105 30 145)) }
+ 
+ 
+div[title="Smart Zinfandel"]:before {
+  content: "🍷"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title$="Meat Meal"]:before {
+  content: "🍱"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="NeuroStimulants"]:before {
+  content: "💊"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="AI-Assisted Lab Coat"]:before {
+  content: "🥼"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title="Scientific Work Station"]:before {
+  content: "🔬"; opacity: 0.2;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+div[title$="Meat Meal"], 
+div[title="AI-Assisted Lab Coat"], 
+div[title="Scientific Work Station"] { background: linear-gradient(135deg, rgb(155 92 169), rgb(57 73 147)) }
+div[title="Smart Zinfandel"], 
+div[title="NeuroStimulants"] { background: linear-gradient(135deg, rgb(155 92 169), rgb(105 30 145)) }
+ 
+/* 🕹☎📞 */
+div[title*="command bridge"i]:before {
+  content: "☎"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+/* ⛰☢⚙🚰🌡 */
+div[title*="engine"i]:before {
+  content: "🚀"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+div[title*="nozzle"i]:before {
+  content: "⛰"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+/* 🧨🌟🧳🛎 */
+div[title*="combustion chamber"i]:before {
+  content: "🧳"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+div[title*="pump"i]:before,
+div[title*="pipe"i]:before,
+div[title*="piping"i]:before
+{
+  content: "🚰"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+div[title*="vent"i]:before {
+  content: "♨";
+  font-size: 40px; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+/* 🗼🧇🔗⛓🛡📎🖇 */ 
+div[title*="structural space"i]:before {
+  content: "⛓"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+/* 🧊📦 */ 
+div[title*="cargo bay"i]:before {
+  content: "📦"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+div[title*="habitat"i]:before {
+  content: "🏠"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+div[title*="surgery unit"i]:before {
+  content: "⚕"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+/*🗄🎯🎡*/
+div[title*="entertainment unit"i]:before {
+  content: "🎡"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+/* 🎨 */
+div[title*="workshop unit"i]:before {
+  content: "🎨"; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  font-size: 30px;
+}
+ 
+/* sizes */
+ 
+div[title*="small"i]:before,
+div[title*="tiny"i]:before,
+div[title$=" s"i]:before 
+{
+  font-size: 20px; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title*="medium"i]:before,
+div[title$=" m"i]:before 
+{
+  font-size: 25px; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+div[title*="transistor"i]:before 
+{
+  font-size: 25px; opacity: 0.4;
+    position: absolute;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+ 
+/* buildings - kill stray icons */
+div.\_6UivsDhXJylBr\+\+R9f05OQ\=\=:before
+{
+  content: "";
 }`;
