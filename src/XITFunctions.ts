@@ -211,7 +211,7 @@ export function Settings_pre(tile, parameters, result, fullBurn, burnSettings, m
 		}
 		right.appendChild(toggle);
 
-		const cleanup = makePushButton("x", () => mp.module.cleanup());
+		const cleanup = makePushButton("x", () => mp.module.cleanup(true));
 		cleanup.style.marginRight = "8px";
 		right.appendChild(cleanup);
 		return;

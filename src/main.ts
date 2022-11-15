@@ -43,7 +43,9 @@ function mainRun(result)
 	style.id = "pmmg-style";
 	style.textContent = PMMGStyle;
 	const doc = document.querySelector("html");
-	if(doc != null){doc.appendChild(style);}
+	if(doc){doc.appendChild(style);}
+	
+	if(!result["PMMGExtended"]["disabled"]){result["PMMGExtended"]["disabled"] = ["ScreenUnpack"];}
 	
 	if(result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"])
 	{
@@ -51,7 +53,7 @@ function mainRun(result)
 		colors.type = "text/css";
 		colors.id = "pmmg-enhanced-colors";
 		colors.textContent = EnhancedColors;
-		if(doc != null){doc.appendChild(colors);}
+		if(doc){doc.appendChild(colors);}
 	}
 	else if(result["PMMGExtended"]["color_scheme"] == "icons")	// Use allocater's icons
 	{
@@ -59,7 +61,7 @@ function mainRun(result)
 		colors.type = "text/css";
 		colors.id = "pmmg-icon-colors";
 		colors.textContent = IconStyle;
-		if(doc != null){doc.appendChild(colors);}
+		if(doc){doc.appendChild(colors);}
 	}
 	var prices = {};
 	getPrices(prices, result["PMMGExtended"]["webappid"]);

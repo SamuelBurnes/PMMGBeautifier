@@ -5,13 +5,18 @@ import {Materials} from "./GameProperties";
 
 export class Notifications implements Module {
   private tag = "pb-nots";
-  cleanup() {
-    genericCleanup(this.tag);
+  cleanup(full: boolean = false) {
+	  full && genericCleanup(this.tag);
+	  return;
   }
   run() {
     const elements = document.querySelectorAll(Selector.Notification);
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
+	  if(element.children[1].firstChild && (element.children[1].firstChild as HTMLElement).classList.contains(this.tag))
+	  {
+		continue;
+	  }
 	  const textContent = (element.children[1].children[0] as HTMLElement).textContent;
 	  if(textContent == null){continue;}
 	  const text = textContent.toLowerCase();

@@ -5,8 +5,8 @@ import {genericCleanup, createNode} from "./util";
 export class ScreenUnpack implements Module {
   private tag = "pb-screens";
   private exclusions;
-  cleanup() {
-    genericCleanup(this.tag);
+  cleanup(full: boolean = false) {
+    full && genericCleanup(this.tag);
   }
   constructor(exclusions) {
 	exclusions = exclusions == undefined ? [] : exclusions;
@@ -16,6 +16,10 @@ export class ScreenUnpack implements Module {
   run() {
 	const navbar = document.getElementById(Selector.ScreenControls);
 	if(navbar == null){return;}
+	if((navbar.children[navbar.children.length - 1] as HTMLElement).classList.contains(this.tag))
+	{
+		return;
+	}
 	const navbarItemClassList = navbar.children[2].classList;
 	const nbitMainClassList = navbar.children[2].children[0].classList;
 	const nbitUnderlineClassList = navbar.children[2].children[1].classList;
@@ -42,6 +46,7 @@ export class ScreenUnpack implements Module {
 		buttonElem.classList.add(this.tag);
 		navbar.appendChild(buttonElem);
 	});
+	return;
   }
   
 }

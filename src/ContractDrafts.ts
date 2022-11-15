@@ -5,8 +5,7 @@ import {genericCleanup, getBuffers, createTextSpan} from "./util";
 
 export class ContractDrafts implements Module {
 	private prices;
-	private cleanups: Array<() => void> = [];
-	
+
 	constructor(prices)
 	{
 		this.prices = prices;
@@ -14,10 +13,6 @@ export class ContractDrafts implements Module {
   private tag = "pb-contd";
 
   cleanup() {
-    this.cleanups.forEach((f, i) => {
-      f();
-      delete this.cleanups[i];
-    });
     genericCleanup(this.tag);
   }
   run() {

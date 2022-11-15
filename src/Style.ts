@@ -467,8 +467,12 @@ div[data-tooltip-content="#tooltip_H2O"]
 background: linear-gradient(135deg, #67a8da, #6098c3) !important;
 color: #f1ffff !important;
 }
+/* I would love these next two to work, but they don't for some reason. */
+div.HWbVOIC2rYGNug3UC2dV\+Q\=\= {
+	background-color: #222;
+}
 /* full item name centering */
-.YCp8jhRg4EBG3aQxcizskQ\=\= {
+div.YCp8jhRg4EBG3aQxcizskQ\=\= {
   display: block;
   text-align: center;
   padding-top: 1px;

@@ -1,13 +1,12 @@
 import {Module} from "./ModuleRunner";
-import {genericCleanup, changeValue} from "./util";
+import {changeValue} from "./util";
 import {Selector} from "./Selector";
 import {PlanetCommands, PlanetNames} from "./GameProperties";
 
 export class CommandCorrecter implements Module {
-  private tag = "pb-command";
-
   cleanup() {
-    genericCleanup(this.tag);
+    // Nothing to clean up.
+	return;
   }
 
   run() {

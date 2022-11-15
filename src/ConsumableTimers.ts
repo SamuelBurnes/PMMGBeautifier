@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {parseBaseName, findBurnAmount, findCorrespondingPlanet, findInventoryAmount, createTextSpan, genericCleanup, getBuffers} from "./util";
+import {parseBaseName, findBurnAmount, findCorrespondingPlanet, findInventoryAmount, createTextSpan, getBuffers} from "./util";
 import {Selector} from "./Selector";
 
 /**
@@ -16,9 +16,10 @@ export class ConsumableTimers implements Module {
 		this.username = username;
 		this.thresholds = thresholds;
 	}
-  private tag = "pb-consumable-timers";
+	
   cleanup() {
-    genericCleanup(this.tag);
+    // Nothing to clean up.
+	return;
   }
   run() {
 	if(this.burn[this.username] == undefined || this.burn[this.username].length == 0){return;}
