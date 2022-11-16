@@ -11,15 +11,17 @@ export class Sidebar implements Module {
     this.buttons = buttons;
   }
 
-  cleanup() {
-    genericCleanup(this.tag);
+  cleanup(full: boolean = false) {
+    full && genericCleanup(this.tag);
   }
 
   run()
   {
 	const sidebar = document.getElementById(Selector.LeftSidebar);
+	
 	if(!this.buttons){this.buttons = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];}
 	if(!sidebar){return;}
+	
 	this.defaultButtons.forEach(defaultButton => {
 		var enabled = false;
 		for(let option of this.buttons)
@@ -41,6 +43,10 @@ export class Sidebar implements Module {
 			});
 		}
 	});
+	if((sidebar.children[sidebar.children.length-1] as HTMLElement).classList.contains(this.tag))
+	{
+		return;
+	}
 	this.buttons.forEach(buttonInfo => {
 		if(this.defaultButtons.includes(buttonInfo[0].toUpperCase())){return;}
 		const button = document.createElement("div");

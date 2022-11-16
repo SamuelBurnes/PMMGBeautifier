@@ -78,7 +78,7 @@ export class ModuleRunner {
     });
 
     // @TODO: Vary the interval based on module performance
-    window.setTimeout(() => this.loop(), 1000);
+    window.setTimeout(() => this.loop(), 250);
   }
 }
 

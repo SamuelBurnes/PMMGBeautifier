@@ -86,6 +86,8 @@ export class Notifications implements Module {
 				case "cogc":
 				case "chamber of global commerce":
 					notText = notText.replace(/ a new economic program/, "");
+					notText = notText.replace(/ Advertising Campaign:/, "");
+					
 					foundType = true;
 					break;
 			}
