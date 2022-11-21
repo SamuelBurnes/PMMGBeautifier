@@ -495,7 +495,9 @@ export const IconStyle = `/* PrUnIcon v0.7
 .rjpYL1i9cZmf47fM9qWyZQ\\=\\= {
     color: #cccccc;
 }
- 
+ div.HWbVOIC2rYGNug3UC2dV\\+Q\\=\\= {
+	background-color: #222;
+}
  
 /* full item name centering */
 .YCp8jhRg4EBG3aQxcizskQ\\=\\= {

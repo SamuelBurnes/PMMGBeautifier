@@ -24,18 +24,17 @@ export class XITHandler implements Module {
   }
   run() {
     const buffers = getBuffers("XIT");
-    if (buffers == undefined) return;
-	var burn = this.burn;
-	var burnSettings = this.burnSettings;
+    if (!buffers) return;
+	const burn = this.burn;
+	const burnSettings = this.burnSettings;
 	buffers.forEach(buffer => {
-		var tile = buffer.querySelector(Selector.XITTile) as HTMLElement;
-		if(tile == null){tile = buffer.querySelector(Selector.XITTileFloat) as HTMLElement;}
-		if(tile == null || tile == undefined){return;}
+		const tile = (buffer.querySelector(Selector.XITTile) || buffer.querySelector(Selector.XITTileFloat)) as HTMLElement;
+		if(!tile){return;}
 		
-		if(tile.firstChild != undefined && ((tile.firstChild as HTMLElement).id == "pmmg-load-success" || (tile.firstChild as HTMLElement).id == "pmmg-no-match")){return;}
+		if(tile.firstChild && ((tile.firstChild as HTMLElement).id == "pmmg-load-success" || (tile.firstChild as HTMLElement).id == "pmmg-no-match")){return;}
 		
 		const parametersRaw = Array.from(buffer.getElementsByClassName(Selector.BufferHeader))[0].textContent;
-		if(parametersRaw == undefined || parametersRaw == null) return;
+		if(!parametersRaw) return;
 		var parameters = [] as string[];
 		if(parametersRaw.charAt(4) == "1")
 		{
@@ -49,14 +48,14 @@ export class XITHandler implements Module {
 		{
 			parameters = parametersRaw.slice(4).split("_");
 		}
-		if(parameters == undefined || parameters == null) return;
+		if(!parameters) return;
 		
-		if(tile.firstChild != undefined && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, burn, burnSettings, this.modules);return;}
+		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, burn, burnSettings, this.modules);return;}
 		
 		tile.classList.add("xit-tile");
 		
 		const refreshButton = document.createElement("div");
-		if(!tile.firstChild || (tile.firstChild != undefined && ((tile.firstChild as HTMLElement).id != "pmmg-no-match")))
+		if(!tile.firstChild || (tile.firstChild && ((tile.firstChild as HTMLElement).id != "pmmg-no-match")))
 		{
 				refreshButton.appendChild(createTextSpan("⟳"));
 				refreshButton.classList.add("button-upper-right");
@@ -73,7 +72,7 @@ export class XITHandler implements Module {
 		tile.appendChild(contentDiv);
 		
 		const preFunc = XITPreFunctions[parameters[0].toUpperCase()];
-		if(preFunc == undefined)
+		if(!preFunc)
 		{
 			tile.textContent = "Error! No Matching Function!";
 			if(!tile.firstChild){return;}
