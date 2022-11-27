@@ -208,6 +208,9 @@ export function createMaterialElement(ticker, className: string = "prun-remove-j
 	const name = (MaterialNames[ticker] || ["Shipment"])[0];
 	const category = (MaterialNames[ticker] || [undefined, "shipment"])[1];
 	const totalPicture = document.createElement("div");
+	totalPicture.addEventListener("click", function() {
+		showBuffer("MAT " + ticker.toUpperCase());
+	});
 	totalPicture.classList.add("T5C45pTOW9QTzokWPqLQJg==");
 	if(small)
 	{

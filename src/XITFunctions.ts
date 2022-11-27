@@ -1,4 +1,4 @@
-import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet, createLink, showBuffer, createTable, createSelectOption, downloadFile} from "./util";
+import {createTextSpan, createMaterialElement, createFinancialTextBox, findCorrespondingPlanet, createLink, createTable, createSelectOption, downloadFile} from "./util";
 import {TextColors} from "./Style";
 import {MaterialNames} from "./GameProperties";
 import {getGroupBurn} from "./BackgroundRunner";
@@ -1701,28 +1701,28 @@ function UpdateBurn(table, dispSettings)
 	(Array.from(table.children[1].children) as HTMLElement[]).forEach(row => {
 		if(row.children[5].classList.contains("burn-infinite"))
 		{
-			row.style.display = dispSettings[3] ? "table-row" :"flex";
+			row.style.display = dispSettings[3] ? "table-row" :"none";
 			row.style.visibility = dispSettings[3] ? "visible" : "hidden";
 			row.style.width = dispSettings[3] ? "auto" : "0px";
 			row.style.height = dispSettings[3] ? "auto" : "0px";
 		}
 		else if(row.children[5].classList.contains("burn-green"))
 		{
-			row.style.display = dispSettings[2] ? "table-row" :"flex";
+			row.style.display = dispSettings[2] ? "table-row" :"none";
 			row.style.visibility = dispSettings[2] ? "visible" : "hidden";
 			row.style.width = dispSettings[2] ? "auto" : "0px";
 			row.style.height = dispSettings[2] ? "auto" : "0px";
 		}
 		else if(row.children[5].classList.contains("burn-yellow"))
 		{
-			row.style.display = dispSettings[1] ? "table-row" :"flex";
+			row.style.display = dispSettings[1] ? "table-row" :"none";
 			row.style.visibility = dispSettings[1] ? "visible" : "hidden";
 			row.style.width = dispSettings[1] ? "auto" : "0px";
 			row.style.height = dispSettings[1] ? "auto" : "0px";
 		}
 		else if(row.children[5].classList.contains("burn-red"))
 		{
-			row.style.display = dispSettings[0] ? "table-row" :"flex";
+			row.style.display = dispSettings[0] ? "table-row" :"none";
 			row.style.visibility = dispSettings[0] ? "visible" : "hidden";
 			row.style.width = dispSettings[0] ? "auto" : "0px";
 			row.style.height = dispSettings[0] ? "auto" : "0px";
@@ -2078,7 +2078,7 @@ function CreateContractRow(contract) {
 
 	const provColumn = document.createElement("td");
 	const provCheck = createTextSpan(conditions[0]["Status"] === "FULFILLED" ? "✓" : "X");
-	provCheck.style.color = conditions[0]["Status"] === "PENDING" ? TextColors.Failure : TextColors.Success;
+	provCheck.style.color = conditions[0]["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 	provCheck.style.fontWeight = "bold";
 	provColumn.style.textAlign = "center";
 	provColumn.appendChild(provCheck);
@@ -2297,8 +2297,8 @@ function FIOInv_post(tile, parameters, jsondata)
 	for(let item of inventoryData["StorageItems"])
 	{
 		const mat = createMaterialElement(item["MaterialTicker"], tag, item["MaterialAmount"], true);
-		
-		if(mat != null){mat.addEventListener("click", function(){showBuffer("MAT " + item["MaterialTicker"]);});body.appendChild(mat);}
+		if(mat)
+		{body.appendChild(mat);}
 	}
 	return;
 }
