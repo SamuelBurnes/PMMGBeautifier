@@ -158,6 +158,12 @@ export function findBurnAmount(ticker, inventory)
 	return 0;
 }
 
+export function CategorySort(a, b)
+{
+	if(MaterialNames[a] == undefined || MaterialNames[b] == undefined){return 0;}
+	return MaterialNames[a][1].localeCompare(MaterialNames[b][1]);
+}
+
 export function findCorrespondingPlanet(planet, data)
 {
 	for(var i = 0; i < data.length; i++)
@@ -200,6 +206,69 @@ export function parseBaseName(text)
 		return text;
 	}
 	
+}
+export function clearChildren(elem)
+{
+	elem.textContent = "";
+	while(elem.children[0])
+	{
+		elem.removeChild(elem.children[0]);
+	}
+	return;
+}
+export function setSettings(result)
+{
+	try
+	{
+		browser.storage.local.set(result);
+	}
+	catch(err)
+	{
+		chrome.storage.local.set(result, function(){
+			console.log("PMMG: Configuration Saved.");
+		});
+	}
+	return;
+}
+
+/**
+ * Make an XML HTTP Request to a service and fill in the tile with that information
+ * @param tile - The tile frame on which to show the output
+ * @param parameters - The parameters from the XIT bufferDepth
+ * @param callbackFunction - The function to call once the request is successful
+ * @param url - The URL to be accessed
+ * @param requestType - The type of HttpRequest (GET, POST, etc)
+ * @param header - A dictionary with 2 key-value pairs "HeaderName": name of header, "HeaderValue": value of header
+ * @param content - The content to send in the HttpRequest
+ */
+export function XITWebRequest(tile, parameters, callbackFunction, url, requestType: string = "GET", header, content)
+{
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {
+		tile.textContent = "Error! Data Could Not Be Loaded! Timed Out!";
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			callbackFunction(tile, parameters, xhr.responseText);
+		}
+		return;
+    };
+	xhr.timeout = 10000;
+	xhr.open(requestType, url, true);
+	if(header){xhr.setRequestHeader(header[0], header[1]);}
+	if(content)
+	{
+		xhr.send(content);
+	}
+	else
+	{
+		xhr.send(null);
+	}
+	return;
 }
 
 export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false, small: boolean = false)

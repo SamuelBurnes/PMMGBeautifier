@@ -1,5 +1,5 @@
 import {XITHandler} from "./XITHandler";
-import { showBuffer } from "./util";
+import { showBuffer, setSettings } from "./util";
 
 export interface Module {
   run();
@@ -80,18 +80,4 @@ export class ModuleRunner {
     // @TODO: Vary the interval based on module performance
     window.setTimeout(() => this.loop(), 250);
   }
-}
-
-function setSettings(result)
-{
-	try
-	{
-		browser.storage.local.set(result);
-	}
-	catch(err)
-	{
-		chrome.storage.local.set(result, function(){
-		});
-	}
-	return;
 }

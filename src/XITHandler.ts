@@ -1,8 +1,56 @@
 import {Module} from "./ModuleRunner";
 import {getBuffers, createTextSpan} from "./util";
 import {Selector} from "./Selector";
-import {XITPreFunctions, XITBufferTitles} from "./XITFunctions";
+import {Start} from "./XIT/Start";
+import {Settings} from "./XIT/Settings";
+import {Debug} from "./XIT/Debug";
+import {Calculator} from "./XIT/Calculator";
+import {Repairs_pre} from "./XIT/Repairs";
+import {Chat_pre} from "./XIT/Chat";
+import {Fin_pre} from "./XIT/Finances";
+import {EnhancedBurn_pre} from "./XIT/Burn";
+import {SheetTable_pre} from "./XIT/SheetTable";
+import {Contracts_pre} from "./XIT/Contracts";
+import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre} from "./XIT/Web";
+import {FIOInv_pre} from "./XIT/Inventory";
 
+export const XITPreFunctions = {
+	"INV": FIOInv_pre,
+	"DISCORD": Discord_pre,
+	"SHEETS": Sheets_pre,
+	"PROSPERITY": Prosperity_pre,
+	"PRUN": PRuN_pre,
+	"SHEETTABLE": SheetTable_pre,
+	"FIN": Fin_pre,
+	"CHAT": Chat_pre,
+	"BURN": EnhancedBurn_pre,
+	"SETTINGS": Settings,
+	"CONTRACTS": Contracts_pre,
+	"REPAIRS": Repairs_pre,
+	"CALCULATOR": Calculator,
+	"CALC": Calculator,
+	"START": Start,
+	"DEBUG": Debug
+}
+
+export const XITBufferTitles = {
+	"INV": "FIO INVENTORY",
+	"DISCORD": "DISCORD SERVER",
+	"SHEETS": "GOOGLE SHEETS",
+	"PROSPERITY": "PROSPERITY",
+	"PRUN": "PRUN-CEPTION",
+	"SHEETTABLE": "GOOGLE SHEETS TABLE",
+	"FIN": "FINANCIAL OVERVIEW",
+	"CHAT": "CHAT",
+	"BURN": "ENHANCED BURN",
+	"SETTINGS": "PMMG SETTINGS",
+	"CONTRACTS": "PENDING CONTRACTS",
+	"REPAIRS": "REPAIRS",
+	"CALC": "CALCULATOR",
+	"CALCULATOR": "CALCULATOR",
+	"START": "STARTING WITH PMMG",
+	"DEBUG": "DEBUG"
+}
 /**
  * Handle XIT buffers
  */
@@ -83,7 +131,7 @@ export class XITHandler implements Module {
 			Array.from(buffer.getElementsByClassName(Selector.BufferTitle))[0].textContent = XITBufferTitles[parameters[0].toUpperCase()];	// Title the buffer
 			const modules = this.modules;
 			var result = this.result;
-			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, burn, burnSettings, modules);});
+			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, burn, burnSettings, modules, true);});
 			(tile.firstChild as HTMLElement).id = "pmmg-load-success";
 			preFunc(contentDiv, parameters, this.result, burn, burnSettings, modules);
 		}

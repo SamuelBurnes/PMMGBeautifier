@@ -158,16 +158,25 @@ color:#bbb
 	background-color: rgba(63, 162, 222, 0.15);
 }
 .burn-green {
-	background-color: #345034 !important;
+	background-color: #345034;
 	color: #9fbb9f;
 }
+tr:hover td.burn-green {
+	background-color: #506c50;
+}
 .burn-yellow {
-	background-color: #836e24 !important;
+	background-color: #836e24;
 	color: #f6df94;
 }
+tr:hover td.burn-yellow {
+	background-color: #9f8a40;
+}
 .burn-red {
-	background-color: #5a3130 !important;
+	background-color: #5a3130;
 	color: #c59c9b;
+}
+tr:hover td.burn-red {
+	background-color: #764d4c;
 }
 .inv-header {
 	display: inline;
