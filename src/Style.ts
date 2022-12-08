@@ -19,7 +19,17 @@ export const Style = {
   SettingsButton: ["A0Raxt0yS41ZQlnzmEvusg==", "ncHrIDsxNKH8LbMDigUiRg=="],
   SettingsBarUntoggled: ["Z9jYD8LyLZoBPb7JsART1w==", "P6Arba53I7cRvxiH0-pDQg=="],
   SettingsBarToggled: ["Z9jYD8LyLZoBPb7JsART1w==", "P6Arba53I7cRvxiH0-pDQg==", "V-75tb03enGVdcB+Sw-mRA==", "vKkB0W7jATtd8dSzgOYEKQ=="],
-  SettingsText: ["YGSoqZwqkaG2CVltxMwoOw==", "fTT52i+1oFauxHOjVfGTww==", "kWTH1-HkYCWeYyDRgZ7ozQ==", "P3sSQkCRUgkpmKUgieJQvg=="]
+  SettingsText: ["YGSoqZwqkaG2CVltxMwoOw==", "fTT52i+1oFauxHOjVfGTww==", "kWTH1-HkYCWeYyDRgZ7ozQ==", "P3sSQkCRUgkpmKUgieJQvg=="],
+  OverlappingDiv: ["M2hLHwe+IseWGDsI+XWqfg=="],
+  GreyStripes: ["_97gjZVDIdguuhtGNHLzJ9A==", "M2hLHwe+IseWGDsI+XWqfg=="],
+  Spacer: ["q2B9662sOwfjgT2X9torrw=="],
+  CenterInterface: ["o09Fez+LO4jWY35kv4affA=="],
+  FormRow: ["qUdr2gquOSadubhiJ4N59g==", "aEVrU0HhzwRff5htNMuGDQ==", "A5WGQ40OQziF0SQm2My3sQ=="],
+  FormLabel: ["bcaYcb8aOOCKVEV5xSv+Gw==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
+  FormInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="],
+  FormSaveRow: ["tFcHfd2aeM7-BLlUM0FKBw==", "_6EPcsJJ1yrlFM0vE1u-vdA==", "A5WGQ40OQziF0SQm2My3sQ=="],
+  FormSaveLabel: ["bcaYcb8aOOCKVEV5xSv+Gw==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
+  FormSaveInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="]
 }
 
 export const WithStyles = (...style: string[][]): string[] => {
@@ -73,12 +83,48 @@ export const CategoryColors = {
 }
 
 export const PMMGStyle = `
+.delete-button {
+	background-color: #d9534f;
+	border: none;
+	color: #fff;
+	line-height: 17px;
+	font-weight: bold;
+	outline: none;
+	padding: 0 8px;
+	font-size: 11px;
+	cursor: pointer;
+}
+.delete-button:hover {
+	color: #222;
+}
+.notes-wrapper textarea{
+	resize: none;
+	padding: 5px;
+    margin: 5px;
+	background-color: #42361d;
+	border-width: 0px;
+	color: #cccccc;
+	font-family: "Open Sans",sans-serif;
+	width: 100%;
+	height: 93%;
+}
+.notes-wrapper{
+	width: 100%;
+	height: 93%;
+	display: flex;
+}
+.notes-wrapper textarea:focus{
+	outline: none;
+}
+.check-wrapper {
+	margin: 5px;
+}
 .tooltip-base{
-display:flex;
-position:absolute!important;
-font-family:"Droid Sans",sans-serif;
-font-size:10px;
-color:#bbb
+	display:flex;
+	position:absolute!important;
+	font-family:"Droid Sans",sans-serif;
+	font-size:10px;
+	color:#bbb
 }
 .tooltip
 {
@@ -157,26 +203,26 @@ color:#bbb
 	padding: 6px 4px 2px;
 	background-color: rgba(63, 162, 222, 0.15);
 }
-.burn-green {
-	background-color: #345034;
+td.burn-green {
+	background-color: #345034 !important;
 	color: #9fbb9f;
 }
 tr:hover td.burn-green {
-	background-color: #506c50;
+	background-color: #506c50 !important;
 }
-.burn-yellow {
-	background-color: #836e24;
+td.burn-yellow {
+	background-color: #836e24 !important;
 	color: #f6df94;
 }
 tr:hover td.burn-yellow {
-	background-color: #9f8a40;
+	background-color: #9f8a40 !important;
 }
-.burn-red {
-	background-color: #5a3130;
+td.burn-red {
+	background-color: #5a3130 !important;
 	color: #c59c9b;
 }
 tr:hover td.burn-red {
-	background-color: #764d4c;
+	background-color: #764d4c !important;
 }
 .inv-header {
 	display: inline;

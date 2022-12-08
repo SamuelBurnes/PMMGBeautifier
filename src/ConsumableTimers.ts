@@ -38,10 +38,11 @@ export class ConsumableTimers implements Module {
 }
 export function generateBurns(buffer, burn, thresholds)
 {
+	if(buffer.classList.contains("pb-loaded")){return;}
 	const nameElem = buffer.querySelector(Selector.WorkforceConsumptionTable);
-	
-	if(nameElem == null || nameElem == undefined || nameElem.textContent == null || nameElem.textContent == undefined) return;
+	if(!nameElem || !nameElem.textContent) return;
 	const name = parseBaseName(nameElem.textContent);
+	if(!name){return;}
 	const headers = Array.from(buffer.querySelectorAll("table > thead > tr") as HTMLElement[]);
 	headers.forEach(header => {
 		const totalHeader = header.children[2] as HTMLElement;
@@ -105,6 +106,6 @@ export function generateBurns(buffer, burn, thresholds)
 		totalData.appendChild(createTextSpan(burnAmount == 0 ? "" : burnAmount.toFixed(2)));
 	  }
 	});
-	
+	buffer.classList.add("pb-loaded");
 	return;
 }
