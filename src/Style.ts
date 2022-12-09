@@ -83,6 +83,10 @@ export const CategoryColors = {
 }
 
 export const PMMGStyle = `
+.checked-text {
+	text-decoration: line-through;
+	color: rgb(153, 153, 153)
+}
 .delete-button {
 	background-color: #d9534f;
 	border: none;
@@ -286,6 +290,10 @@ tr:hover td.burn-red {
 }
 .link:hover {
 	color: #f7a600 !important;
+}
+.chat-image {
+	max-height: 300px;
+	max-width: 90%;
 }
 .input-text{
     padding: 0px 5px;

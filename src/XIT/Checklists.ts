@@ -139,7 +139,7 @@ function dispStoredCheck(result, params)
 	
 	const addButton = document.createElement("button");
 	addButton.textContent = "+";
-	checkWrapper.appendChild(addButton);
+	tile.appendChild(addButton);
 	addButton.classList.add(...Style.Button);
     addButton.classList.add(...Style.ButtonSuccess);
 	
@@ -210,6 +210,7 @@ function dispStoredCheck(result, params)
 			}
 			getLocalStorage("PMMG-Notes", updateThenStoreCheck, [checkName, result["PMMG-Notes"][CHECK_INDICATOR + checkName]]);
 			
+			createCheckRow(checkWrapper, result, checkName, itemName, false);
 			return;
 		});
 		
@@ -239,10 +240,19 @@ function createCheckRow(tile, result, checkName, name, checked)
 	tile.appendChild(checkRow);
 	const checkText = createTextSpan(name);
 	checkText.style.paddingTop = "7px";
+	if(checked){checkText.classList.add("checked-text");}
 	checkRow.appendChild(checkText);
 	
 	checkCircle.addEventListener("click", function(){
 		checked = !checked;
+		if(checked)
+		{
+			checkText.classList.add("checked-text");
+		}
+		else
+		{
+			checkText.classList.remove("checked-text");
+		}
 		checkCircle.textContent = checked ? '●' : '○';
 		result["PMMG-Notes"][CHECK_INDICATOR + checkName].forEach(possibleMatch => {
 			if(possibleMatch[0] == name)
@@ -250,7 +260,7 @@ function createCheckRow(tile, result, checkName, name, checked)
 				possibleMatch[1] = checked;
 			}
 		});
-		getLocalStorage("PMMG-Notes", updateThenStoreCheck, result["PMMG-Notes"][CHECK_INDICATOR + checkName]);
+		getLocalStorage("PMMG-Notes", updateThenStoreCheck, [checkName, result["PMMG-Notes"][CHECK_INDICATOR + checkName]]);
 	});
 	
 	

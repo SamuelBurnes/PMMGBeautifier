@@ -37,5 +37,6 @@ export const Selector = {
   ChatWindow: "div[class~='tvLh70IeyzjPBXlNSDYokg==']",
   ChatInput: "div[class~='BArxa2yGz-u5GgiT-uvI9Q==']",
   ChatTile: "div[class~='_8MZs-piY-+t2NOXRPhMM6A==']",
-  MaterialIcon: "E7OLUChYCexMUgOolKYjOQ=="
+  MaterialIcon: "E7OLUChYCexMUgOolKYjOQ==",
+  ChatLink: "span[class~='kq5BrGKnTUTqCDYMpLQ90g==']"
 }

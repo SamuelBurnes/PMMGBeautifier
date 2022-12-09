@@ -15,6 +15,7 @@ import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
 import { CalculatorButton } from "./CalculatorButton";
 import { ContractDrafts } from "./ContractDrafts";
+import { ImageCreator } from "./ImageCreator";
 
 try
 {
@@ -84,6 +85,7 @@ function mainRun(result)
 		  new FleetETAs(),
 		  new Notifications(),
 		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
+		  new ImageCreator(),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"])
