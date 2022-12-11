@@ -204,6 +204,11 @@ export function parseBaseName(text)
 		{
 			return SystemNames[match[1].toUpperCase()] + match[2].toLowerCase();
 		}
+		match = text.match(/@ [A-Z]{2}-[0-9]{3} - ([A-z]*) Base/);
+		if(match && match[1])
+		{
+			return match[1];
+		}
 		return null;
 		
 	} catch (TypeError)

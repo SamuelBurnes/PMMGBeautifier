@@ -134,7 +134,7 @@ function dispStoredCheck(result, params)
 	if(result["PMMG-Notes"][CHECK_INDICATOR + checkName])
 	{
 		// Construct Checklist from Stored Data
-		result["PMMG-Notes"][CHECK_INDICATOR + checkName].forEach(check => {createCheckRow(checkWrapper, result, checkName, check[0], check[1]);});
+		result["PMMG-Notes"][CHECK_INDICATOR + checkName].forEach(check => {createCheckRow(checkWrapper, result, checkName, check[0], check[1], check[2]);});
 	}
 	
 	const addButton = document.createElement("button");
@@ -181,6 +181,34 @@ function dispStoredCheck(result, params)
 		const nameInput = document.createElement("input");
 		nameInputDiv.appendChild(nameInput);
 		
+		const dateRow = document.createElement("div");
+		dateRow.classList.add(...Style.FormRow);
+		form.appendChild(dateRow);
+		const dateLabel = document.createElement("label");
+		dateLabel.textContent = "Due Date";
+		dateLabel.classList.add(...Style.FormLabel);
+		dateRow.appendChild(dateLabel);
+		const dateInputDiv = document.createElement("div");
+		dateInputDiv.classList.add(...Style.FormInput);
+		dateRow.appendChild(dateInputDiv);
+		const dateInput = document.createElement("input");
+		dateInput.type = "date";
+		dateInputDiv.appendChild(dateInput);
+		
+		const timeRow = document.createElement("div");
+		timeRow.classList.add(...Style.FormRow);
+		form.appendChild(timeRow);
+		const timeLabel = document.createElement("label");
+		timeLabel.textContent = "Due Date Time";
+		timeLabel.classList.add(...Style.FormLabel);
+		timeRow.appendChild(timeLabel);
+		const timeInputDiv = document.createElement("div");
+		timeInputDiv.classList.add(...Style.FormInput);
+		timeRow.appendChild(timeInputDiv);
+		const timeInput = document.createElement("input");
+		timeInput.type = "time";
+		timeInputDiv.appendChild(timeInput);
+		
 		const saveRow = document.createElement("div");
 		saveRow.classList.add(...Style.FormSaveRow);
 		form.appendChild(saveRow);
@@ -200,17 +228,31 @@ function dispStoredCheck(result, params)
 		saveButton.addEventListener("click", function() {
 			const itemName = nameInput.value || "";
 			tile.removeChild(overlapDiv);
+			var dueDate;
+			if(dateInput.value)
+			{
+				if(timeInput.value)
+				{
+					dueDate = Date.parse(dateInput.value + " " + timeInput.value);
+				}
+				else
+				{
+					dueDate = Date.parse(dateInput.value);
+				}
+			}
+			const itemContent = [itemName, false];
+			if(dueDate && !isNaN(dueDate)){itemContent.push(dueDate);}
 			if(result["PMMG-Notes"][CHECK_INDICATOR + checkName])
 			{
-				result["PMMG-Notes"][CHECK_INDICATOR + checkName].push([itemName, false]);
+				result["PMMG-Notes"][CHECK_INDICATOR + checkName].push(itemContent);
 			}
 			else
 			{
-				result["PMMG-Notes"][CHECK_INDICATOR + checkName] = [[itemName, false]];
+				result["PMMG-Notes"][CHECK_INDICATOR + checkName] = [itemContent];
 			}
 			getLocalStorage("PMMG-Notes", updateThenStoreCheck, [checkName, result["PMMG-Notes"][CHECK_INDICATOR + checkName]]);
 			
-			createCheckRow(checkWrapper, result, checkName, itemName, false);
+			createCheckRow(checkWrapper, result, checkName, itemName, false, dueDate);
 			return;
 		});
 		
@@ -225,7 +267,7 @@ function dispStoredCheck(result, params)
 // checkName: Name of the checklist
 // name: Name of the item in the checklist
 // checked: Whether that item is checked
-function createCheckRow(tile, result, checkName, name, checked)
+function createCheckRow(tile, result, checkName, name, checked, dueDate)
 {
 	const checkRow = document.createElement("div");
 	checkRow.style.display = "flex";
@@ -233,18 +275,36 @@ function createCheckRow(tile, result, checkName, name, checked)
 	const checkCircle = document.createElement("div");
 	checkCircle.textContent = checked ? '●' : '○';
 	checkRow.appendChild(checkCircle);
-	checkCircle.style.color = "#f7a600";
-	checkCircle.style.fontSize = "45px";
+	checkCircle.style.color = dueDate && dueDate < Date.now() ? "#d9534f" : "#f7a600";
+	checkCircle.style.fontSize = "35px";
 	checkCircle.style.cursor = "pointer";
 	
 	tile.appendChild(checkRow);
 	const checkText = createTextSpan(name);
-	checkText.style.paddingTop = "7px";
+	checkText.style.paddingTop = "6px";
 	if(checked){checkText.classList.add("checked-text");}
 	checkRow.appendChild(checkText);
 	
 	checkCircle.addEventListener("click", function(){
 		checked = !checked;
+		checkCircle.textContent = checked ? '●' : '○';
+		var possibleMatch;
+		for(var i = 0; i < result["PMMG-Notes"][CHECK_INDICATOR + checkName].length; i++){
+			possibleMatch = result["PMMG-Notes"][CHECK_INDICATOR + checkName][i];
+			if(possibleMatch[0] == name)
+			{
+				if(checked)
+				{
+					result["PMMG-Notes"][CHECK_INDICATOR + checkName].splice(i, 1);
+				}
+				possibleMatch[1] = checked;
+				break;
+			}
+		}
+		if(!possibleMatch)
+		{
+			result["PMMG-Notes"][CHECK_INDICATOR + checkName].push([name, checked, dueDate]);
+		}
 		if(checked)
 		{
 			checkText.classList.add("checked-text");
@@ -252,14 +312,8 @@ function createCheckRow(tile, result, checkName, name, checked)
 		else
 		{
 			checkText.classList.remove("checked-text");
+			
 		}
-		checkCircle.textContent = checked ? '●' : '○';
-		result["PMMG-Notes"][CHECK_INDICATOR + checkName].forEach(possibleMatch => {
-			if(possibleMatch[0] == name)
-			{
-				possibleMatch[1] = checked;
-			}
-		});
 		getLocalStorage("PMMG-Notes", updateThenStoreCheck, [checkName, result["PMMG-Notes"][CHECK_INDICATOR + checkName]]);
 	});
 	
