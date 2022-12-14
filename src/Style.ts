@@ -83,6 +83,15 @@ export const CategoryColors = {
 }
 
 export const PMMGStyle = `
+.check-time-complete {
+	text-decoration: line-through;
+}
+.check-time-overdue {
+	color: #d9534f;
+}
+.check-time {
+	color: rgb(153, 153, 153)
+}
 .checked-text {
 	text-decoration: line-through;
 	color: rgb(153, 153, 153)

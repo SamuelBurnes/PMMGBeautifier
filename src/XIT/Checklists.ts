@@ -137,9 +137,12 @@ function dispStoredCheck(result, params)
 		result["PMMG-Notes"][CHECK_INDICATOR + checkName].forEach(check => {createCheckRow(checkWrapper, result, checkName, check[0], check[1], check[2]);});
 	}
 	
+	const buttonDiv = document.createElement("div");
+	tile.appendChild(buttonDiv);
 	const addButton = document.createElement("button");
-	addButton.textContent = "+";
-	tile.appendChild(addButton);
+	addButton.textContent = "Add New";
+	buttonDiv.appendChild(addButton);
+	addButton.style.marginLeft = "5px";
 	addButton.classList.add(...Style.Button);
     addButton.classList.add(...Style.ButtonSuccess);
 	
@@ -259,6 +262,32 @@ function dispStoredCheck(result, params)
 		greyStripes.appendChild(makeSpacer(tile, overlapDiv));
 	});
 	
+	const clearButton = document.createElement("button");
+	clearButton.textContent = "Clear Complete";
+	buttonDiv.appendChild(clearButton);
+	clearButton.style.marginLeft = "5px";
+	clearButton.classList.add(...Style.Button);
+    clearButton.classList.add(...Style.ButtonDanger);
+	clearButton.addEventListener("click", function(){
+		for(var i = 0; i < result["PMMG-Notes"][CHECK_INDICATOR + checkName].length; i++){
+			if(result["PMMG-Notes"][CHECK_INDICATOR + checkName][i][1])	// Reminder is checked
+			{
+				result["PMMG-Notes"][CHECK_INDICATOR + checkName].splice(i, 1);
+				i--;
+			}
+		}
+		for(i = 0; i < checkWrapper.children.length; i++)
+		{
+			const checkRow = checkWrapper.children[i];
+			// Check and remove check row elements that are checked
+			if(checkRow && checkRow.classList.contains("checked"))
+			{
+				checkWrapper.removeChild(checkRow);
+				i--;
+			}
+		}
+		getLocalStorage("PMMG-Notes", updateThenStoreCheck, [checkName, result["PMMG-Notes"][CHECK_INDICATOR + checkName]]);
+	});
 	
 	return;
 }
@@ -280,39 +309,49 @@ function createCheckRow(tile, result, checkName, name, checked, dueDate)
 	checkCircle.style.cursor = "pointer";
 	
 	tile.appendChild(checkRow);
+	const textDiv = document.createElement("div");
 	const checkText = createTextSpan(name);
-	checkText.style.paddingTop = "6px";
-	if(checked){checkText.classList.add("checked-text");}
-	checkRow.appendChild(checkText);
+	textDiv.appendChild(checkText);
+	checkText.style.display = "block";
+	checkText.style.paddingTop = "5px";
+	var dueDateText;
+	if(dueDate)
+	{
+		dueDateText = createTextSpan(new Date(dueDate).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) + " " + new Date(dueDate).toLocaleDateString(undefined, {day: "numeric", month: "numeric", year: "numeric"}));
+		dueDateText.classList.add(dueDate < Date.now() ? "check-time-overdue" : "check-time");
+		textDiv.appendChild(dueDateText);
+	}
+	if(checked){
+		checkText.classList.add("checked-text");
+		checkRow.classList.add("checked");
+		if(dueDateText){
+			dueDateText.classList.add("check-time-complete");
+		}
+	}
+	checkRow.appendChild(textDiv);
 	
 	checkCircle.addEventListener("click", function(){
 		checked = !checked;
 		checkCircle.textContent = checked ? '●' : '○';
-		var possibleMatch;
 		for(var i = 0; i < result["PMMG-Notes"][CHECK_INDICATOR + checkName].length; i++){
-			possibleMatch = result["PMMG-Notes"][CHECK_INDICATOR + checkName][i];
+			const possibleMatch = result["PMMG-Notes"][CHECK_INDICATOR + checkName][i];
 			if(possibleMatch[0] == name)
 			{
-				if(checked)
-				{
-					result["PMMG-Notes"][CHECK_INDICATOR + checkName].splice(i, 1);
-				}
 				possibleMatch[1] = checked;
 				break;
 			}
 		}
-		if(!possibleMatch)
-		{
-			result["PMMG-Notes"][CHECK_INDICATOR + checkName].push([name, checked, dueDate]);
-		}
 		if(checked)
 		{
 			checkText.classList.add("checked-text");
+			checkRow.classList.add("checked");
+			if(dueDateText){dueDateText.classList.add("check-time-complete");}
 		}
 		else
 		{
 			checkText.classList.remove("checked-text");
-			
+			checkRow.classList.remove("checked");
+			if(dueDateText){dueDateText.classList.remove("check-time-complete");}
 		}
 		getLocalStorage("PMMG-Notes", updateThenStoreCheck, [checkName, result["PMMG-Notes"][CHECK_INDICATOR + checkName]]);
 	});
