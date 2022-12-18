@@ -73,24 +73,24 @@ function mainRun(result)
 	getBurnSettings(burnSettings, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
 	
 	const runner = new ModuleRunner([
-		  new LocalMarketAds(),
-		  new OrderETAs(),
-		  new FlightETAs(),
-		  new ShippingAds(),
-		  new PostLM(prices),
-		  new ContractDrafts(prices),
-		  new QueueLoad(),
-		  new ConsumableTimers(result["PMMGExtended"]["username"], burn, result["PMMGExtended"]["burn_thresholds"]),
-		  new FleetETAs(),
-		  new Notifications(),
-		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
-		  new CommandCorrecter(),
-		  new CalculatorButton(),
-		  new Sidebar(result["PMMGExtended"]["sidebar"])
+		new LocalMarketAds(),
+		new OrderETAs(),
+		new FlightETAs(),
+		new ShippingAds(),
+		new PostLM(prices),
+		new ContractDrafts(prices),
+		new QueueLoad(),
+		new ConsumableTimers(result["PMMGExtended"]["username"], burn, result["PMMGExtended"]["burn_thresholds"]),
+		new FleetETAs(),
+		new Notifications(),
+		new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
+		new CommandCorrecter(),
+		new CalculatorButton(),
+		new Sidebar(result["PMMGExtended"]["sidebar"])
 	], result, burn, burnSettings);
 	
 	(function () {
-	  runner.loop()
+		runner.loop()
 	})();
 }
 
