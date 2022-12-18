@@ -189,22 +189,22 @@ export function parseBaseName(text)
 	try
 	{
 		
-		var match = text.match(/@ ([A-Z]{2}-[0-9]{3} [a-z]) Base/);
+		var match = text.match(/@ ([A-Z]{2}-[0-9]{3} [a-z]) Base/);	// Unnamed system unnamed planet
 		if(match && match[1])
 		{
 			return match[1].replace(" ","");
 		}
-		match = text.match(/@ ([A-z ]*) - ([A-z ]*) Base/);
+		match = text.match(/@ ([A-z ]*) - ([A-z ]*) Base/);	// Named system named planet
 		if(match && match[1] && match[2])
 		{
 			return match[2];
 		}
-		match = text.match(/@ ([A-z ]*) ([A-z]) Base/);
+		match = text.match(/@ ([A-z ]*) ([A-z]) Base/);	// Named system unnamed planet
 		if(match && match[1] && match[2] && SystemNames[match[1].toUpperCase()])
 		{
 			return SystemNames[match[1].toUpperCase()] + match[2].toLowerCase();
 		}
-		match = text.match(/@ [A-Z]{2}-[0-9]{3} - ([A-z]*) Base/);
+		match = text.match(/@ [A-Z]{2}-[0-9]{3} - ([A-z ]*) Base/);	// Unnamed system named planet
 		if(match && match[1])
 		{
 			return match[1];
