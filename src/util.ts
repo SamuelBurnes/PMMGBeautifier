@@ -35,10 +35,10 @@ export function createQuickRowButton(shortTextBold, shortTextNormal, longText, c
                           <span><span class="D+GJhIGmC2eFk59dvrY+Sg==">{{:shortBold}}</span>
                               {{:shortNormal}}</span><span class="cKqzEDeyKbzb9nPry0Dkfw==">: {{:longText}}
                           </span>
-                     </div>`;
+                    </div>`;
     let result = template.replace("{{:shortBold}}", shortTextBold)
-                         .replace("{{:shortNormal}}", shortTextNormal)
-                         .replace("{{:longText}}", longText);
+                        .replace("{{:shortNormal}}", shortTextNormal)
+                        .replace("{{:longText}}", longText);
     let node = createNode(result) as HTMLElement;
     node.onclick = () => { showBuffer(command); };
     return node as HTMLElement;
@@ -98,6 +98,13 @@ export function parseDuration(duration) {
  */
 export function createTextSpan(text, className: string = "prun-remove-js") {
   const newSpan = document.createElement("span");
+  newSpan.classList.add(className);
+  newSpan.textContent = text;
+  return newSpan;
+}
+
+export function createTextDiv(text, className: string = "prun-remove-js") {
+  const newSpan = document.createElement("div");
   newSpan.classList.add(className);
   newSpan.textContent = text;
   return newSpan;
@@ -264,25 +271,25 @@ export function setSettings(result)
  * @param header - A dictionary with 2 key-value pairs "HeaderName": name of header, "HeaderValue": value of header
  * @param content - The content to send in the HttpRequest
  */
-export function XITWebRequest(tile, parameters, callbackFunction, url, requestType: string = "GET", header, content)
+export function XITWebRequest(tile, parameters, callbackFunction, url, requestType: string = "GET", header, content?)
 {
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
 		tile.textContent = "Error! Data Could Not Be Loaded! Timed Out!";
 	};
 	
-	xhr.onreadystatechange = function()
-    {
-	
-	    if(xhr.readyState == XMLHttpRequest.DONE)
-	    {
+	xhr.onreadystatechange = function() {
+		if(xhr.readyState == XMLHttpRequest.DONE)
+		{
 			callbackFunction(tile, parameters, xhr.responseText);
 		}
 		return;
-    };
+	};
 	xhr.timeout = 10000;
 	xhr.open(requestType, url, true);
-	if(header){xhr.setRequestHeader(header[0], header[1]);}
+	if(header) {
+		xhr.setRequestHeader(header[0], header[1]);
+	}
 	if(content)
 	{
 		xhr.send(content);
