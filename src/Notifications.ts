@@ -122,5 +122,6 @@ const Searchers = [
 	["apex", "update", "#00aa77"],
 	["warehous", "war", "#cc2929"],
 	["shipbuilding project", "ship", "#8f52cc"],
-	["planetary project", "infra", "#8f52cc"]
+	["planetary project", "infra", "#8f52cc"],
+	["consumable supplies", "supplies", "#b37b32"]
 ]

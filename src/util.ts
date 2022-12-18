@@ -1,5 +1,5 @@
 import {Selector} from "./Selector";
-import {MaterialNames, PlanetNames} from "./GameProperties";
+import {MaterialNames, PlanetNames, SystemNames} from "./GameProperties";
 import {Style, CategoryColors} from "./Style";
 
 export function downloadFile(fileData, fileName, isJSON: boolean = true)
@@ -195,24 +195,47 @@ export function parseBaseName(text)
 {
 	try
 	{
-		text = text.split("@")[1];
-		text = text.split(" Base")[0];
-		var hyphens = text.split(" - ");
-		text = hyphens[hyphens.length - 1];
-		var ending = text.split(" ");
-		if(ending[1] != undefined && ending[2] != undefined && ending[2].length == 1)
+		
+		var match = text.match(/@ ([A-Z]{2}-[0-9]{3} [a-z]) Base/);
+		if(match && match[1])
 		{
-			return ending[1] + ending[2];
+			return match[1].replace(" ","");
 		}
-		else
+		match = text.match(/@ ([A-z ]*) - ([A-z ]*) Base/);
+		if(match && match[1] && match[2])
 		{
-			return text;
+			return match[2];
 		}
+		match = text.match(/@ ([A-z ]*) ([A-z]) Base/);
+		if(match && match[1] && match[2] && SystemNames[match[1].toUpperCase()])
+		{
+			return SystemNames[match[1].toUpperCase()] + match[2].toLowerCase();
+		}
+		match = text.match(/@ [A-Z]{2}-[0-9]{3} - ([A-z]*) Base/);
+		if(match && match[1])
+		{
+			return match[1];
+		}
+		return null;
+		
 	} catch (TypeError)
 	{
 		return text;
 	}
 	
+}
+export function getLocalStorage(storageName, callbackFunction, params)
+{
+	try
+	{
+		browser.storage.local.get(storageName).then(callbackFunction(params));
+	} catch(err)
+	{
+		chrome.storage.local.get([storageName], function(result)
+		{
+			callbackFunction(result, params);
+		});
+	}
 }
 export function clearChildren(elem)
 {
@@ -232,7 +255,7 @@ export function setSettings(result)
 	catch(err)
 	{
 		chrome.storage.local.set(result, function(){
-			console.log("PMMG: Configuration Saved.");
+			//console.log("PMMG: Configuration Saved.");
 		});
 	}
 	return;
@@ -452,7 +475,7 @@ export function toFixed(value: number, precision: number = 2) {
 // Return all matching buffers
 export function getBuffers(bufferCode: string): HTMLElement[] {
   const nodes = document.evaluate(
-    `//div[@class='${Selector.BufferHeader}'][starts-with(., '${bufferCode}')]/../..`,
+    `//div[@class='${Selector.BufferHeader}'][starts-with(translate(., abcdefghijklmnopqrstuvwxyz, ABCDEFGHIJKLMNOPQRSTUVWXYZ), '${bufferCode}')]/../..`,
     document, null, XPathResult.ANY_TYPE, null);
 	var buffers = [];
 	var node;

@@ -125,6 +125,15 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 	} else
 	{
 		const planetBurn = findCorrespondingPlanet(planet, burn);	// The planet data to work with
+		var lastUpdated;
+		try
+		{
+			lastUpdated = new Date(planetBurn["LastUpdate"] + "Z");
+		}
+		catch
+		{
+		
+		}
 		settings = findCorrespondingPlanet(planet, burnSettings);
 		if(planetBurn == undefined){tile.textContent = "Error! No Matching Planet!";return;}
 		
@@ -175,9 +184,12 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 	const dispSettings = settingsIndex == -1 ? [1, 1, 1, 1] : result["PMMGExtended"]["burn_display_settings"][settingsIndex][1];
 	
 	const table = document.createElement("table");
+	const bufferHeader = document.createElement("div");
+	bufferHeader.style.display = "flex";
+	tile.appendChild(bufferHeader);
 	const settingsDiv = document.createElement("div");
 	settingsDiv.style.display = "flex";
-	tile.appendChild(settingsDiv);
+	bufferHeader.appendChild(settingsDiv);
 	settingsDiv.appendChild(createSettingsButton("RED", 22.025, dispSettings[0], function(){
 		dispSettings[0] = dispSettings[0] ? 0 : 1;
 		UpdateBurn(table, dispSettings);
@@ -235,6 +247,13 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 		setSettings(result);
 	}));
 	
+	if(lastUpdated){
+		const lastUpdatedSpan = createTextSpan("Last Updated: " + lastUpdated.toLocaleDateString(undefined, {day: "numeric", month: "numeric"}) + " " + lastUpdated.toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}));
+		lastUpdatedSpan.style.marginLeft = "auto";
+		lastUpdatedSpan.style.marginRight = "0";
+		lastUpdatedSpan.style.color = "rgb(153, 153, 153)";
+		bufferHeader.appendChild(lastUpdatedSpan);
+	}
 	
 	const head = document.createElement("thead");
 	const headRow = document.createElement("tr");

@@ -1,4 +1,4 @@
-import {createTextSpan, clearChildren, XITWebRequest} from "../util";
+import {createTextSpan, clearChildren, XITWebRequest, setSettings} from "../util";
 
 export function Repairs_pre(tile, parameters, result)
 {
@@ -13,6 +13,7 @@ export function Repairs_pre(tile, parameters, result)
 		tile.textContent = "Error! Missing API Key";
 		return;
 	}
+	if(!parameters[parameters.length - 1]["PMMGExtended"]){parameters.push(result);}
 	XITWebRequest(tile, parameters, Repairs_post, "https://rest.fnar.net/sites/"+ result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
 	
 	return;
@@ -20,6 +21,8 @@ export function Repairs_pre(tile, parameters, result)
 
 function Repairs_post(tile, parameters, jsondata)
 {
+	const result = parameters[parameters.length - 1];
+	
 	if(jsondata == undefined || jsondata == null){return;}
 	var repairData;
 	try
@@ -31,7 +34,7 @@ function Repairs_post(tile, parameters, jsondata)
 		tile.textContent = "Error! Could Not Load Data!";
 		return;
 	}
-	if(parameters.length < 2)
+	if(parameters.length < 3)
 	{
 		const title = createTextSpan("All Repairs");
 		title.classList.add("title");
@@ -45,7 +48,7 @@ function Repairs_post(tile, parameters, jsondata)
 		const thresholdText = createTextSpan("Age Threshold:");
 		thresholdText.style.paddingLeft = "5px";
 		thresholdInput.type = "number";
-		thresholdInput.value = "70";
+		thresholdInput.value = result["PMMGExtended"]["repair_threshold"] ? result["PMMGExtended"]["repair_threshold"] : "70";
 		thresholdInput.style.width = "60px";
 		thresholdDiv.appendChild(thresholdText);
 		thresholdDiv.appendChild(thresholdInput);
@@ -92,6 +95,8 @@ function Repairs_post(tile, parameters, jsondata)
 			clearChildren(body);
 			
 			generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput);
+			result["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
+			setSettings(result);
 		});
 		
 	}
@@ -119,7 +124,7 @@ function Repairs_post(tile, parameters, jsondata)
 		const thresholdText = createTextSpan("Age Threshold:");
 		thresholdText.style.paddingLeft = "5px";
 		thresholdInput.type = "number";
-		thresholdInput.value = "70";
+		thresholdInput.value = result["PMMGExtended"]["repair_threshold"] ? result["PMMGExtended"]["repair_threshold"] : "70";
 		thresholdInput.style.width = "60px";
 		thresholdDiv.appendChild(thresholdText);
 		thresholdDiv.appendChild(thresholdInput);
@@ -158,6 +163,8 @@ function Repairs_post(tile, parameters, jsondata)
 			clearChildren(body);
 			
 			generateRepairScreen(body, matDiv, siteData, thresholdInput);
+			result["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
+			setSettings(result);
 		});
 	}
 	return;

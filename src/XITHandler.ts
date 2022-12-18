@@ -13,6 +13,8 @@ import {SheetTable_pre} from "./XIT/SheetTable";
 import {Contracts_pre} from "./XIT/Contracts";
 import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre} from "./XIT/Web";
 import {FIOInv_pre} from "./XIT/Inventory";
+import {Notes} from "./XIT/Notes";
+import {Checklists} from "./XIT/Checklists";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -30,7 +32,13 @@ export const XITPreFunctions = {
 	"CALCULATOR": Calculator,
 	"CALC": Calculator,
 	"START": Start,
-	"DEBUG": Debug
+	"DEBUG": Debug,
+	"NOTE": Notes,
+	"NOTES": Notes,
+	"CHECK": Checklists,
+	"CHECKS": Checklists,
+	"CHECKLIST": Checklists,
+	"CHECKLISTS": Checklists
 }
 
 export const XITBufferTitles = {
@@ -49,7 +57,13 @@ export const XITBufferTitles = {
 	"CALC": "CALCULATOR",
 	"CALCULATOR": "CALCULATOR",
 	"START": "STARTING WITH PMMG",
-	"DEBUG": "DEBUG"
+	"DEBUG": "DEBUG",
+	"NOTE": "NOTE",
+	"NOTES": "NOTE",
+	"CHECK": "CHECKLIST",
+	"CHECKS": "CHECKLIST",
+	"CHECKLIST": "CHECKLIST",
+	"CHECKLISTS": "CHECKLISTS"
 }
 /**
  * Handle XIT buffers
