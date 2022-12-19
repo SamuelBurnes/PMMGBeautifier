@@ -1,5 +1,6 @@
 import {clearChildren, createLink, createTextSpan, XITWebRequest, createTable, createMaterialElement, createTextDiv} from "../util";
 import {TextColors} from "../Style";
+import {FactionHeaders} from "../GameProperties";
 
 export function Contracts_pre(tile, parameters, result)
 {
@@ -32,10 +33,10 @@ async function Contracts_post(tile, parameters, jsondata)
 	}
 	
 	let validContracts = contractData.filter(c => !invalidContractStatus.includes(c["Status"]));
-
+	
 	validContracts.map(contract => {
 		contract["IsFaction"] = false;
-		contract["materialCondition"] = null;
+		contract["materialConditions"] = [];
 
 		let selfConditions = [] as any;
 		let partnerConditions = [] as any;
@@ -46,7 +47,7 @@ async function Contracts_post(tile, parameters, jsondata)
 				contract["IsFaction"] = true;
 
 			if (condition["MaterialTicker"] !== null && materialFulfilmentType.includes(condition["Type"]))
-				contract["materialCondition"] = condition;
+				contract["materialConditions"].push(condition);
 
 			// Categorize conditions by who fulfills it
 			if (condition["Party"] === contract["Party"])
@@ -67,7 +68,7 @@ async function Contracts_post(tile, parameters, jsondata)
 
 	validContracts.sort(ContractSort);
 	
-	const table = createTable(tile, ["Contract ID", "Material", "My Conditions", "Partner's Conditions"]);
+	const table = createTable(tile, ["Contract ID", "Material", "Partner's Conditions", "My Conditions"]);
 	if (validContracts.length === 0){
 		const row = createNoContractsRow(4);
 		table.appendChild(row);
@@ -104,25 +105,51 @@ function createContractRow(contract) {
 	const materialColumn = document.createElement("td");
 	materialColumn.style.width = "32px";
 	materialColumn.style.paddingLeft = "10px";
-
-	if (contract["materialCondition"]) {
-		let materialCondition = contract["materialCondition"];
-		const materialElement = createMaterialElement(materialCondition["MaterialTicker"], "prun-remove-js", materialCondition["MaterialAmount"], false, true);
-		if(materialElement) { materialColumn.appendChild(materialElement); }
+	const materialDiv = document.createElement("div");
+	materialColumn.appendChild(materialDiv);
+	if (contract["materialConditions"].length > 0) {
+		contract["materialConditions"].forEach(materialCondition => { 
+			const materialElement = createMaterialElement(materialCondition["MaterialTicker"], "prun-remove-js", materialCondition["MaterialAmount"], false, true);
+			
+			if(materialElement) { 
+				materialElement.style.marginBottom = "4px";
+				materialDiv.appendChild(materialElement); 
+			}
+			return;
+		});
 	}
 	row.appendChild(materialColumn);
+	
+	const partnerColumn = document.createElement("td");
+	var faction;
+	if(contract["IsFaction"])
+	{
+		Object.keys(FactionHeaders).forEach(factionName => {
+			if(contract["PartnerName"].includes(factionName))
+			{
+				faction = FactionHeaders[factionName];
+			}
+			return;
+		});
+	}
+	if(!faction)
+	{
+		let partnerLink = createLink(contract["PartnerName"], "CO " + contract["PartnerCompanyCode"]);
+		partnerColumn.appendChild(partnerLink);
+	}
+	else
+	{
+		let partnerLink = createLink(contract["PartnerName"], "FA " + faction);
+		partnerColumn.appendChild(partnerLink);
+	}
+	for (let condition of contract.Conditions["partner"])
+		partnerColumn.appendChild(conditionStatus(condition));
+	row.appendChild(partnerColumn);
 	
 	const selfColumn = document.createElement("td");
 	for (let condition of contract.Conditions["self"])
 		selfColumn.appendChild(conditionStatus(condition));
 	row.appendChild(selfColumn);
-
-	let partnerLink = createLink(contract["PartnerName"], "CO " + contract["PartnerCompanyCode"]);
-	const partnerColumn = document.createElement("td");
-	partnerColumn.appendChild(partnerLink);
-	for (let condition of contract.Conditions["partner"])
-		partnerColumn.appendChild(conditionStatus(condition));
-	row.appendChild(partnerColumn);
 
 	return row;
 };
@@ -186,11 +213,14 @@ const friendlyConditionText = {
 	REPUTATION: "Reputation",
 	PAYMENT: "Payment",
 	PICKUP_SHIPMENT: "Pickup Shipment",
-	PROVISION_SHIPMENT: "Provision Shipment"
+	PROVISION_SHIPMENT: "Provision",
+	PROVISION: "Provision"
 }
 
 const materialFulfilmentType = [
 	"DELIVERY",
 	"DELIVERY_SHIPMENT",
-	"PROVISION_SHIPMENT"
+	"PROVISION_SHIPMENT",
+	"COMEX_PURCHASE_PICKUP"
 ]
+
