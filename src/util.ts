@@ -224,6 +224,23 @@ export function parseBaseName(text)
 	}
 	
 }
+
+export function parseInvName(text)
+{
+	try
+	{
+		const match = text.match(/\(([A-Z]{2}-[0-9]{3}[a-z])\)/);
+		if(match && match[1])
+		{
+			return match[1];
+		}
+		return null;
+	} catch(TypeError)
+	{
+		return null;
+	}
+}
+
 export function getLocalStorage(storageName, callbackFunction, params)
 {
 	try

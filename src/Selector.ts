@@ -38,5 +38,10 @@ export const Selector = {
   ChatInput: "div[class~='BArxa2yGz-u5GgiT-uvI9Q==']",
   ChatTile: "div[class~='_8MZs-piY-+t2NOXRPhMM6A==']",
   MaterialIcon: "E7OLUChYCexMUgOolKYjOQ==",
-  ChatLink: "span[class~='kq5BrGKnTUTqCDYMpLQ90g==']"
+  ChatLink: "span[class~='kq5BrGKnTUTqCDYMpLQ90g==']",
+  InventoryName: "span[class~='kq5BrGKnTUTqCDYMpLQ90g==']",
+  FullMaterialIcon: "div[class~='HWbVOIC2rYGNug3UC2dV+Q==']",
+  Inventory: "div[class~='e7M0g3qfy5EYIqWywjDYKQ==']",
+  MaterialText: "span[class~='rjpYL1i9cZmf47fM9qWyZQ==']",
+  InventorySortOptions: "div[class~='_3vmsvGjeJ5VCcbHBAAIpHw==']"
 }

@@ -1,6 +1,4 @@
-/**
- * This is a list of CCS styles that can be applied to buttons and fonts and other various styles
- */
+// A list of PrUN class names that can be applied to style elements
 export const Style = {
   Button: ["fMW62cERnlzxZPFhnlPOeQ=="],
   ButtonPrimary: ["kgGsDNvDoWj61w4I7VAlfA=="],
@@ -32,12 +30,14 @@ export const Style = {
   FormSaveInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="]
 }
 
+// A function to apply multiple classes to an element in one go
 export const WithStyles = (...style: string[][]): string[] => {
   return style.reduce(((previousValue, currentValue) =>
     previousValue.concat(currentValue))
   )
 }
 
+// The text colors used in PrUN
 export const TextColors = {
 	Failure: "#d9534f",
 	Success: "#5cb85c",
@@ -45,6 +45,7 @@ export const TextColors = {
 	Yellow: "#f7a600"
 }
 
+// The default category colors used in PrUN
 export const CategoryColors = {
 	"electronic devices": ["linear-gradient(135deg, rgb(86, 20, 147), rgb(111, 45, 172))", "rgb(213, 147, 255)"],
 	"construction prefabs": ["linear-gradient(135deg, rgb(15, 30, 98), rgb(40, 55, 123))", "rgb(142, 157, 225)"],
@@ -82,6 +83,7 @@ export const CategoryColors = {
 	"shipment": ["linear-gradient(135deg, #030303, #181818)", "#7f7f7f"]
 }
 
+// The style needed for PMMG's modules to function
 export const PMMGStyle = `
 .check-time-complete {
 	text-decoration: line-through;
@@ -337,6 +339,7 @@ tr:hover td.burn-red {
 	background-color: rgb(247, 166, 0);
 }`;
 
+// The enhanced colors style that improves color contrast
 export const EnhancedColors = `/* consumables (luxury) */
 div[title="Stellar Pale Ale"],
 div[data-tooltip-content="#tooltip_ALE"],
@@ -550,18 +553,8 @@ span.YCp8jhRg4EBG3aQxcizskQ\\=\\= {
   width: 100%;
 }`;
 
-export const IconStyle = `/* PrUnIcon v0.7
-* ===============
-*
-* Install Chrome addon: StyleBot 
-* goto: apex.prosperousuniverse.com
-* right-click anywhere, select: StyleBot -> Style Element
-* Copy&Paste this file into the StyleBot window
-*/
- 
-/* controversial UI changes and colors */
-/* (comment/delete if not desired)
-/* ----------------------------------- */
+// allocater's icon style
+export const IconStyle = `
  
 /* item ticker color */
 .rjpYL1i9cZmf47fM9qWyZQ\\=\\= {

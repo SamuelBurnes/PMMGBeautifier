@@ -32,7 +32,6 @@ export function Checklists(tile, parameters)
 
 function generateCheckTable(result, tile)
 {
-	console.log(result);
 	if(!tile){return;}
 	
 	if(!result["PMMG-Notes"])

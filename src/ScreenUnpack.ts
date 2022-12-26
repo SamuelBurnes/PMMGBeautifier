@@ -37,16 +37,22 @@ export class ScreenUnpack implements Module {
 	navbar.appendChild(spacerDiv);
 	
 	links.forEach(link => {
-		// Add support for exceptions somehow?
 		const button = `<div class="${navbarItemClassList}">
                           <a class="${nbitMainClassList}" style="color: inherit" href="${link.Link}">${link.Name}</a>
                           <div class="${nbitUnderlineClassList}"></div>
                       </div>`;
 		const buttonElem = createNode(button) as HTMLElement;
 		buttonElem.classList.add(this.tag);
+		// Add detection of activation here
 		navbar.appendChild(buttonElem);
 	});
+	
 	return;
   }
   
 }
+//(buttonElem.children[1] as HTMLElement).style.backgroundColor = "#f7a600";
+//(buttonElem.children[1] as HTMLElement).style.boxShadow = "0 0 6px 0 #f7a600";
+
+//(otherButton.children[1] as HTMLElement).style.backgroundColor = "rgba(247, 166, 0, 0.15)";
+//(otherButton.children[1] as HTMLElement).style.boxShadow = "none";

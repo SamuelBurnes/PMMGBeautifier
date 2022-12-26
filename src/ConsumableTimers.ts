@@ -25,7 +25,7 @@ export class ConsumableTimers implements Module {
 	if(this.burn[this.username] == undefined || this.burn[this.username].length == 0){return;}
     const buffers = getBuffers("WF");
 	
-    if (buffers == undefined || buffers == null){return};
+    if (!buffers){return};
 	
 	buffers.forEach(buffer => {
 		generateBurns(buffer, this.burn[this.username], this.thresholds);

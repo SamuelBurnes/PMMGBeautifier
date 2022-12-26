@@ -16,10 +16,11 @@ interface ModuleEntry {
 }
 
 export class ModuleRunner {
-  private readonly modules: ModuleEntry[];
-  private readonly xit: XITHandler;
-  private result;
+  private readonly modules: ModuleEntry[];	// The list of modules run by the extension
+  private readonly xit: XITHandler;	// The XIT module, run separately
+  private result;	// The stored settings
   constructor(modules: Module[], result, burn, burnSettings) {
+	// Construct global variables
     this.modules = modules.map(m => this.moduleToME(m));
 	this.xit = new XITHandler(result, burn, burnSettings, this.modules);
 	this.result = result;
@@ -27,11 +28,12 @@ export class ModuleRunner {
 	this.updateActiveModules(result);
   }
   
+  // Enable or disable modules based on settings preference
   private updateActiveModules(result)
   {
 	if(result["PMMGExtended"]["disabled"] == undefined){return;}
 	this.modules.forEach(mp => {
-		if(result["PMMGExtended"]["disabled"] != undefined && result["PMMGExtended"]["disabled"].includes(mp.name))
+		if(result["PMMGExtended"]["disabled"] && result["PMMGExtended"]["disabled"].includes(mp.name))
 		{
 			mp.enabled = false;
 		}
@@ -50,6 +52,7 @@ export class ModuleRunner {
   }
 
   loop() {
+	// Render all XIT buffers
 	this.xit.run();
 	
 	// Run intro if it hasn't run already
@@ -62,6 +65,7 @@ export class ModuleRunner {
 		}
 	}
 	
+	// For each module, run it, clean it, and measure its performance
     this.modules.map(entry => {
       if (entry.enabled) {
         const t0 = performance.now();
