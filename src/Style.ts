@@ -27,7 +27,16 @@ export const Style = {
   FormInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="],
   FormSaveRow: ["tFcHfd2aeM7-BLlUM0FKBw==", "_6EPcsJJ1yrlFM0vE1u-vdA==", "A5WGQ40OQziF0SQm2My3sQ=="],
   FormSaveLabel: ["bcaYcb8aOOCKVEV5xSv+Gw==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
-  FormSaveInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="]
+  FormSaveInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="],
+  MatText: ["rjpYL1i9cZmf47fM9qWyZQ=="],
+  MatTextWrapper: ["nlQirpSkdLH0a6+C4lhduA=="],
+  MaterialElement: ["E7OLUChYCexMUgOolKYjOQ=="],
+  MaterialWrapper: ["T5C45pTOW9QTzokWPqLQJg=="],
+  MaterialWrapperWrapper: ["A-Re0xb+rkw3eNvxj3pMDA=="],
+  MaterialNumberWrapper: ["G37fUJPwMoJ6fKHDGeg+-w=="],
+  MaterialNumber: ["bHjlDPB84Uz0yUnvHa-Y5A==", "_6OK6sXNjIIhq3NDD9ELVGw==", "gl73vnp5jo+VaepDRocunA=="],
+  MaterialOuter: ["HWbVOIC2rYGNug3UC2dV+Q=="],
+  MaterialNameText: ["YCp8jhRg4EBG3aQxcizskQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="]
 }
 
 // A function to apply multiple classes to an element in one go
@@ -85,6 +94,26 @@ export const CategoryColors = {
 
 // The style needed for PMMG's modules to function
 export const PMMGStyle = `
+.mat-element-large {
+	height: 48px;
+	width: 48px;
+}
+.mat-element-large div.E7OLUChYCexMUgOolKYjOQ\\=\\= {
+	height: 48px;
+	width: 48px;
+	font-size: 15.84px;
+	cursor: pointer;
+}
+.mat-element-small {
+	height: 32px;
+	width: 32px;
+}
+.mat-element-large div.E7OLUChYCexMUgOolKYjOQ\\=\\= {
+	height: 48px;
+	width: 48px;
+	font-size: 15.84px;
+	cursor: pointer;
+}
 .check-time-complete {
 	text-decoration: line-through;
 }

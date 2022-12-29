@@ -1,6 +1,6 @@
 import {Module} from "./ModuleRunner";
 import {Selector} from "./Selector";
-import {createTextSpan, genericCleanup, toFixed} from "./util";
+import {createTextSpan, genericCleanup} from "./util";
 
 export class ShippingAds implements Module {
   private tag = "pb-shipping-ads";
@@ -31,7 +31,7 @@ export class ShippingAds implements Module {
         }
 
         const totalCents = parseInt(totalCost.replace(/[,.]/g, ''));
-        const perItem = toFixed(totalCents / count / 100, 2);
+        const perItem = (totalCents / count / 100).toLocaleString(undefined, {maximumFractionDigits: 2});
         const priceSpan = element.querySelector(Selector.LMCommodityAdPriceSpan)!;
         priceSpan.appendChild(createTextSpan(` (${perItem}/${unit})`, this.tag));
       }

@@ -1,6 +1,6 @@
 import {Module} from "./ModuleRunner";
 import {Selector} from "./Selector";
-import {createTextSpan, genericCleanup, parseDuration, toFixed} from "./util";
+import {createTextSpan, genericCleanup, parseDuration} from "./util";
 
 export class QueueLoad implements Module {
     private tag = "pb-queue-load";
@@ -45,7 +45,7 @@ export class QueueLoad implements Module {
             if (totalTime > 0) {
                 rows.forEach(row => {
                     const eta = this.getEtaFromRow(row);
-                    const percent = toFixed(eta / totalTime * 100, 2);
+                    const percent = (eta / totalTime * 100).toLocaleString(undefined, {maximumFractionDigits: 2});
                     const textField = row.querySelectorAll("td").item(6);
                     if (textField && eta > 0) {
                         const span = createTextSpan(` ${percent}%`, this.tag);

@@ -1,4 +1,5 @@
 import {clearChildren, createTextSpan, createMaterialElement, createLink, XITWebRequest} from "../util";
+import {MaterialNames} from "../GameProperties";
 
 export function FIOInv_pre(tile, parameters, result)
 {
@@ -41,6 +42,7 @@ function FIOInv_post(tile, parameters, jsondata)
 		tile.textContent = "Error! Could Not Load Data!";
 		return;
 	}
+	if(!inventoryData){return;}
 	const volumeUsed = inventoryData["VolumeLoad"];
 	const volumeTotal = inventoryData["VolumeCapacity"];
 	const weightUsed = inventoryData["WeightLoad"];
@@ -169,6 +171,12 @@ function FIOInv_allDisplay(tile, parameters, jsondata)
 
 function fioMatsAlphabetSort(a, b)
 {
-	if(a["MaterialCategory"] == null || b["MaterialCategory"] == null){return 0;}
-	return a["MaterialCategory"].localeCompare(b["MaterialCategory"]);
+	if(!a["MaterialTicker"] || !b["MaterialTicker"] || !MaterialNames[a["MaterialTicker"]] || !MaterialNames[b["MaterialTicker"]]){return 0;}
+	
+	if(MaterialNames[a["MaterialTicker"]][1] == MaterialNames[b["MaterialTicker"]][1])
+	{
+		return a["MaterialTicker"].localeCompare(b["MaterialTicker"]);
+	}
+	
+	return MaterialNames[a["MaterialTicker"]][1].localeCompare(MaterialNames[b["MaterialTicker"]][1]);
 }

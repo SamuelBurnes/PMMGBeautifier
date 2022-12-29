@@ -1,7 +1,8 @@
 import {Selector} from "./Selector";
 import {MaterialNames, PlanetNames, SystemNames} from "./GameProperties";
-import {Style, CategoryColors} from "./Style";
+import {Style, CategoryColors, WithStyles} from "./Style";
 
+// Download a file containing fileData with fileName
 export function downloadFile(fileData, fileName, isJSON: boolean = true)
 {
 	const blob = new Blob([isJSON ? JSON.stringify(fileData) : fileData], {type: "text/plain"});
@@ -16,12 +17,14 @@ export function downloadFile(fileData, fileName, isJSON: boolean = true)
 	return;
 }
 
+// Creates an HTML element from an HTML string
 export function createNode(htmlString) {
   var div = document.createElement('div');
   div.innerHTML = htmlString.trim();
   return div.firstChild as HTMLElement;
 }
 
+// Create an option element for a select list
 export function createSelectOption(optionLabel, optionValue) 
 {
 	const option = document.createElement("option");
@@ -30,26 +33,11 @@ export function createSelectOption(optionLabel, optionValue)
 	return option;
 }
 
-export function createQuickRowButton(shortTextBold, shortTextNormal, longText, command) {
-    const template = `<div class="MApcsYEd7+wqIJTfbHP1yA== fTT52i+1oFauxHOjVfGTww== kWTH1-HkYCWeYyDRgZ7ozQ==">
-                          <span><span class="D+GJhIGmC2eFk59dvrY+Sg==">{{:shortBold}}</span>
-                              {{:shortNormal}}</span><span class="cKqzEDeyKbzb9nPry0Dkfw==">: {{:longText}}
-                          </span>
-                    </div>`;
-    let result = template.replace("{{:shortBold}}", shortTextBold)
-                        .replace("{{:shortNormal}}", shortTextNormal)
-                        .replace("{{:longText}}", longText);
-    let node = createNode(result) as HTMLElement;
-    node.onclick = () => { showBuffer(command); };
-    return node as HTMLElement;
-}
-
 /**
  * parse a duration into an actual ETA string
  * @param duration
  * @returns {string}
  */
-
 export function convertDurationToETA(parsedSeconds) {
   const eta = new Date();
   const now = new Date();
@@ -103,6 +91,12 @@ export function createTextSpan(text, className: string = "prun-remove-js") {
   return newSpan;
 }
 
+/**
+ * Create a div with the given text
+ * @param text
+ * @param className
+ * @returns {HTMLDivElement}
+ */
 export function createTextDiv(text, className: string = "prun-remove-js") {
   const newSpan = document.createElement("div");
   newSpan.classList.add(className);
@@ -141,6 +135,7 @@ export function createFinancialTextBox(primaryText, secondaryText, primaryTextCo
 	return box;
 }
 
+// For a material ticker and FIO inventory payload, find the amount of that material in the inventory
 export function findInventoryAmount(ticker, inventory)
 {
 	for(var i = 0; i < inventory["Inventory"].length; i++)
@@ -153,6 +148,7 @@ export function findInventoryAmount(ticker, inventory)
 	return 0;
 }
 
+// For a material ticker and FIO inventory payload, find the amount of that material consumed by worker consumption
 export function findBurnAmount(ticker, inventory)
 {
 	for(var i = 0; i < inventory["WorkforceConsumption"].length; i++)
@@ -165,25 +161,27 @@ export function findBurnAmount(ticker, inventory)
 	return 0;
 }
 
+// Sort tickers by their material category
 export function CategorySort(a, b)
 {
-	if(MaterialNames[a] == undefined || MaterialNames[b] == undefined){return 0;}
+	if(!MaterialNames[a] || !MaterialNames[b]){return 0;}
 	return MaterialNames[a][1].localeCompare(MaterialNames[b][1]);
 }
 
+// Find the data corresponding to a planet in an array of FIO inventory/burn data
 export function findCorrespondingPlanet(planet, data)
 {
 	for(var i = 0; i < data.length; i++)
 	{
-		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase())
+		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase())	// If the natural ID matches: XX-000x
 		{
 			return data[i];
 		}
-		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase())
+		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase())	// If the planet name matches
 		{
 			return data[i];
 		}
-		else if(planet && data[i]["PlanetNaturalId"] && PlanetNames[planet] && PlanetNames[planet].toLowerCase() == data[i]["PlanetNaturalId"].toLowerCase())
+		else if(planet && data[i]["PlanetNaturalId"] && PlanetNames[planet] && PlanetNames[planet].toLowerCase() == data[i]["PlanetNaturalId"].toLowerCase())	// When planet name isn't in the payload, convert it to natural ID
 		{
 			return data[i];
 		}
@@ -191,6 +189,7 @@ export function findCorrespondingPlanet(planet, data)
 	return undefined;
 }
 
+// Parse the base name on WF buffers
 export function parseBaseName(text)
 {
 	try
@@ -225,6 +224,7 @@ export function parseBaseName(text)
 	
 }
 
+// Parse the planet name on inventory buffers
 export function parseInvName(text)
 {
 	try
@@ -241,19 +241,23 @@ export function parseInvName(text)
 	}
 }
 
+// Get the data in local storage for a given storageName. Then call the callback function.
+// Also pass the params through to the callback function
 export function getLocalStorage(storageName, callbackFunction, params)
 {
 	try
 	{
-		browser.storage.local.get(storageName).then(callbackFunction(params));
+		browser.storage.local.get(storageName).then(callbackFunction(params));	// For FireFox, throws an error in Chrome
 	} catch(err)
 	{
-		chrome.storage.local.get([storageName], function(result)
+		chrome.storage.local.get([storageName], function(result)	// For Chrome, doesn't work in FireFox
 		{
 			callbackFunction(result, params);
 		});
 	}
 }
+
+// Remove all the children of a given element
 export function clearChildren(elem)
 {
 	elem.textContent = "";
@@ -263,15 +267,17 @@ export function clearChildren(elem)
 	}
 	return;
 }
+
+// Set the data in local storage. Pass it the result of a getLocalStorage call
 export function setSettings(result)
 {
 	try
 	{
-		browser.storage.local.set(result);
+		browser.storage.local.set(result);	// For FireFox, throws an error in Chrome
 	}
 	catch(err)
 	{
-		chrome.storage.local.set(result, function(){
+		chrome.storage.local.set(result, function(){	// For Chrome, doesn't work in FireFox
 			//console.log("PMMG: Configuration Saved.");
 		});
 	}
@@ -317,94 +323,83 @@ export function XITWebRequest(tile, parameters, callbackFunction, url, requestTy
 	}
 	return;
 }
-
+/**
+ * Create a material element that mimics the ones generated by the game
+ * @param ticker - The ticker of the MAT
+ * @param className - A class that can be applied to the material element
+ * @param amount - The number shown in the lower right of the material. "none" indicates no number
+ * @param text - Indicates whether the full material name should appear under the material element
+ * @param small - Indicates whether the material is full size (as in an inventory) or small (as in a WF buffer)
+*/
 export function createMaterialElement(ticker, className: string = "prun-remove-js", amount: string = "none", text: boolean = false, small: boolean = false)
 {
-	if(MaterialNames[ticker] == undefined && ticker != "SHPT"){return null;}
-	const name = (MaterialNames[ticker] || ["Shipment"])[0];
-	const category = (MaterialNames[ticker] || [undefined, "shipment"])[1];
-	const totalPicture = document.createElement("div");
-	totalPicture.addEventListener("click", function() {
+	if(!MaterialNames[ticker] && ticker != "SHPT"){return null;}	// Return nothing if the material isn't recognized
+	const name = (MaterialNames[ticker] || ["Shipment"])[0];	// The full name of the material (Basic Bulkhead)
+	const category = (MaterialNames[ticker] || [undefined, "shipment"])[1];	// The category of the material
+	
+	const matText = createTextSpan(ticker, className);	// The ticker text in the middle
+	matText.classList.add(...WithStyles(Style.MatText));	// Apply styles
+	
+	const matTextWrapper = document.createElement("div");	// The first wrapper around the text
+	matTextWrapper.classList.add(...WithStyles(Style.MatTextWrapper));	// Apply styles
+	matTextWrapper.appendChild(matText);
+	
+	const material = document.createElement("div");	// The colored material square
+	material.classList.add(...WithStyles(Style.MaterialElement));	// Apply styles
+	material.appendChild(matTextWrapper);
+	material.style.background = CategoryColors[category][0];	// Apply colors
+	material.style.color = CategoryColors[category][1];
+	material.title = name;										// Provide the material with a title when hovered over
+	material.addEventListener("click", function() {				// Show MAT buffer when clicked
 		showBuffer("MAT " + ticker.toUpperCase());
 	});
-	totalPicture.classList.add("T5C45pTOW9QTzokWPqLQJg==");
+	
+	const materialWrapper = document.createElement("div");		// First wrapper around material square
+	materialWrapper.classList.add(...WithStyles(Style.MaterialWrapper));	// Apply styles
+	materialWrapper.appendChild(material);
+	
+	const materialWrapperWrapper = document.createElement("div");	// Second wrapper around material square
+	materialWrapperWrapper.classList.add(...WithStyles(Style.MaterialWrapperWrapper));	// Apply styles
+	materialWrapperWrapper.appendChild(materialWrapper);
+	
+	const outerLayer = document.createElement("div");	// Final element to be returned (for big case)
+	outerLayer.classList.add(...WithStyles(Style.MaterialOuter));	// Apply styles
+	outerLayer.appendChild(materialWrapperWrapper);
+	
+	if(amount && amount != "none")	// If there is an amount listed
+	{
+		const materialNumberWrapper = document.createElement("div");	// Wrapper for amount
+		materialNumberWrapper.classList.add(...WithStyles(Style.MaterialNumberWrapper));	// Apply styles
+		materialWrapper.appendChild(materialNumberWrapper);
+		
+		const materialNumber = createTextDiv(amount, className);	// Span containing amount
+		materialNumber.classList.add(...WithStyles(Style.MaterialNumber));	// Apply styles
+		materialNumberWrapper.appendChild(materialNumber);
+	}
+	
+	if(text)	// If the full material name will appear under the element
+	{
+		const textElemWrapper = document.createElement("span");	// Wrapper around the text
+		textElemWrapper.classList.add(...WithStyles(Style.MaterialNameText));	// Apply styles
+		
+		const textElem = createTextSpan(name, className);	// The text itself
+		textElemWrapper.appendChild(textElem);	// Apply styles
+		
+		outerLayer.appendChild(textElemWrapper);
+	}
+	
 	if(small)
 	{
-		totalPicture.style.height = "32px";
-		totalPicture.style.width = "32px";
+		materialWrapper.classList.add("mat-element-small");	// Apply small size
+		return materialWrapper;	// Small material elements don't need all the wrapping
 	}
 	else
 	{
-		totalPicture.style.height = "48px";
-		totalPicture.style.width = "48px";
+		materialWrapper.classList.add("mat-element-large");	// Apply large size
 	}
-	const material = document.createElement("div");
-	material.classList.add("E7OLUChYCexMUgOolKYjOQ==");
-	material.title = name;
-	if(small)
-	{
-		material.style.height = "32px";
-		material.style.width = "32px";
-		material.style.fontSize = "10.56px";
-	}
-	else
-	{
-		material.style.height = "48px";
-		material.style.width = "48px";
-		material.style.fontSize = "15.84px";
-		material.style.margin = "2px auto";
-	}
-	material.style.background = CategoryColors[category][0];
-	material.style.color = CategoryColors[category][1];
-	
-	material.style.cursor = "pointer";
-	totalPicture.classList.add(className);
-	const subDiv = document.createElement("div");
-	subDiv.classList.add("nlQirpSkdLH0a6+C4lhduA==");
-	const matText = document.createElement("span");
-	matText.classList.add("rjpYL1i9cZmf47fM9qWyZQ==");
-	matText.textContent = ticker;
-	subDiv.appendChild(matText);
-	material.appendChild(subDiv);
-	totalPicture.appendChild(material);
-	if(amount != "none")
-	{
-		const numberDiv = document.createElement("div");
-		numberDiv.classList.add("G37fUJPwMoJ6fKHDGeg+-w==");
-		const numberSubDiv = document.createElement("div");
-		numberSubDiv.classList.add("bHjlDPB84Uz0yUnvHa-Y5A==");
-		numberSubDiv.classList.add("_6OK6sXNjIIhq3NDD9ELVGw==");
-		numberSubDiv.classList.add("gl73vnp5jo+VaepDRocunA==");
-		numberSubDiv.textContent = amount;
-		numberDiv.appendChild(numberSubDiv);
-		totalPicture.appendChild(numberDiv);
-	}
-	
-	if(small){return totalPicture;}
-	
-	var superElem = document.createElement("div");
-	superElem.classList.add(className);
-	superElem.appendChild(totalPicture);
-	superElem.style.display = "block";
-	superElem.style.width = "64px";
-	superElem.style.margin = "3px";
-	superElem.style.padding = "auto";
-	
-	if(text != false)
-	{
-		var label = document.createElement("span");
-		label.classList.add(className);
-		label.textContent = name;
-		label.style.fontWeight = "bold";
-		label.style.boxSizing = "border-box";
-		label.style.paddingTop = "2px";
-		label.style.display = "block";
-		superElem.appendChild(label);
-	}
-	
-	return superElem;
+	return outerLayer;
 }
-
+// Creates an element that links to a buffer with command "command"
 export function createLink(text, command)
 {
 	const link = document.createElement("span");
@@ -417,6 +412,7 @@ export function createLink(text, command)
 	return linkDiv;
 }
 
+// Shows a buffer with a specified command
 export function showBuffer(command) {
 	const button = document.getElementById(Selector.NewBFRButton);
 	if(button == null){return false;}
@@ -434,6 +430,7 @@ export function showBuffer(command) {
 	return true;
 }
 
+// Change the value of a new buffer box
 export function changeValue(input, value){
     var propDescriptor = Object.getOwnPropertyDescriptor(
       window["HTMLInputElement"].prototype,
@@ -452,6 +449,7 @@ export function changeValue(input, value){
 	return;
 }
 
+// Wait for a new buffer to be created
 function monitorOnElementCreated(selector, callback, onlyOnce = true) {
     const getElementsFromNodes = (nodes) => (Array.from(nodes)).flatMap(node => node.nodeType === 3 ? null : Array.from(node.querySelectorAll(selector))).filter(item => item !== null);
     let onMutationsObserved = function(mutations) {
@@ -475,18 +473,14 @@ function monitorOnElementCreated(selector, callback, onlyOnce = true) {
 	return;
 }
 
+// Remove all elements added in the last run with a class name
 export function genericCleanup(className: string = "prun-remove-js") {
-  // remove all elements added in the last run
+  
   Array.from(document.getElementsByClassName(className)).forEach((elem) => {
     elem.parentNode && elem.parentNode.removeChild(elem);
 	return;
   });
   return;
-}
-
-export function toFixed(value: number, precision: number = 2) {
-  const power = Math.pow(10, precision || 0);
-  return Math.round(value * power) / power;
 }
 
 // Return all matching buffers
@@ -504,6 +498,7 @@ export function getBuffers(bufferCode: string): HTMLElement[] {
 	return buffers;
 }
 
+// Get elements that match an XPath
 export function getElementsByXPath(xpath: string): Array<Node> {
   const result = document.evaluate(
     xpath, document, null, XPathResult.ANY_UNORDERED_NODE_TYPE, null);
@@ -546,6 +541,7 @@ function tableSortAlph(a, b)
 	return a[0].localeCompare(b[0]);
 }
 
+// Create a table in the style of PrUN
 export function createTable(tile, headers: Array<string>, sectionHeaderTitle = "") {
 	if (sectionHeaderTitle !== ""){
 		const sectionHeader = document.createElement("h3");

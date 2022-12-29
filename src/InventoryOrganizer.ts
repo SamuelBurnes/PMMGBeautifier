@@ -47,7 +47,7 @@ export class InventoryOrganizer implements Module {
 				toggleButton.classList.add("LgjAIPjxxF1iSm2VWQSmPw==");
 				sortOptions.appendChild(toggleButton);
 				const toggleLabel = document.createElement("div");
-				toggleLabel.textContent = "ADV";
+				toggleLabel.textContent = "BRN";
 				toggleButton.appendChild(toggleLabel);
 				if(result["PMMGExtended"]["inventory_sorting"].includes(screenName + baseNameElem.textContent))
 				{

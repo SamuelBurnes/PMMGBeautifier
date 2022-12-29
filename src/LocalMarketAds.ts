@@ -1,6 +1,6 @@
 import {Module} from "./ModuleRunner";
 import {Selector} from "./Selector";
-import {createTextSpan, genericCleanup, toFixed} from "./util";
+import {createTextSpan, genericCleanup} from "./util";
 
 export class LocalMarketAds implements Module {
   private tag = "pb-lm-ads";
@@ -17,7 +17,7 @@ export class LocalMarketAds implements Module {
         const count = parseInt(matches[2]);
         const totalCents = parseInt(matches[3].replace(/[,.]/g, ''));
 		const priceSpan = element.querySelector(Selector.LMCommodityAdPriceSpan)!;
-		const perItem = toFixed(totalCents / count / 100, 2);
+		const perItem = (totalCents / count / 100).toLocaleString(undefined, {maximumFractionDigits: 2});
 		
 		priceSpan.appendChild(createTextSpan(` (${perItem} ea)`, this.tag));
         
