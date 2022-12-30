@@ -486,7 +486,7 @@ export function genericCleanup(className: string = "prun-remove-js") {
 // Return all matching buffers
 export function getBuffers(bufferCode: string): HTMLElement[] {
   const nodes = document.evaluate(
-    `//div[@class='${Selector.BufferHeader}'][starts-with(translate(., abcdefghijklmnopqrstuvwxyz, ABCDEFGHIJKLMNOPQRSTUVWXYZ), '${bufferCode}')]/../..`,
+    `//div[@class='${Selector.BufferHeader}'][starts-with(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), '${bufferCode}')]/../..`,
     document, null, XPathResult.ANY_TYPE, null);
 	var buffers = [];
 	var node;
