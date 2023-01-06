@@ -58,7 +58,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	tile.appendChild(webDiv);
 	
 	const moduleSettingsHeader = document.createElement('h3');
-    moduleSettingsHeader.appendChild(document.createTextNode("Module Settings"));
+    moduleSettingsHeader.appendChild(document.createTextNode("Toggle Features"));
     moduleSettingsHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(moduleSettingsHeader);
 	const content = document.createElement("div");
@@ -71,7 +71,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 		content.appendChild(line);
 
 		// Left
-		line.appendChild(createTextSpan(mp.name));
+		line.appendChild(createTextSpan(mp.friendlyName));
 		content.appendChild(line);
 		
 		// Right

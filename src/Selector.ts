@@ -43,5 +43,6 @@ export const Selector = {
   FullMaterialIcon: "div[class~='HWbVOIC2rYGNug3UC2dV+Q==']",
   Inventory: "div[class~='e7M0g3qfy5EYIqWywjDYKQ==']",
   MaterialText: "span[class~='rjpYL1i9cZmf47fM9qWyZQ==']",
-  InventorySortOptions: "div[class~='_3vmsvGjeJ5VCcbHBAAIpHw==']"
+  InventorySortOptions: "div[class~='_3vmsvGjeJ5VCcbHBAAIpHw==']",
+  ChatArea: "div[class~='tvLh70IeyzjPBXlNSDYokg==']"
 }

@@ -250,7 +250,7 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 	if(lastUpdated){
 		const lastUpdatedSpan = createTextSpan("Last Updated: " + lastUpdated.toLocaleDateString(undefined, {day: "numeric", month: "numeric"}) + " " + lastUpdated.toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}));
 		lastUpdatedSpan.style.marginLeft = "auto";
-		lastUpdatedSpan.style.marginRight = "0";
+		lastUpdatedSpan.style.marginRight = "10px";
 		lastUpdatedSpan.style.color = "rgb(153, 153, 153)";
 		bufferHeader.appendChild(lastUpdatedSpan);
 	}

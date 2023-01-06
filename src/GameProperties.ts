@@ -27,6 +27,25 @@ export const RatingColors = {
 	"A": "#f6a204"
 }
 
+export const FriendlyNames = {
+	"LocalMarketAds": "LM Unit Prices",
+	"OrderETAs": "Order ETAs",
+	"FlightETAs": "Flight Planning ETAs",
+	"ShippingAds": "LM Shipping Rates",
+	"PostLM": "LM Posting Unit Price",
+	"ContractDrafts": "CONTD Unit Prices",
+	"QueueLoad": "Queue Percent Display",
+	"ConsumableTimers": "Workforce Consumable Burn",
+	"FleetETAs": "Fleet ETAs",
+	"Notifications": "Notifications",
+	"ScreenUnpack": "Screen Unpack",
+	"ImageCreator": "Chat Image Creator",
+	"InventoryOrganizer": "Inventory Burn Sorting",
+	"CommandCorrecter": "Command Correcter",
+	"CalculatorButton": "Calculator Button",
+	"Sidebar": "Sidebar"
+}
+
 export const PlanetCommands = ["ADM", "BSC", "COGC", "COGCPEX", "COGCU", "FLTP", "LR", "LMP", "LM", "PLI", "POPI", "POPR", "PPS", "SHY", "WAR"];
 
 export const SystemNames = {

@@ -23,6 +23,8 @@ export class ImageCreator implements Module {
 	
 	buffers.forEach(buffer => {
 		const chatLinks = buffer.querySelectorAll(Selector.ChatLink); // Chat link elements. Also includes company code links! Make sure to filter out...
+		const chatArea = buffer.querySelector(Selector.ChatArea);
+		if(!chatArea){return;}
 		Array.from(chatLinks).forEach(link => {
 			const linkText = link.textContent;
 			if(!linkText || link.classList.contains(this.tag)){return;}
@@ -34,6 +36,7 @@ export class ImageCreator implements Module {
 			link.parentElement.appendChild(document.createElement("br"));
 			link.parentElement.appendChild(img);
 			link.classList.add(this.tag);
+			chatArea.scrollBy(0, (img.offsetHeight || 0) + 2);
 			return;
 		});
 		return;

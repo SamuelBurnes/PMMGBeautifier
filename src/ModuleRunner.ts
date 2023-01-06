@@ -1,5 +1,6 @@
 import {XITHandler} from "./XITHandler";
 import { showBuffer, setSettings } from "./util";
+import { FriendlyNames } from "./GameProperties";
 
 export interface Module {
   run();
@@ -9,6 +10,7 @@ export interface Module {
 interface ModuleEntry {
   module: Module;
   name: string;
+  friendlyName: string;
   enabled: boolean;
   count: number;
   cleanupTime: number;
@@ -44,6 +46,7 @@ export class ModuleRunner {
     return {
       module,
       name: module.constructor.name,
+	  friendlyName: FriendlyNames[module.constructor.name] || module.constructor.name,
       enabled: true,
       count: 0,
       cleanupTime: 0,

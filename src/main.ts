@@ -89,19 +89,19 @@ function mainRun(result)
 	
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
-		  new LocalMarketAds(),
-		  new OrderETAs(),
-		  new FlightETAs(),
 		  new ShippingAds(),
+		  new LocalMarketAds(),
 		  new PostLM(prices),
 		  new ContractDrafts(prices),
+		  new OrderETAs(),
+		  new FlightETAs(),
+		  new FleetETAs(),
 		  new QueueLoad(),
 		  new ConsumableTimers(result["PMMGExtended"]["username"], burn, result["PMMGExtended"]["burn_thresholds"]),
-		  new FleetETAs(),
-		  new Notifications(),
-		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
-		  new ImageCreator(),
 		  new InventoryOrganizer(result["PMMGExtended"]["username"], burn, result),
+		  new Notifications(),
+		  new ImageCreator(),
+		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"])
