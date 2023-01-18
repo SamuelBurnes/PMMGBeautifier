@@ -36,7 +36,8 @@ export const Style = {
   MaterialNumberWrapper: ["G37fUJPwMoJ6fKHDGeg+-w=="],
   MaterialNumber: ["bHjlDPB84Uz0yUnvHa-Y5A==", "_6OK6sXNjIIhq3NDD9ELVGw==", "gl73vnp5jo+VaepDRocunA=="],
   MaterialOuter: ["HWbVOIC2rYGNug3UC2dV+Q=="],
-  MaterialNameText: ["YCp8jhRg4EBG3aQxcizskQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="]
+  MaterialNameText: ["YCp8jhRg4EBG3aQxcizskQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
+  SmallButton: ["zVuH9y-6nJDHnUQBaBixLg==","px0H8VJLoM5YTxdTMdfQhA==","fMW62cERnlzxZPFhnlPOeQ==","YRXUjzmWA2jJzWrOAy3-3A=="]
 }
 
 // A function to apply multiple classes to an element in one go

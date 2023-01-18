@@ -1,4 +1,4 @@
-import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings} from "../util";
+import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings, getLocalStorage} from "../util";
 import {Style, WithStyles} from "../Style";
 
 export function Settings(tile, parameters, result, fullBurn, burnSettings, modules)
@@ -274,7 +274,6 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 			try
 			{
 				const fileOutput = JSON.parse(e.target.result);
-				console.log(fileOutput);
 				const exclude = ["username", "apikey", "webappid"];	// Don't overwrite username, apikey, and webappid
 				Object.keys(fileOutput).forEach(key => {
 					if(!exclude.includes(key))
@@ -317,6 +316,64 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	});
 	
 	tile.appendChild(importDiv);
+	
+	const importNoteDiv = document.createElement("div");
+	
+	const importNoteButton = document.createElement("button");
+	importNoteButton.textContent = "Import Notes";
+	importNoteButton.classList.add(...Style.Button);
+	importNoteButton.classList.add(...Style.ButtonPrimary);
+	importNoteButton.style.marginLeft = "4px";
+	importNoteButton.style.marginBottom = "4px";
+	importNoteDiv.appendChild(importNoteButton);
+	const importNoteFileInput = document.createElement("input");
+	importNoteFileInput.type = "file";
+	importNoteFileInput.accept = ".json";
+	importNoteFileInput.style.display = "none";
+	importNoteDiv.appendChild(importNoteFileInput);
+	importNoteButton.addEventListener("click", function() {
+		importNoteFileInput.click()
+		return;
+	});
+	const errorNoteTextBox = createTextSpan("Error Loading File!");
+	errorNoteTextBox.style.display = "none";
+	importNoteDiv.appendChild(errorNoteTextBox);
+	importNoteFileInput.addEventListener("change", function() {
+		if(!this.files){return;}
+		const file = this.files[0];
+		if(!file){return;}
+		const reader = new FileReader();
+		reader.onload = function(e){
+			if(!e || !e.target){return;}
+			try
+			{
+				const fileOutput = JSON.parse(e.target.result);
+				setSettings(fileOutput);
+				errorNoteTextBox.style.display = "none";
+			} catch(ex)
+			{
+				console.log("PMMG: Error encountered processing file!");
+				errorNoteTextBox.style.display = "inline-block";
+			}
+			
+		}
+		reader.readAsText(file);
+		return;
+	});
+	
+	const exportNoteButton = document.createElement("button");
+	exportNoteButton.textContent = "Export Notes";
+	exportNoteButton.classList.add(...Style.Button);
+	exportNoteButton.classList.add(...Style.ButtonPrimary);
+	exportNoteButton.style.marginLeft = "4px";
+	exportNoteButton.style.marginBottom = "4px";
+	importNoteDiv.appendChild(exportNoteButton);
+	
+	exportNoteButton.addEventListener("click", function(){
+		getLocalStorage("PMMG-Notes", downloadFile, "pmmg-notes" + Date.now().toString() + ".json");
+	});
+	
+	tile.appendChild(importNoteDiv);
 	
 	return [parameters, fullBurn, burnSettings];
 }

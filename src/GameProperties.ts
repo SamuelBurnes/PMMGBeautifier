@@ -40,7 +40,7 @@ export const FriendlyNames = {
 	"Notifications": "Notifications",
 	"ScreenUnpack": "Screen Unpack",
 	"ImageCreator": "Chat Image Creator",
-	"InventoryOrganizer": "Inventory Burn Sorting",
+	"InventoryOrganizer": "Inventory Sorting",
 	"CommandCorrecter": "Command Correcter",
 	"CalculatorButton": "Calculator Button",
 	"Sidebar": "Sidebar"

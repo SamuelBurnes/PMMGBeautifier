@@ -15,6 +15,7 @@ import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre} from "./XIT/Web";
 import {FIOInv_pre} from "./XIT/Inventory";
 import {Notes} from "./XIT/Notes";
 import {Checklists} from "./XIT/Checklists";
+import {Sort} from "./XIT/Sort";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -38,7 +39,8 @@ export const XITPreFunctions = {
 	"CHECK": Checklists,
 	"CHECKS": Checklists,
 	"CHECKLIST": Checklists,
-	"CHECKLISTS": Checklists
+	"CHECKLISTS": Checklists,
+	"SORT": Sort
 }
 
 export const XITBufferTitles = {
@@ -63,7 +65,8 @@ export const XITBufferTitles = {
 	"CHECK": "CHECKLIST",
 	"CHECKS": "CHECKLIST",
 	"CHECKLIST": "CHECKLIST",
-	"CHECKLISTS": "CHECKLISTS"
+	"CHECKLISTS": "CHECKLISTS",
+	"SORT": "SORTING OPTIONS"
 }
 /**
  * Handle XIT buffers
@@ -142,7 +145,7 @@ export class XITHandler implements Module {
 		}
 		else
 		{
-			Array.from(buffer.getElementsByClassName(Selector.BufferTitle))[0].textContent = XITBufferTitles[parameters[0].toUpperCase()];	// Title the buffer
+			Array.from(buffer.querySelectorAll(Selector.BufferTitle))[0].textContent = XITBufferTitles[parameters[0].toUpperCase()];	// Title the buffer
 			const modules = this.modules;
 			var result = this.result;
 			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, burn, burnSettings, modules, true);});

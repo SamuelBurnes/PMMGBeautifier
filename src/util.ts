@@ -171,6 +171,7 @@ export function CategorySort(a, b)
 // Find the data corresponding to a planet in an array of FIO inventory/burn data
 export function findCorrespondingPlanet(planet, data)
 {
+	if(!data || !planet){return undefined;}
 	for(var i = 0; i < data.length; i++)
 	{
 		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase())	// If the natural ID matches: XX-000x
@@ -224,12 +225,29 @@ export function parseBaseName(text)
 	
 }
 
-// Parse the planet name on inventory buffers
+// Parse the inventory name on inventory buffers
 export function parseInvName(text)
 {
 	try
 	{
-		const match = text.match(/\(([A-Z]{2}-[0-9]{3}[a-z])\)/);
+		const match = text.split(" ");
+		if(match && match[1])
+		{
+			return match[1];
+		}
+		return null;
+	} catch(TypeError)
+	{
+		return null;
+	}
+}
+
+// Parse the planet name on inventory buffers
+export function parsePlanetName(text)
+{
+	try
+	{
+		const match = text.match(/\((.*?)\)/);
 		if(match && match[1])
 		{
 			return match[1];
@@ -530,7 +548,6 @@ export function sortTable(table: HTMLTableElement, column: number, sortType: str
 		sorter.push([item.firstChild.textContent, rows[i]]);
 	}
 	if(sortType == "alph"){sorter.sort(tableSortAlph);}
-	console.log(sorter);
 	sorter.forEach(item => {
 		table.children[1].insertBefore(table.children[1].children[0], item[1]);
 	});
