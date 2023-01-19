@@ -31,6 +31,7 @@ export class InventoryOrganizer implements Module {
 		if(this.result["PMMGExtended"]["inventory_sorting"]){this.result["PMMGExtended"]["inventory_sorting"] = undefined;}	// If the old inventory sorting options are present, delete them
 		
 		if(!this.result["PMMGExtended"]["selected_sorting"]){this.result["PMMGExtended"]["selected_sorting"] = []};	// Replace them with a new inventory sorting option variable
+		if(!this.result["PMMGExtended"]["sorting"]){this.result["PMMGExtended"]["sorting"] = []};	// Initialize sorting if it doesn't exist
 		const screenNameElem = document.querySelector(Selector.ScreenName);	// Get the screen name
 		const screenName = screenNameElem ? screenNameElem.textContent : "";
 		if(!screenName){return;}
