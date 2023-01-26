@@ -158,6 +158,23 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	colorDiv.appendChild(colorSelect);
 	tile.appendChild(colorDiv);
 	
+	const minDiv = document.createElement("div");
+	const minLabel = document.createElement('h3');
+	minLabel.appendChild(createTextSpan("Minimize Headers By Default"));
+	minLabel.classList.add(...Style.SidebarSectionHead);
+	minLabel.style.marginBottom = "4px";
+	minDiv.appendChild(minLabel);
+	
+	const minCheckbox = document.createElement("input");
+	minCheckbox.type = "checkbox";
+	minCheckbox.checked = result["PMMGExtended"]["minimize_by_default"];
+	minDiv.appendChild(minCheckbox);
+	tile.appendChild(minDiv);
+	minCheckbox.addEventListener("click", function() {
+		result["PMMGExtended"]["minimize_by_default"] = minCheckbox.checked;
+		setSettings(result);
+	});
+	
 	const burnDiv = document.createElement("div");
 	const burnLabel = document.createElement('h3');
 	burnLabel.appendChild(createTextSpan("Burn Settings"));

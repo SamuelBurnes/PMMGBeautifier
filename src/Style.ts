@@ -37,7 +37,10 @@ export const Style = {
   MaterialNumber: ["bHjlDPB84Uz0yUnvHa-Y5A==", "_6OK6sXNjIIhq3NDD9ELVGw==", "gl73vnp5jo+VaepDRocunA=="],
   MaterialOuter: ["HWbVOIC2rYGNug3UC2dV+Q=="],
   MaterialNameText: ["YCp8jhRg4EBG3aQxcizskQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
-  SmallButton: ["zVuH9y-6nJDHnUQBaBixLg==","px0H8VJLoM5YTxdTMdfQhA==","fMW62cERnlzxZPFhnlPOeQ==","YRXUjzmWA2jJzWrOAy3-3A=="]
+  SmallButton: ["zVuH9y-6nJDHnUQBaBixLg==","px0H8VJLoM5YTxdTMdfQhA==","fMW62cERnlzxZPFhnlPOeQ==","YRXUjzmWA2jJzWrOAy3-3A=="],
+  HeaderRow: ["xshT5pa8qFfAmBT00htF0A==", "PKRymSkPiFaFYEWHnpHLCQ==", "A5WGQ40OQziF0SQm2My3sQ=="],
+  HeaderLabel: ["bcaYcb8aOOCKVEV5xSv+Gw==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
+  HeaderContent: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="]
 }
 
 // A function to apply multiple classes to an element in one go
@@ -95,6 +98,22 @@ export const CategoryColors = {
 
 // The style needed for PMMG's modules to function
 export const PMMGStyle = `
+.pb-minimize {
+	font-size: 14px;
+	font-weight: bold;
+	margin-left: auto;
+	margin-right: 3px;
+	margin-top: 1px;
+	text-align: center;
+	width: 18px;
+	background-color: #26353e;
+	color: #3fa2de;
+	cursor: pointer;
+}
+.pb-minimize:hover {
+	color: #26353e;
+	background-color: #3fa2de;
+}
 .mat-element-large {
 	height: 48px;
 	width: 48px;

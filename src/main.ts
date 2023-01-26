@@ -17,6 +17,7 @@ import { CalculatorButton } from "./CalculatorButton";
 import { ContractDrafts } from "./ContractDrafts";
 import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
+import { HeaderMinimizer } from "./HeaderMinimizer";
 
 try
 {
@@ -102,6 +103,7 @@ function mainRun(result)
 		  new Notifications(),
 		  new ImageCreator(),
 		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
+		  new HeaderMinimizer(result["PMMGExtended"]["minimize_by_default"]),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"])

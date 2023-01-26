@@ -43,7 +43,8 @@ export const FriendlyNames = {
 	"InventoryOrganizer": "Inventory Sorting",
 	"CommandCorrecter": "Command Correcter",
 	"CalculatorButton": "Calculator Button",
-	"Sidebar": "Sidebar"
+	"Sidebar": "Sidebar",
+	"HeaderMinimizer": "Minimize Headers"
 }
 
 export const PlanetCommands = ["ADM", "BSC", "COGC", "COGCPEX", "COGCU", "FLTP", "LR", "LMP", "LM", "PLI", "POPI", "POPR", "PPS", "SHY", "WAR"];

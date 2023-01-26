@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers, parseInvName, parsePlanetName, findCorrespondingPlanet, genericCleanup, setSettings, showBuffer} from "./util";
+import {getBuffers, parseInvName, parsePlanetName, findCorrespondingPlanet, targetedCleanup, setSettings, showBuffer, createMaterialElement} from "./util";
 import {Selector} from "./Selector";
 import {Style} from "./Style";
 import {MaterialNames} from  "./GameProperties";
@@ -20,7 +20,7 @@ export class InventoryOrganizer implements Module {
 	}
 	
     cleanup() {
-      genericCleanup(this.tag);	// Clean up all elements with the tag
+      //genericCleanup(this.tag);	// Clean up all elements with the tag
 	  return;
     }
     run() {
@@ -36,6 +36,7 @@ export class InventoryOrganizer implements Module {
 		const screenName = screenNameElem ? screenNameElem.textContent : "";
 		if(!screenName){return;}
 		
+		const tag = this.tag;
 		
 		buffers.forEach(buffer => {	// For each buffer...
 			const sortOptions = buffer.querySelector(Selector.InventorySortOptions);	// Get the sorting option list at the top of the buffer
@@ -52,7 +53,31 @@ export class InventoryOrganizer implements Module {
 			const inventory = buffer.querySelector(Selector.Inventory);	// The inventory element containing all the materials
 			if(!inventory || !inventory.parentElement){return;}
 			
-			sortInventory(inventory, sortOptions, result, this.tag, screenName, invName, burn);	// Now apply sorting and sorting select options
+			if(!inventory.classList.contains("pb-monitored"))
+			{
+				inventory.classList.add("pb-monitored");
+				sortInventory(inventory, sortOptions, result, this.tag, screenName, invName, burn);	// Now apply sorting and sorting select options
+				
+				let onMutationsObserved = function() {
+					observer.disconnect();
+					setTimeout(() => {
+						observer.observe(target, config)
+					}, "250");	// Just chill...
+					targetedCleanup(tag, inventory)	// Cleanup old sorting stuff
+					sortInventory(inventory, sortOptions, result, tag, screenName, invName, burn);	// Now apply sorting and sorting select options
+					return;
+					
+				};
+				
+				let target = inventory;
+				let config = { childList: true, subtree: true };
+				let MutationObserver = window["MutationObserver"] || window["WebKitMutationObserver"];
+				let observer = new MutationObserver(onMutationsObserved);
+				observer.observe(target, config);
+			}
+			
+			
+			
 			return;
 		});
 		
@@ -70,7 +95,28 @@ export class InventoryOrganizer implements Module {
 			const inventory = buffer.querySelector(Selector.Inventory);	// The inventory element containing all the materials
 			if(!inventory || !inventory.parentElement){return;}
 			
-			sortInventory(inventory, sortOptions, result, this.tag, screenName, shipName, undefined); // Now apply sorting and sorting select options
+			if(!inventory.classList.contains("pb-monitored"))
+			{
+				inventory.classList.add("pb-monitored");
+				sortInventory(inventory, sortOptions, result, tag, screenName, shipName, undefined);	// Now apply sorting and sorting select options
+				
+				let onMutationsObserved = function() {
+					observer.disconnect();
+					setTimeout(() => {
+						observer.observe(target, config)
+					}, "250");	// Just chill...
+					targetedCleanup(tag, inventory)	// Cleanup old sorting stuff
+					sortInventory(inventory, sortOptions, result, tag, screenName, shipName, undefined);	// Now apply sorting and sorting select options
+					return;
+					
+				};
+				
+				let target = inventory;
+				let config = { childList: true, subtree: true };
+				let MutationObserver = window["MutationObserver"] || window["WebKitMutationObserver"];
+				let observer = new MutationObserver(onMutationsObserved);
+				observer.observe(target, config);
+			}
 			return;
 		});
 		
@@ -117,6 +163,8 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 						}
 						return;
 					});
+					
+					if(inventory.firstChild){inventory.insertBefore(inventory.firstChild, inventory.firstChild);}
 					return;
 				});
 			}
@@ -124,12 +172,12 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 		});
 		if(burn)	// If there is burn data for this inventory, add the burn sorting option
 		{
-			sortOptions.appendChild(createToggle(result, sortOptions, "BRN", findIfActive(result["PMMGExtended"]["selected_sorting"], screenName + planetName, "BRN"), screenName + planetName));
+			sortOptions.appendChild(createToggle(result, sortOptions, "BRN", findIfActive(result["PMMGExtended"]["selected_sorting"], screenName + planetName, "BRN"), screenName + planetName, inventory));
 		}
 		result["PMMGExtended"]["sorting"].forEach(settings => {	// For each setting for this inventory, create a button
 			if(!settings[0] || !settings[1] || !settings[2]){return;}
 			if(settings[1].toUpperCase() != planetName.toUpperCase()){return;}
-			sortOptions.appendChild(createToggle(result, sortOptions, settings[0], findIfActive(result["PMMGExtended"]["selected_sorting"], screenName + planetName, settings[0]), screenName + planetName));
+			sortOptions.appendChild(createToggle(result, sortOptions, settings[0], findIfActive(result["PMMGExtended"]["selected_sorting"], screenName + planetName, settings[0]), screenName + planetName, inventory));
 			return;
 		});
 	}
@@ -160,9 +208,6 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 		return;
 	});
 	
-	var materials = Array.from(inventory.querySelectorAll(Selector.FullMaterialIcon)) as HTMLElement[];	// Get all the material elements
-	materials.sort(materialSort);	// Sort the material elements by category primarily, then by ticker secondarily
-	
 	// Update circles live
 	(Array.from(sortOptions.children) as HTMLElement[]).forEach(option => {	// For each sorting option
 		if(option != sortOptions.firstChild && option.firstChild && option.firstChild.textContent == activeSort && !option.children[1])	// Test if it is the button corresponding to the active sort
@@ -191,7 +236,73 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 	});
 	
 	if(activeSort == ""){return;}	// No sorting to do, stock option selected
-	else if(activeSort == "BRN")	// Do burn sorting
+	
+	var materials = Array.from(inventory.querySelectorAll(Selector.FullMaterialIcon)) as HTMLElement[];	// Get all the material elements
+	materials.sort(materialSort);	// Sort the material elements by category primarily, then by ticker secondarily
+	
+	var sorted = [] as string[];	// A list of all the material tickers already sorted into categories
+	var sortingDetails = [];	// The details of which materials to put in which category [[catName, [MAT1, MAT2]], [catName2, [MAT3, MAT4]]]
+	result["PMMGExtended"]["sorting"].forEach(result_sortingDetails => {	// Search through each option in the settings
+		if(result_sortingDetails[0] == activeSort && result_sortingDetails[1] == planetName)	// If it matches, assign it to sortingDetails
+		{
+			sortingDetails = result_sortingDetails;
+		}
+		return;
+	});
+	
+	if(activeSort != "BRN")
+	{
+		if(sortingDetails.length < 3){return;}	// No sorting to do
+		
+		if(sortingDetails[4])
+		{
+			var materialsToSort = [];
+			(sortingDetails[2] as any[]).forEach(category => {
+				materialsToSort = materialsToSort.concat(category[1]);
+			});
+			var materialsToSort = materialsToSort.filter((c, index) => {
+				return materialsToSort.indexOf(c) === index;
+			});
+			
+			materialsToSort.forEach(ticker => {
+				if(!materialListContains(materials, ticker))
+				{
+					const matElement = createMaterialElement(ticker, tag, "0", true, false);
+					if(!matElement){return;}
+					const matQuantityElem = matElement.querySelector(Selector.MaterialQuantity) as HTMLElement;
+					if(matQuantityElem){matQuantityElem.style.color = "#bb0000";}
+					materials.push(matElement);
+				}
+			});
+			materials.sort(materialSort);
+		}
+		
+		(sortingDetails[2] as any[]).forEach(category => {	// For each sorting category...
+			// Add a header
+			const categoryTitle = document.createElement('h3');
+			categoryTitle.appendChild(document.createTextNode(category[0]));
+			categoryTitle.classList.add(...Style.SidebarSectionHead);
+			categoryTitle.style.width = "100%";
+			categoryTitle.classList.add(tag);
+			inventory.appendChild(categoryTitle);
+			var areItemsInCategory = false;	// Keep track if there are any elements in that category
+			materials.forEach(material => {	// For each material in the inventory...
+				const tickerElem = material.querySelector(Selector.MaterialText);
+				if(!tickerElem){return;}
+				const ticker = tickerElem.textContent;
+				if(ticker && category[1].includes(ticker) && !sorted.includes(ticker))	// If the ticker is in that category and hasn't been sorted already
+				{
+					inventory.appendChild(material);	// Add it to the bottom of the inventory
+					areItemsInCategory = true;
+				}
+			});
+			if(!areItemsInCategory){inventory.removeChild(categoryTitle);}	// If there are no items in that category, return
+			sorted = sorted.concat(category[1]);	// Add the list of materials just sorted to the list of materials that have been sorted
+			return;
+		});
+	}
+	
+	if(sortingDetails[3] || activeSort == "BRN")	// If burn sorting is enabled as a subsort
 	{
 		if(!burn){return;}
 		const workforceMaterials = extractMaterials(burn["WorkforceConsumption"]);	// Get a list of all the materials in each category
@@ -210,7 +321,7 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 			const tickerElem = material.querySelector(Selector.MaterialText);
 			if(!tickerElem){return;}
 			const ticker = tickerElem.textContent;
-			if(ticker && workforceMaterials.includes(ticker) && !inputMaterials.includes(ticker) && !outputMaterials.includes(ticker)) // Test if the ticker is a consumable, but is not an input or output
+			if(ticker && workforceMaterials.includes(ticker) && !inputMaterials.includes(ticker) && !outputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is a consumable, but is not an input or output
 			{
 				inventory.appendChild(material);	// Move it to the end of the list
 				areConsumables = true;
@@ -230,7 +341,7 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 			const tickerElem = material.querySelector(Selector.MaterialText);
 			if(!tickerElem){return;}
 			const ticker = tickerElem.textContent;
-			if(ticker && inputMaterials.includes(ticker)) // Test if the ticker is an input
+			if(ticker && inputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is an input
 			{
 				inventory.appendChild(material);	// Move it to the end of the list
 				areInputs = true;
@@ -250,74 +361,17 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 			const tickerElem = material.querySelector(Selector.MaterialText);
 			if(!tickerElem){return;}
 			const ticker = tickerElem.textContent;
-			if(ticker && outputMaterials.includes(ticker) && !inputMaterials.includes(ticker)) // Test if the ticker is an output, but not an input
+			if(ticker && outputMaterials.includes(ticker) && !inputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is an output, but not an input
 			{
 				inventory.appendChild(material);	// Move it to the end of the list
 				areOutputs = true;
 			}
 		});
 		if(!areOutputs){inventory.removeChild(outputTitle);} // If no items in that category exist, remove the header
-		
-		// Create the category for misc
-		const miscTitle = document.createElement('h3');
-		miscTitle.appendChild(document.createTextNode("Other"));
-		miscTitle.classList.add(...Style.SidebarSectionHead);
-		miscTitle.style.width = "100%";
-		miscTitle.classList.add(tag);
-		inventory.appendChild(miscTitle);
-		var areMisc = false; // Test if any materials in that category exist
-		materials.forEach(material => { // For each material in the inventory...
-			const tickerElem = material.querySelector(Selector.MaterialText);
-			if(!tickerElem){return;}
-			const ticker = tickerElem.textContent;
-			if(ticker && !outputMaterials.includes(ticker) && !workforceMaterials.includes(ticker) && !inputMaterials.includes(ticker)) // Test if the ticker is in no other category
-			{
-				inventory.appendChild(material);	// Move it to the end of the list
-				areMisc = true;
-			}
-		});
-		if(!areMisc){inventory.removeChild(miscTitle);} // If no items in that category exist, remove the header
-		return;
+		sorted = sorted.concat(workforceMaterials);
+		sorted = sorted.concat(inputMaterials);
+		sorted = sorted.concat(outputMaterials);
 	}
-	
-	var sortingDetails = [];	// The details of which materials to put in which category [[catName, [MAT1, MAT2]], [catName2, [MAT3, MAT4]]]
-	result["PMMGExtended"]["sorting"].forEach(result_sortingDetails => {	// Search through each option in the settings
-		if(result_sortingDetails[0] == activeSort && result_sortingDetails[1] == planetName)	// If it matches, assign it to sortingDetails
-		{
-			sortingDetails = result_sortingDetails[2];
-		}
-		return;
-	});
-	if(sortingDetails.length == 0){return;}	// No sorting to do
-	
-	
-	
-	var sorted = [] as string[];	// A list of all the material tickers already sorted into categories
-	
-	sortingDetails.forEach(category => {	// For each sorting category...
-		// Add a header
-		const categoryTitle = document.createElement('h3');
-		categoryTitle.appendChild(document.createTextNode(category[0]));
-		categoryTitle.classList.add(...Style.SidebarSectionHead);
-		categoryTitle.style.width = "100%";
-		categoryTitle.classList.add(tag);
-		inventory.appendChild(categoryTitle);
-		var areItemsInCategory = false;	// Keep track if there are any elements in that category
-		materials.forEach(material => {	// For each material in the inventory...
-			const tickerElem = material.querySelector(Selector.MaterialText);
-			if(!tickerElem){return;}
-			const ticker = tickerElem.textContent;
-			if(ticker && category[1].includes(ticker) && !sorted.includes(ticker))	// If the ticker is in that category and hasn't been sorted already
-			{
-				inventory.appendChild(material);	// Add it to the bottom of the inventory
-				areItemsInCategory = true;
-			}
-		});
-		if(!areItemsInCategory){inventory.removeChild(categoryTitle);}	// If there are no items in that category, return
-		sorted = sorted.concat(category[1]);	// Add the list of materials just sorted to the list of materials that have been sorted
-		return;
-	});
-	
 	// Add a header for misc
 	const miscTitle = document.createElement('h3');
 	miscTitle.appendChild(document.createTextNode("Other"));
@@ -340,6 +394,17 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 	if(!areMisc){inventory.removeChild(miscTitle);}	// If no misc materials exist, remove the header
 	
 	return;
+}
+
+function materialListContains(materials, ticker)
+{
+	for(var i = 0; i < materials.length; i++)
+	{
+		const tickerElem = materials[i].querySelector(Selector.MaterialText);
+		if(!tickerElem){continue;}
+		if(ticker == tickerElem.textContent){return true;}
+	}
+	return false;
 }
 
 /**
@@ -369,7 +434,7 @@ function findIfActive(sortSettings, screenPlanet, sortModeName)
 *	selected: Whether the button is selected
 *	combinedName: The concatentated screen and encoded inventory name
 **/
-function createToggle(result, sortOptions, abbreviation, selected, combinedName)
+function createToggle(result, sortOptions, abbreviation, selected, combinedName, inventory)
 {	
 	const customSortButton = document.createElement("div");	// Create the button and style it
 	customSortButton.classList.add("LgjAIPjxxF1iSm2VWQSmPw==");
@@ -413,6 +478,7 @@ function createToggle(result, sortOptions, abbreviation, selected, combinedName)
 				{
 					(option.children[1] as HTMLElement).style.display = "none";
 				}
+				if(inventory.firstChild){inventory.insertBefore(inventory.firstChild, inventory.firstChild);}
 			}
 			return;
 		});

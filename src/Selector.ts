@@ -19,7 +19,7 @@ export const Selector = {
   Notification: "div[class~='_6iTMJZ+xm-PbG+nWoPqh7g==']",
   ProdQueue: "div[class~='o1YcYrDkxt9IvN4ApCEjIw==']",
   ProdWindow: "div[class~='Iw1zMtcrB7NFCxAG4xTz8g==']",
-  ProdPanel: "div[class~='gecI5uGBluvjP5GCRk3dHA==']",
+  BufferPanel: "div[class~='gecI5uGBluvjP5GCRk3dHA==']",
   NewBFRButton: "TOUR_TARGET_BUTTON_BUFFER_NEW",
   WholeWindow: "#container",
   BufferTextField: ".UoOoh9EGx7YihezkSGeV2Q\\=\\=",
@@ -44,5 +44,7 @@ export const Selector = {
   Inventory: "div[class~='e7M0g3qfy5EYIqWywjDYKQ==']",
   MaterialText: "span[class~='rjpYL1i9cZmf47fM9qWyZQ==']",
   InventorySortOptions: "div[class~='_3vmsvGjeJ5VCcbHBAAIpHw==']",
-  ChatArea: "div[class~='tvLh70IeyzjPBXlNSDYokg==']"
+  ChatArea: "div[class~='tvLh70IeyzjPBXlNSDYokg==']",
+  MaterialQuantity: "div[class~='bHjlDPB84Uz0yUnvHa-Y5A==']",
+  HeaderRow: "div[class~='xshT5pa8qFfAmBT00htF0A==']"
 }

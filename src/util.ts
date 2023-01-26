@@ -382,6 +382,7 @@ export function createMaterialElement(ticker, className: string = "prun-remove-j
 	
 	const outerLayer = document.createElement("div");	// Final element to be returned (for big case)
 	outerLayer.classList.add(...WithStyles(Style.MaterialOuter));	// Apply styles
+	outerLayer.classList.add(className);
 	outerLayer.appendChild(materialWrapperWrapper);
 	
 	if(amount && amount != "none")	// If there is an amount listed
@@ -495,6 +496,16 @@ function monitorOnElementCreated(selector, callback, onlyOnce = true) {
 export function genericCleanup(className: string = "prun-remove-js") {
   
   Array.from(document.getElementsByClassName(className)).forEach((elem) => {
+    elem.parentNode && elem.parentNode.removeChild(elem);
+	return;
+  });
+  return;
+}
+
+// Remove all elements from an HTML Element added in the last run with a class name
+export function targetedCleanup(className: string, element: Element) {
+  
+  Array.from(element.getElementsByClassName(className)).forEach((elem) => {
     elem.parentNode && elem.parentNode.removeChild(elem);
 	return;
   });

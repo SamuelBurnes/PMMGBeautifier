@@ -126,8 +126,28 @@ function createInputRow(label, text: string = "")
 	inputInputDiv.classList.add(...Style.FormInput);
 	inputRow.appendChild(inputInputDiv);
 	const inputInput = document.createElement("input");
+	inputInput.style.width = "80%";
 	inputInputDiv.appendChild(inputInput);
 	inputInput.value = text;
+	return inputRow;
+}
+
+// Create an checkbox input row for the editing interface (should move to util)
+function createCheckboxRow(label, enabled: boolean = false)
+{
+	const inputRow = document.createElement("div");
+	inputRow.classList.add(...Style.FormRow);
+	const inputLabel = document.createElement("label");
+	inputLabel.textContent = label;
+	inputLabel.classList.add(...Style.FormLabel);
+	inputRow.appendChild(inputLabel);
+	const inputInputDiv = document.createElement("div");
+	inputInputDiv.classList.add(...Style.FormInput);
+	inputRow.appendChild(inputInputDiv);
+	const inputInput = document.createElement("input");
+	inputInput.type = "checkbox"
+	inputInputDiv.appendChild(inputInput);
+	inputInput.checked = enabled;
 	return inputRow;
 }
 
@@ -141,6 +161,19 @@ function getValueOfRow(row)
 	else
 	{
 		return row.children[1].firstChild.value || "";
+	}
+}
+
+// Gets the checked status of a check box in a row in the add interface (should move to util)
+function getCheckOfRow(row)
+{
+	if(!row || !row.children[1] || !row.children[1].firstChild)
+	{
+		return false;
+	}
+	else
+	{
+		return (row.children[1].firstChild as HTMLInputElement).checked || false;
 	}
 }
 
@@ -214,9 +247,16 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 
 	addButton.addEventListener("click", function() {
 		const catNumber = (form.children.length - 1) / 2;
-		form.insertBefore(createInputRow("Category " + catNumber + " Name"), form.children[form.children.length - 2]);
-		form.insertBefore(createInputRow("Category " + catNumber + " MATs"), form.children[form.children.length - 2]);
+		form.insertBefore(createInputRow("Category " + catNumber + " Name"), form.children[form.children.length - 4]);
+		form.insertBefore(createInputRow("Category " + catNumber + " MATs"), form.children[form.children.length - 4]);
 	});
+	
+	//Create the burn row
+	const burnRow = createCheckboxRow("Include Burn Sorting", settings[3] || false);
+	form.appendChild(burnRow);
+	//Create zero items row
+	const zeroRow = createCheckboxRow("Show Zero Quantities", settings[4] || false);
+	form.appendChild(zeroRow);
 
 	const saveRow = document.createElement("div");
 	saveRow.classList.add(...Style.FormSaveRow);
@@ -238,7 +278,7 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 		const itemAbbreviation = getValueOfRow(form.firstChild);
 		
 		const sortingInfo = [] as any[];
-		for(var i = 1; i < form.children.length - 2; i += 2)
+		for(var i = 1; i < form.children.length - 4; i += 2)
 		{
 			if(!form.children[i] || !form.children[i + 1])
 			{
@@ -257,14 +297,14 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 			{
 				if(result["PMMGExtended"]["sorting"][i] == settings)
 				{
-					result["PMMGExtended"]["sorting"][i] = [itemAbbreviation, parameters[1], sortingInfo];
+					result["PMMGExtended"]["sorting"][i] = [itemAbbreviation, parameters[1], sortingInfo, getCheckOfRow(burnRow), getCheckOfRow(zeroRow)];
 					break;
 				}
 			}
 		}
 		else
 		{
-			result["PMMGExtended"]["sorting"].push([itemAbbreviation, parameters[1], sortingInfo]);
+			result["PMMGExtended"]["sorting"].push([itemAbbreviation, parameters[1], sortingInfo, getCheckOfRow(burnRow), getCheckOfRow(zeroRow)]);
 		}
 		setSettings(result);
 		Sort(tile, parameters, result);
