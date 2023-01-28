@@ -1,4 +1,4 @@
-import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings, getLocalStorage} from "../util";
+import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings, getLocalStorage, createToolTip} from "../util";
 import {Style, WithStyles} from "../Style";
 
 export function Settings(tile, parameters, result, fullBurn, burnSettings, modules)
@@ -11,6 +11,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const authenticationHeader = document.createElement('h3');
     authenticationHeader.appendChild(document.createTextNode("Authentication Settings"));
+	authenticationHeader.appendChild(createToolTip("Enter your FIO username and API key, as well as a corporate web app ID", "right"));
 	authenticationHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(authenticationHeader);
 	const usernameDiv = document.createElement("div");
@@ -59,6 +60,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const moduleSettingsHeader = document.createElement('h3');
     moduleSettingsHeader.appendChild(document.createTextNode("Toggle Features"));
+	moduleSettingsHeader.appendChild(createToolTip("Toggle features on and off. The yellow X cleans up any stray elements.", "right"));
     moduleSettingsHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(moduleSettingsHeader);
 	const content = document.createElement("div");
@@ -120,6 +122,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const enhancedColorHeader = document.createElement('h3');
     enhancedColorHeader.appendChild(document.createTextNode("Color Scheme"));
+	enhancedColorHeader.appendChild(createToolTip("Select a color scheme to customize material icons.", "right"));
     enhancedColorHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(enhancedColorHeader);
 	
@@ -161,6 +164,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	const minDiv = document.createElement("div");
 	const minLabel = document.createElement('h3');
 	minLabel.appendChild(createTextSpan("Minimize Headers By Default"));
+	minLabel.appendChild(createToolTip("Minimize header rows on CXs and contracts by default.", "right"));
 	minLabel.classList.add(...Style.SidebarSectionHead);
 	minLabel.style.marginBottom = "4px";
 	minDiv.appendChild(minLabel);
@@ -178,6 +182,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	const burnDiv = document.createElement("div");
 	const burnLabel = document.createElement('h3');
 	burnLabel.appendChild(createTextSpan("Burn Settings"));
+	burnLabel.appendChild(createToolTip("Set the thresholds for yellow and red consumable levels in burn tiles (in days).", "right"));
 	burnLabel.classList.add(...Style.SidebarSectionHead);
 	burnLabel.style.marginBottom = "4px";
 	burnDiv.appendChild(burnLabel);
@@ -218,6 +223,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const screenUnpackHeader = document.createElement('h3');
     screenUnpackHeader.appendChild(document.createTextNode("Screen Unpack Exclusions"));
+	screenUnpackHeader.appendChild(createToolTip("List screens to be excluded from screen unpack. Separate screens with a comma.", "right"));
     screenUnpackHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(screenUnpackHeader);
 	const notifDiv = document.createElement("div");
@@ -235,6 +241,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const hotkeyHeader = document.createElement('h3');
     hotkeyHeader.appendChild(document.createTextNode("Left Sidebar Buttons"));
+	hotkeyHeader.appendChild(createToolTip("Create hotkeys on the left sidebar. The first value is what will be displayed, the second is the command.", "right"));
     hotkeyHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(hotkeyHeader);
 	const hotkeyInputDiv = document.createElement("div");

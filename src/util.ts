@@ -600,3 +600,10 @@ export function createTable(tile, headers: Array<string>, sectionHeaderTitle = "
 
 	return tbody;
 }
+
+export function createToolTip(text: string, position: string)
+{
+	const tooltip = document.createElement("span");
+	tooltip.innerHTML = `<span data-tooltip="${text}" data-tooltip-position="${position}" class="kfU78EaaOVbQR2YM0eeGew==" style="float: revert;font-size: 12px;margin-top:-4px;">ⓘ</span>`
+	return tooltip.firstChild || tooltip;
+}

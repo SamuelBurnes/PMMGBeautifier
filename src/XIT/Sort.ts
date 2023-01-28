@@ -1,4 +1,4 @@
-import {clearChildren, createTextSpan, setSettings} from "../util";
+import {clearChildren, createTextSpan, setSettings, createToolTip} from "../util";
 import {Style} from "../Style";
 
 // Create the interface for adding and editing sorting options
@@ -114,12 +114,13 @@ function makeSpacer(tile, toRemove)
 }
 
 // Create an input row for the editing interface (should move to util)
-function createInputRow(label, text: string = "")
+function createInputRow(label, text: string = "", tooltip: string = "")
 {
 	const inputRow = document.createElement("div");
 	inputRow.classList.add(...Style.FormRow);
 	const inputLabel = document.createElement("label");
 	inputLabel.textContent = label;
+	if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
 	inputLabel.classList.add(...Style.FormLabel);
 	inputRow.appendChild(inputLabel);
 	const inputInputDiv = document.createElement("div");
@@ -133,12 +134,13 @@ function createInputRow(label, text: string = "")
 }
 
 // Create an checkbox input row for the editing interface (should move to util)
-function createCheckboxRow(label, enabled: boolean = false)
+function createCheckboxRow(label, enabled: boolean = false, tooltip: string = "")
 {
 	const inputRow = document.createElement("div");
 	inputRow.classList.add(...Style.FormRow);
 	const inputLabel = document.createElement("label");
 	inputLabel.textContent = label;
+	if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
 	inputLabel.classList.add(...Style.FormLabel);
 	inputRow.appendChild(inputLabel);
 	const inputInputDiv = document.createElement("div");
@@ -214,20 +216,20 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 	const form = document.createElement("div");
 	addInterface.appendChild(form);
 
-	form.appendChild(createInputRow("Abbreviation", prefilled ? settings[0] : ""));
+	form.appendChild(createInputRow("Abbreviation", prefilled ? settings[0] : "", "The abbreviation showing at the top of the inventory (ABC, CAT, etc.)"));
 	
 	if(prefilled)
 	{
 		for(var i = 0; i < settings[2].length; i++)
 		{
-			form.appendChild(createInputRow("Category " + (i + 1) + " Name", prefilled ? settings[2][i][0] : ""));
-			form.appendChild(createInputRow("Category " + (i + 1) + " MATs", prefilled ? settings[2][i][1].join(", ") : ""));
+			form.appendChild(createInputRow("Category " + (i + 1) + " Name", prefilled ? settings[2][i][0] : "", i == 0 ? "The name of the first category for materials" : ""));
+			form.appendChild(createInputRow("Category " + (i + 1) + " MATs", prefilled ? settings[2][i][1].join(", ") : "", i == 0 ? "A list of materials in the first category. Separate tickers by a comma. (RAT, DW, etc.)" : ""));
 		}
 	}
 	else
 	{
-		form.appendChild(createInputRow("Category 1 Name"));
-		form.appendChild(createInputRow("Category 1 MATs"));
+		form.appendChild(createInputRow("Category 1 Name", "", "The name of the first category for materials."));
+		form.appendChild(createInputRow("Category 1 MATs", "", "A list of materials in the first category. Separate tickers by a comma. (RAT, DW, etc.)"));
 	}
 	const addRow = document.createElement("div");
 	addRow.classList.add(...Style.FormSaveRow);
@@ -252,10 +254,10 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 	});
 	
 	//Create the burn row
-	const burnRow = createCheckboxRow("Include Burn Sorting", settings[3] || false);
+	const burnRow = createCheckboxRow("Burn Sorting", settings[3] || false, "Add burn sorting as a secondary sorting method. Burn categories will show under the categories defined above.");
 	form.appendChild(burnRow);
 	//Create zero items row
-	const zeroRow = createCheckboxRow("Show Zero Quantities", settings[4] || false);
+	const zeroRow = createCheckboxRow("Show Zeros", settings[4] || false, "Show item icons that have zero quantity.");
 	form.appendChild(zeroRow);
 
 	const saveRow = document.createElement("div");

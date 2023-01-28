@@ -2,7 +2,7 @@ import {Module} from "./ModuleRunner";
 import {getBuffers, parseInvName, parsePlanetName, findCorrespondingPlanet, targetedCleanup, setSettings, showBuffer, createMaterialElement} from "./util";
 import {Selector} from "./Selector";
 import {Style} from "./Style";
-import {MaterialNames} from  "./GameProperties";
+import {MaterialNames, SortingTriangleHTML} from  "./GameProperties";
 
 /**
  * Sort inventory into custom categories
@@ -212,8 +212,9 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 	(Array.from(sortOptions.children) as HTMLElement[]).forEach(option => {	// For each sorting option
 		if(option != sortOptions.firstChild && option.firstChild && option.firstChild.textContent == activeSort && !option.children[1])	// Test if it is the button corresponding to the active sort
 		{
-			const toggleIndicator = document.createElement("div");	// Add the dot next to it
-			toggleIndicator.textContent = "⬤";
+			// Add the triangle next to it
+			const toggleIndicator = document.createElement("div");
+			toggleIndicator.innerHTML = SortingTriangleHTML;
 			toggleIndicator.style.marginLeft = "2px";
 			option.appendChild(toggleIndicator);
 		}
@@ -270,7 +271,7 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 					const matElement = createMaterialElement(ticker, tag, "0", true, false);
 					if(!matElement){return;}
 					const matQuantityElem = matElement.querySelector(Selector.MaterialQuantity) as HTMLElement;
-					if(matQuantityElem){matQuantityElem.style.color = "#bb0000";}
+					if(matQuantityElem){matQuantityElem.style.color = "#cc0000";}
 					materials.push(matElement);
 				}
 			});
@@ -304,73 +305,74 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 	
 	if(sortingDetails[3] || activeSort == "BRN")	// If burn sorting is enabled as a subsort
 	{
-		if(!burn){return;}
-		const workforceMaterials = extractMaterials(burn["WorkforceConsumption"]);	// Get a list of all the materials in each category
-		const inputMaterials = extractMaterials(burn["OrderConsumption"]);
-		const outputMaterials = extractMaterials(burn["OrderProduction"]);
-		
-		// Create the category for workforce consumables
-		const workforceTitle = document.createElement('h3');
-		workforceTitle.appendChild(document.createTextNode("Consumables"));
-		workforceTitle.classList.add(...Style.SidebarSectionHead);
-		workforceTitle.style.width = "100%";
-		workforceTitle.classList.add(tag);
-		inventory.appendChild(workforceTitle);
-		var areConsumables = false;	// Test if any materials in that category exist
-		materials.forEach(material => {	// For each material in the inventory...
-			const tickerElem = material.querySelector(Selector.MaterialText);
-			if(!tickerElem){return;}
-			const ticker = tickerElem.textContent;
-			if(ticker && workforceMaterials.includes(ticker) && !inputMaterials.includes(ticker) && !outputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is a consumable, but is not an input or output
-			{
-				inventory.appendChild(material);	// Move it to the end of the list
-				areConsumables = true;
-			}
-		});
-		if(!areConsumables){inventory.removeChild(workforceTitle);}	// If no items in that category exist, remove the header
-		
-		// Create the category for inputs
-		const inputTitle = document.createElement('h3');
-		inputTitle.appendChild(document.createTextNode("Inputs"));
-		inputTitle.classList.add(...Style.SidebarSectionHead);
-		inputTitle.style.width = "100%";
-		inputTitle.classList.add(tag);
-		inventory.appendChild(inputTitle);
-		var areInputs = false; // Test if any materials in that category exist
-		materials.forEach(material => { // For each material in the inventory...
-			const tickerElem = material.querySelector(Selector.MaterialText);
-			if(!tickerElem){return;}
-			const ticker = tickerElem.textContent;
-			if(ticker && inputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is an input
-			{
-				inventory.appendChild(material);	// Move it to the end of the list
-				areInputs = true;
-			}
-		});
-		if(!areInputs){inventory.removeChild(inputTitle);} // If no items in that category exist, remove the header
-		
-		// Create the category for outputs
-		const outputTitle = document.createElement('h3');
-		outputTitle.appendChild(document.createTextNode("Outputs"));
-		outputTitle.classList.add(...Style.SidebarSectionHead);
-		outputTitle.style.width = "100%";
-		outputTitle.classList.add(tag);
-		inventory.appendChild(outputTitle);
-		var areOutputs = false;	// Test if any materials in that category exist
-		materials.forEach(material => {	// For each material in the inventory...
-			const tickerElem = material.querySelector(Selector.MaterialText);
-			if(!tickerElem){return;}
-			const ticker = tickerElem.textContent;
-			if(ticker && outputMaterials.includes(ticker) && !inputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is an output, but not an input
-			{
-				inventory.appendChild(material);	// Move it to the end of the list
-				areOutputs = true;
-			}
-		});
-		if(!areOutputs){inventory.removeChild(outputTitle);} // If no items in that category exist, remove the header
-		sorted = sorted.concat(workforceMaterials);
-		sorted = sorted.concat(inputMaterials);
-		sorted = sorted.concat(outputMaterials);
+		if(burn){
+			const workforceMaterials = extractMaterials(burn["WorkforceConsumption"]);	// Get a list of all the materials in each category
+			const inputMaterials = extractMaterials(burn["OrderConsumption"]);
+			const outputMaterials = extractMaterials(burn["OrderProduction"]);
+			
+			// Create the category for workforce consumables
+			const workforceTitle = document.createElement('h3');
+			workforceTitle.appendChild(document.createTextNode("Consumables"));
+			workforceTitle.classList.add(...Style.SidebarSectionHead);
+			workforceTitle.style.width = "100%";
+			workforceTitle.classList.add(tag);
+			inventory.appendChild(workforceTitle);
+			var areConsumables = false;	// Test if any materials in that category exist
+			materials.forEach(material => {	// For each material in the inventory...
+				const tickerElem = material.querySelector(Selector.MaterialText);
+				if(!tickerElem){return;}
+				const ticker = tickerElem.textContent;
+				if(ticker && workforceMaterials.includes(ticker) && !inputMaterials.includes(ticker) && !outputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is a consumable, but is not an input or output
+				{
+					inventory.appendChild(material);	// Move it to the end of the list
+					areConsumables = true;
+				}
+			});
+			if(!areConsumables){inventory.removeChild(workforceTitle);}	// If no items in that category exist, remove the header
+			
+			// Create the category for inputs
+			const inputTitle = document.createElement('h3');
+			inputTitle.appendChild(document.createTextNode("Inputs"));
+			inputTitle.classList.add(...Style.SidebarSectionHead);
+			inputTitle.style.width = "100%";
+			inputTitle.classList.add(tag);
+			inventory.appendChild(inputTitle);
+			var areInputs = false; // Test if any materials in that category exist
+			materials.forEach(material => { // For each material in the inventory...
+				const tickerElem = material.querySelector(Selector.MaterialText);
+				if(!tickerElem){return;}
+				const ticker = tickerElem.textContent;
+				if(ticker && inputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is an input
+				{
+					inventory.appendChild(material);	// Move it to the end of the list
+					areInputs = true;
+				}
+			});
+			if(!areInputs){inventory.removeChild(inputTitle);} // If no items in that category exist, remove the header
+			
+			// Create the category for outputs
+			const outputTitle = document.createElement('h3');
+			outputTitle.appendChild(document.createTextNode("Outputs"));
+			outputTitle.classList.add(...Style.SidebarSectionHead);
+			outputTitle.style.width = "100%";
+			outputTitle.classList.add(tag);
+			inventory.appendChild(outputTitle);
+			var areOutputs = false;	// Test if any materials in that category exist
+			materials.forEach(material => {	// For each material in the inventory...
+				const tickerElem = material.querySelector(Selector.MaterialText);
+				if(!tickerElem){return;}
+				const ticker = tickerElem.textContent;
+				if(ticker && outputMaterials.includes(ticker) && !inputMaterials.includes(ticker) && !sorted.includes(ticker)) // Test if the ticker is an output, but not an input
+				{
+					inventory.appendChild(material);	// Move it to the end of the list
+					areOutputs = true;
+				}
+			});
+			if(!areOutputs){inventory.removeChild(outputTitle);} // If no items in that category exist, remove the header
+			sorted = sorted.concat(workforceMaterials);
+			sorted = sorted.concat(inputMaterials);
+			sorted = sorted.concat(outputMaterials);
+		}
 	}
 	// Add a header for misc
 	const miscTitle = document.createElement('h3');
@@ -460,8 +462,9 @@ function createToggle(result, sortOptions, abbreviation, selected, combinedName,
 			}
 			return;
 		});
-		const toggleIndicator = document.createElement("div");	// Add the circle to the current option
-		toggleIndicator.textContent = "⬤";
+		// Add the triangle next to the current option
+		const toggleIndicator = document.createElement("div");
+		toggleIndicator.innerHTML = SortingTriangleHTML;
 		toggleIndicator.style.marginLeft = "2px";
 		customSortButton.appendChild(toggleIndicator);
 	}
@@ -482,8 +485,9 @@ function createToggle(result, sortOptions, abbreviation, selected, combinedName,
 			}
 			return;
 		});
-		const toggleIndicator = document.createElement("div");	// Then add the circle to the current option
-		toggleIndicator.textContent = "⬤";
+		// Add the triangle next to the current option
+		const toggleIndicator = document.createElement("div");
+		toggleIndicator.innerHTML = SortingTriangleHTML;
 		toggleIndicator.style.marginLeft = "2px";
 		customSortButton.appendChild(toggleIndicator);
 		

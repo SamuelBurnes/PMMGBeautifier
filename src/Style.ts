@@ -1707,7 +1707,7 @@ div[title*="transistor"i]:before
 }
  
 /* buildings - kill stray icons */
-div.\_6UivsDhXJylBr\+\+R9f05OQ\=\=:before
+div.\\_6UivsDhXJylBr\\+\\+R9f05OQ\\=\\=:before
 {
   content: "";
 }`;
