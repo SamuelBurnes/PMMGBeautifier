@@ -1,4 +1,4 @@
-import {clearChildren, createTextSpan, setSettings, createToolTip} from "../util";
+import {clearChildren, createTextSpan, setSettings, makePopupSpacer, createPopupInputRow, createPopupCheckboxRow, getValueOfPopupRow, getCheckOfPopupRow, createSmallButton} from "../util";
 import {Style} from "../Style";
 
 // Create the interface for adding and editing sorting options
@@ -100,95 +100,6 @@ export function Sort(tile, parameters, result)
 	
 	return;
 }
-
-// Create an empty spacer for the editing interface (should move to util)
-function makeSpacer(tile, toRemove)
-{
-	const spacer = document.createElement("div");
-	spacer.classList.add(...Style.Spacer);
-	spacer.addEventListener("click", function() {
-			tile.removeChild(toRemove);
-			return;
-		});
-	return spacer;
-}
-
-// Create an input row for the editing interface (should move to util)
-function createInputRow(label, text: string = "", tooltip: string = "")
-{
-	const inputRow = document.createElement("div");
-	inputRow.classList.add(...Style.FormRow);
-	const inputLabel = document.createElement("label");
-	inputLabel.textContent = label;
-	if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
-	inputLabel.classList.add(...Style.FormLabel);
-	inputRow.appendChild(inputLabel);
-	const inputInputDiv = document.createElement("div");
-	inputInputDiv.classList.add(...Style.FormInput);
-	inputRow.appendChild(inputInputDiv);
-	const inputInput = document.createElement("input");
-	inputInput.style.width = "80%";
-	inputInputDiv.appendChild(inputInput);
-	inputInput.value = text;
-	return inputRow;
-}
-
-// Create an checkbox input row for the editing interface (should move to util)
-function createCheckboxRow(label, enabled: boolean = false, tooltip: string = "")
-{
-	const inputRow = document.createElement("div");
-	inputRow.classList.add(...Style.FormRow);
-	const inputLabel = document.createElement("label");
-	inputLabel.textContent = label;
-	if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
-	inputLabel.classList.add(...Style.FormLabel);
-	inputRow.appendChild(inputLabel);
-	const inputInputDiv = document.createElement("div");
-	inputInputDiv.classList.add(...Style.FormInput);
-	inputRow.appendChild(inputInputDiv);
-	const inputInput = document.createElement("input");
-	inputInput.type = "checkbox"
-	inputInputDiv.appendChild(inputInput);
-	inputInput.checked = enabled;
-	return inputRow;
-}
-
-// Gets the value of the text box in a row in the add interface (should move to util)
-function getValueOfRow(row)
-{
-	if(!row || !row.children[1] || !row.children[1].firstChild)
-	{
-		return "";
-	}
-	else
-	{
-		return row.children[1].firstChild.value || "";
-	}
-}
-
-// Gets the checked status of a check box in a row in the add interface (should move to util)
-function getCheckOfRow(row)
-{
-	if(!row || !row.children[1] || !row.children[1].firstChild)
-	{
-		return false;
-	}
-	else
-	{
-		return (row.children[1].firstChild as HTMLInputElement).checked || false;
-	}
-}
-
-// Creates a small button as in LMOS and CXOS view/delete buttons
-function createSmallButton(label, clickFunction, parameters)
-{
-	const button = document.createElement("button");
-	button.textContent = label;
-	button.classList.add(...Style.SmallButton);
-	button.addEventListener("click", function(){clickFunction(...parameters);});
-	return button;
-}
-
 // Creates the interface to add a new sorting option
 function createAddInterface(tile, result, parameters, settings: any[] = [])
 {
@@ -200,7 +111,7 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 	overlapDiv.appendChild(greyStripes);
 	tile.insertBefore(overlapDiv, tile.firstChild);
 
-	greyStripes.appendChild(makeSpacer(tile, overlapDiv));
+	greyStripes.appendChild(makePopupSpacer(tile, overlapDiv));
 	const addInterfaceWrapper = document.createElement("div");
 	addInterfaceWrapper.classList.add(...Style.CenterInterface);
 	greyStripes.appendChild(addInterfaceWrapper);
@@ -216,20 +127,20 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 	const form = document.createElement("div");
 	addInterface.appendChild(form);
 
-	form.appendChild(createInputRow("Abbreviation", prefilled ? settings[0] : "", "The abbreviation showing at the top of the inventory (ABC, CAT, etc.)"));
+	form.appendChild(createPopupInputRow("Abbreviation", prefilled ? settings[0] : "", "The abbreviation showing at the top of the inventory (ABC, CAT, etc.)"));
 	
 	if(prefilled)
 	{
 		for(var i = 0; i < settings[2].length; i++)
 		{
-			form.appendChild(createInputRow("Category " + (i + 1) + " Name", prefilled ? settings[2][i][0] : "", i == 0 ? "The name of the first category for materials" : ""));
-			form.appendChild(createInputRow("Category " + (i + 1) + " MATs", prefilled ? settings[2][i][1].join(", ") : "", i == 0 ? "A list of materials in the first category. Separate tickers by a comma. (RAT, DW, etc.)" : ""));
+			form.appendChild(createPopupInputRow("Category " + (i + 1) + " Name", prefilled ? settings[2][i][0] : "", i == 0 ? "The name of the first category for materials" : ""));
+			form.appendChild(createPopupInputRow("Category " + (i + 1) + " MATs", prefilled ? settings[2][i][1].join(", ") : "", i == 0 ? "A list of materials in the first category. Separate tickers by a comma. (RAT, DW, etc.)" : ""));
 		}
 	}
 	else
 	{
-		form.appendChild(createInputRow("Category 1 Name", "", "The name of the first category for materials."));
-		form.appendChild(createInputRow("Category 1 MATs", "", "A list of materials in the first category. Separate tickers by a comma. (RAT, DW, etc.)"));
+		form.appendChild(createPopupInputRow("Category 1 Name", "", "The name of the first category for materials."));
+		form.appendChild(createPopupInputRow("Category 1 MATs", "", "A list of materials in the first category. Separate tickers by a comma. (RAT, DW, etc.)"));
 	}
 	const addRow = document.createElement("div");
 	addRow.classList.add(...Style.FormSaveRow);
@@ -248,16 +159,16 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 	addInputDiv.appendChild(addButton);
 
 	addButton.addEventListener("click", function() {
-		const catNumber = (form.children.length - 1) / 2;
-		form.insertBefore(createInputRow("Category " + catNumber + " Name"), form.children[form.children.length - 4]);
-		form.insertBefore(createInputRow("Category " + catNumber + " MATs"), form.children[form.children.length - 4]);
+		const catNumber = (form.children.length - 3) / 2;
+		form.insertBefore(createPopupInputRow("Category " + catNumber + " Name"), form.children[form.children.length - 4]);
+		form.insertBefore(createPopupInputRow("Category " + catNumber + " MATs"), form.children[form.children.length - 4]);
 	});
 	
 	//Create the burn row
-	const burnRow = createCheckboxRow("Burn Sorting", settings[3] || false, "Add burn sorting as a secondary sorting method. Burn categories will show under the categories defined above.");
+	const burnRow = createPopupCheckboxRow("Burn Sorting", settings[3] || false, "Add burn sorting as a secondary sorting method. Burn categories will show under the categories defined above.");
 	form.appendChild(burnRow);
 	//Create zero items row
-	const zeroRow = createCheckboxRow("Show Zeros", settings[4] || false, "Show item icons that have zero quantity.");
+	const zeroRow = createPopupCheckboxRow("Show Zeros", settings[4] || false, "Show item icons that have zero quantity.");
 	form.appendChild(zeroRow);
 
 	const saveRow = document.createElement("div");
@@ -277,7 +188,7 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 	saveInputDiv.appendChild(saveButton);
 
 	saveButton.addEventListener("click", function() {
-		const itemAbbreviation = getValueOfRow(form.firstChild);
+		const itemAbbreviation = getValueOfPopupRow(form.firstChild);
 		
 		const sortingInfo = [] as any[];
 		for(var i = 1; i < form.children.length - 4; i += 2)
@@ -286,8 +197,8 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 			{
 				break;
 			}
-			if(getValueOfRow(form.children[i]) == "" || getValueOfRow(form.children[i + 1]) == ""){continue;}
-			sortingInfo.push([getValueOfRow(form.children[i]), getValueOfRow(form.children[i + 1])	.replace(/ /g, "").split(",")]);
+			if(getValueOfPopupRow(form.children[i]) == "" || getValueOfPopupRow(form.children[i + 1]) == ""){continue;}
+			sortingInfo.push([getValueOfPopupRow(form.children[i]), getValueOfPopupRow(form.children[i + 1])	.replace(/ /g, "").split(",")]);
 			
 		}
 		
@@ -299,14 +210,14 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 			{
 				if(result["PMMGExtended"]["sorting"][i] == settings)
 				{
-					result["PMMGExtended"]["sorting"][i] = [itemAbbreviation, parameters[1], sortingInfo, getCheckOfRow(burnRow), getCheckOfRow(zeroRow)];
+					result["PMMGExtended"]["sorting"][i] = [itemAbbreviation, parameters[1], sortingInfo, getCheckOfPopupRow(burnRow), getCheckOfPopupRow(zeroRow)];
 					break;
 				}
 			}
 		}
 		else
 		{
-			result["PMMGExtended"]["sorting"].push([itemAbbreviation, parameters[1], sortingInfo, getCheckOfRow(burnRow), getCheckOfRow(zeroRow)]);
+			result["PMMGExtended"]["sorting"].push([itemAbbreviation, parameters[1], sortingInfo, getCheckOfPopupRow(burnRow), getCheckOfPopupRow(zeroRow)]);
 		}
 		setSettings(result);
 		Sort(tile, parameters, result);
@@ -314,5 +225,5 @@ function createAddInterface(tile, result, parameters, settings: any[] = [])
 		return;
 	});
 
-	greyStripes.appendChild(makeSpacer(tile, overlapDiv));
+	greyStripes.appendChild(makePopupSpacer(tile, overlapDiv));
 }

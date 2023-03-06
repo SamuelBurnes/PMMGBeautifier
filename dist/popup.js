@@ -9,11 +9,14 @@ function OnClear_Click()
 	{
 		browser.storage.local.remove("PMMGExtended");
 		browser.storage.local.remove("PMMG-Notes");
+		browser.storage.local.remove("PMMG-Lists");
 	}
 	catch(err)
 	{
 		chrome.storage.local.remove("PMMGExtended");
 		chrome.storage.local.remove("PMMG-Notes");
+		chrome.storage.local.remove("PMMG-Lists");
+
 	}
 }
 

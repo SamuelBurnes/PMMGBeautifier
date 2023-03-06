@@ -16,6 +16,7 @@ import {FIOInv_pre} from "./XIT/Inventory";
 import {Notes} from "./XIT/Notes";
 import {Checklists} from "./XIT/Checklists";
 import {Sort} from "./XIT/Sort";
+import {CommandLists} from "./XIT/CommandLists";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -40,7 +41,8 @@ export const XITPreFunctions = {
 	"CHECKS": Checklists,
 	"CHECKLIST": Checklists,
 	"CHECKLISTS": Checklists,
-	"SORT": Sort
+	"SORT": Sort,
+	"LIST": CommandLists
 }
 
 export const XITBufferTitles = {
@@ -65,8 +67,9 @@ export const XITBufferTitles = {
 	"CHECK": "CHECKLIST",
 	"CHECKS": "CHECKLIST",
 	"CHECKLIST": "CHECKLIST",
-	"CHECKLISTS": "CHECKLISTS",
-	"SORT": "SORTING OPTIONS"
+	"CHECKLISTS": "CHECKLIST",
+	"SORT": "SORTING OPTIONS",
+	"LIST": "COMMAND LIST"
 }
 /**
  * Handle XIT buffers

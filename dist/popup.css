@@ -15,6 +15,7 @@ button{
     font-weight: bold;
     display: inline;
 	cursor: pointer;
+	transition: 0.2s;
 }
 
 button:hover {

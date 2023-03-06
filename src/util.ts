@@ -607,3 +607,91 @@ export function createToolTip(text: string, position: string)
 	tooltip.innerHTML = `<span data-tooltip="${text}" data-tooltip-position="${position}" class="kfU78EaaOVbQR2YM0eeGew==" style="float: revert;font-size: 12px;margin-top:-4px;">ⓘ</span>`
 	return tooltip.firstChild || tooltip;
 }
+
+// Create an empty spacer for the editing interface
+export function makePopupSpacer(tile, toRemove)
+{
+	const spacer = document.createElement("div");
+	spacer.classList.add(...Style.Spacer);
+	spacer.addEventListener("click", function() {
+			tile.removeChild(toRemove);
+			return;
+		});
+	return spacer;
+}
+
+// Create an input row for the editing interface
+export function createPopupInputRow(label, text: string = "", tooltip: string = "")
+{
+	const inputRow = document.createElement("div");
+	inputRow.classList.add(...Style.FormRow);
+	const inputLabel = document.createElement("label");
+	inputLabel.textContent = label;
+	if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
+	inputLabel.classList.add(...Style.FormLabel);
+	inputRow.appendChild(inputLabel);
+	const inputInputDiv = document.createElement("div");
+	inputInputDiv.classList.add(...Style.FormInput);
+	inputRow.appendChild(inputInputDiv);
+	const inputInput = document.createElement("input");
+	inputInput.style.width = "80%";
+	inputInputDiv.appendChild(inputInput);
+	inputInput.value = text;
+	return inputRow;
+}
+
+// Create an checkbox input row for the editing interface
+export function createPopupCheckboxRow(label, enabled: boolean = false, tooltip: string = "")
+{
+	const inputRow = document.createElement("div");
+	inputRow.classList.add(...Style.FormRow);
+	const inputLabel = document.createElement("label");
+	inputLabel.textContent = label;
+	if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
+	inputLabel.classList.add(...Style.FormLabel);
+	inputRow.appendChild(inputLabel);
+	const inputInputDiv = document.createElement("div");
+	inputInputDiv.classList.add(...Style.FormInput);
+	inputRow.appendChild(inputInputDiv);
+	const inputInput = document.createElement("input");
+	inputInput.type = "checkbox"
+	inputInputDiv.appendChild(inputInput);
+	inputInput.checked = enabled;
+	return inputRow;
+}
+
+// Gets the value of the text box in a row in the add interface (should move to util)
+export function getValueOfPopupRow(row)
+{
+	if(!row || !row.children[1] || !row.children[1].firstChild)
+	{
+		return "";
+	}
+	else
+	{
+		return row.children[1].firstChild.value || "";
+	}
+}
+
+// Gets the checked status of a check box in a row in the add interface (should move to util)
+export function getCheckOfPopupRow(row)
+{
+	if(!row || !row.children[1] || !row.children[1].firstChild)
+	{
+		return false;
+	}
+	else
+	{
+		return (row.children[1].firstChild as HTMLInputElement).checked || false;
+	}
+}
+
+// Creates a small button as in LMOS and CXOS view/delete buttons
+export function createSmallButton(label, clickFunction, parameters)
+{
+	const button = document.createElement("button");
+	button.textContent = label;
+	button.classList.add(...Style.SmallButton);
+	button.addEventListener("click", function(){clickFunction(...parameters);});
+	return button;
+}
