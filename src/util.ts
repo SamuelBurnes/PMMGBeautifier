@@ -475,6 +475,7 @@ function monitorOnElementCreated(selector, callback, onlyOnce = true) {
         mutations.forEach(function(mutation) {
             if (mutation.addedNodes.length) {
                 var elements = getElementsFromNodes(mutation.addedNodes);
+				
                 for (var i = 0, len = elements.length; i < len; i++) {
                     callback(elements[i]);
                     if (onlyOnce) observer.disconnect();
@@ -570,13 +571,14 @@ function tableSortAlph(a, b)
 }
 
 // Create a table in the style of PrUN
-export function createTable(tile, headers: Array<string>, sectionHeaderTitle = "") {
-	if (sectionHeaderTitle !== ""){
+export function createTable(tile, headers: Array<string>) {
+	// Support for section headers in tables?
+	/*if (sectionHeaderTitle !== ""){
 		const sectionHeader = document.createElement("h3");
 		sectionHeader.appendChild(document.createTextNode(sectionHeaderTitle));
 		sectionHeader.classList.add(...Style.SidebarSectionHead);
 		tile.appendChild(sectionHeader);
-	}
+	}*/
 
 	let table = document.createElement("table");
 	tile.appendChild(table);

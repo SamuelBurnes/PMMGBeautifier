@@ -1,46 +1,46 @@
 // A list of PrUN class names that can be applied to style elements
 export const Style = {
-  Button: ["fMW62cERnlzxZPFhnlPOeQ=="],
-  ButtonPrimary: ["kgGsDNvDoWj61w4I7VAlfA=="],
-  ButtonSuccess: ["QW80xveQm2GESkSORRH24g=="],
-  ButtonDanger: ["ZFXWy4HCnztpZNlCXk83wQ=="],
-  SidebarSectionHead: ["_2YrOM7-2sdK042VvH6WaJg==", "fTT52i+1oFauxHOjVfGTww=="],
-  SidebarSectionContent: ["CN0NPNovlYtaIm4bqHFbLw==", "fTT52i+1oFauxHOjVfGTww=="],
-  SidebarLine: ["y84EUI8gCP-SV91X7vIihQ==", "fVd3aYJhFY-uuaH+QTByhA=="],
-  FontsRegular: ["CBorIbFC6Yt+FRYEHZyuaA=="],
-  SidebarText: ["x-mLxEwC-ODh9MXDx4DxSQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
-  SidebarSliver: ["ZPsRYCOj7pX59GYDIiOtKg==", "-dcYfbCWP72VS2OFhoDG-Q=="],
-  SidebarButton: ["GHCPyjs3bxhb+WZ2BGLWHw=="],
+  Button: ["Button__btn___UJGZ1b7"],
+  ButtonPrimary: ["Button__primary____lObPiw"],
+  ButtonSuccess: ["Button__success___bCiIVXw"],
+  ButtonDanger: ["Button__danger___S2rSOES"],
+  SidebarSectionHead: ["Sidebar__sectionHead____NHLKDT", "fonts__font-regular___Sxp1xjo"],
+  SidebarSectionContent: ["Sidebar__sectionContent___wgGYFop", "fonts__font-regular___Sxp1xjo"],
+  SidebarLine: ["Sidebar__contract___J0gmlzN", "Sidebar__sidebar-line___bE2rbRb"],
+  FontsRegular: ["fonts__font-regular___Sxp1xjo"],
+  SidebarText: ["Frame__toggleLabel___BTFce8H", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  SidebarSliver: ["Frame__toggleIndicatorSecondary___frX4CGi", "Frame__toggleIndicator___ZKQQgAL"],
+  SidebarButton: ["Frame__toggle___V3iHpB7"],
   ContractLine: ["y84EUI8gCP-SV91X7vIihQ==", "fVd3aYJhFY-uuaH+QTByhA=="],
   ContractName: ["zhixp408YF082IzA5KPvfA=="],
   ContractView: ["kq5BrGKnTUTqCDYMpLQ90g=="],
-  SettingsButton: ["A0Raxt0yS41ZQlnzmEvusg==", "ncHrIDsxNKH8LbMDigUiRg=="],
-  SettingsBarUntoggled: ["Z9jYD8LyLZoBPb7JsART1w==", "P6Arba53I7cRvxiH0-pDQg=="],
-  SettingsBarToggled: ["Z9jYD8LyLZoBPb7JsART1w==", "P6Arba53I7cRvxiH0-pDQg==", "V-75tb03enGVdcB+Sw-mRA==", "vKkB0W7jATtd8dSzgOYEKQ=="],
-  SettingsText: ["YGSoqZwqkaG2CVltxMwoOw==", "fTT52i+1oFauxHOjVfGTww==", "kWTH1-HkYCWeYyDRgZ7ozQ==", "P3sSQkCRUgkpmKUgieJQvg=="],
-  OverlappingDiv: ["M2hLHwe+IseWGDsI+XWqfg=="],
-  GreyStripes: ["_97gjZVDIdguuhtGNHLzJ9A==", "M2hLHwe+IseWGDsI+XWqfg=="],
-  Spacer: ["q2B9662sOwfjgT2X9torrw=="],
-  CenterInterface: ["o09Fez+LO4jWY35kv4affA=="],
-  FormRow: ["qUdr2gquOSadubhiJ4N59g==", "aEVrU0HhzwRff5htNMuGDQ==", "A5WGQ40OQziF0SQm2My3sQ=="],
-  FormLabel: ["bcaYcb8aOOCKVEV5xSv+Gw==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
-  FormInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="],
-  FormSaveRow: ["tFcHfd2aeM7-BLlUM0FKBw==", "_6EPcsJJ1yrlFM0vE1u-vdA==", "A5WGQ40OQziF0SQm2My3sQ=="],
-  FormSaveLabel: ["bcaYcb8aOOCKVEV5xSv+Gw==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
-  FormSaveInput: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="],
-  MatText: ["rjpYL1i9cZmf47fM9qWyZQ=="],
-  MatTextWrapper: ["nlQirpSkdLH0a6+C4lhduA=="],
-  MaterialElement: ["E7OLUChYCexMUgOolKYjOQ=="],
-  MaterialWrapper: ["T5C45pTOW9QTzokWPqLQJg=="],
-  MaterialWrapperWrapper: ["A-Re0xb+rkw3eNvxj3pMDA=="],
-  MaterialNumberWrapper: ["G37fUJPwMoJ6fKHDGeg+-w=="],
-  MaterialNumber: ["bHjlDPB84Uz0yUnvHa-Y5A==", "_6OK6sXNjIIhq3NDD9ELVGw==", "gl73vnp5jo+VaepDRocunA=="],
-  MaterialOuter: ["HWbVOIC2rYGNug3UC2dV+Q=="],
-  MaterialNameText: ["YCp8jhRg4EBG3aQxcizskQ==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
-  SmallButton: ["zVuH9y-6nJDHnUQBaBixLg==","px0H8VJLoM5YTxdTMdfQhA==","fMW62cERnlzxZPFhnlPOeQ==","YRXUjzmWA2jJzWrOAy3-3A=="],
-  HeaderRow: ["xshT5pa8qFfAmBT00htF0A==", "PKRymSkPiFaFYEWHnpHLCQ==", "A5WGQ40OQziF0SQm2My3sQ=="],
-  HeaderLabel: ["bcaYcb8aOOCKVEV5xSv+Gw==", "fTT52i+1oFauxHOjVfGTww==", "O7RX4zXL4gzHLoOwTVbrXw=="],
-  HeaderContent: ["ktwbOl9-X7iRBmoqJBuEwg==", "-0yad1sQZcqfSAAbEHsOSQ=="]
+  SettingsButton: ["RadioItem__container___CSczqmG", "RadioItem__containerHorizontal____trlXDo"],
+  SettingsBarUntoggled: ["RadioItem__indicator___QzQtjhA", "RadioItem__indicatorHorizontal___SwtwTIh"],
+  SettingsBarToggled: ["RadioItem__indicator___QzQtjhA", "RadioItem__indicatorHorizontal___SwtwTIh", "RadioItem__active___CDscOQV", "effects__shadowPrimary___EbXJQor"],
+  SettingsText: ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO", "RadioItem__valueHorizontal___D5AXJ9P"],
+  OverlappingDiv: ["Overlay__overlay___NA9HV8y"],
+  GreyStripes: ["Overlay__background___ieZpHiF", "Overlay__overlay___NA9HV8y"],
+  Spacer: ["Overlay__close___bxGoMIl"],
+  CenterInterface: ["Overlay__children___rgtVaxc"],
+  FormRow: ["FormComponent__containerActive___HZv9jHd", "forms__active___wn9KQTZ", "forms__form-component___yTgP_Qa"],
+  FormLabel: ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  FormInput: ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"],
+  FormSaveRow: ["FormComponent__containerCommand___B4XLERf", "forms__cmd___IMzt7Ug", "forms__form-component___yTgP_Qa"],
+  FormSaveLabel: ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  FormSaveInput: ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"],
+  MatText: ["ColoredIcon__label___OU1I4oP"],
+  MatTextWrapper: ["ColoredIcon__labelContainer___YVfgzOk"],
+  MaterialElement: ["ColoredIcon__container___djaR4r2"],
+  MaterialWrapper: ["MaterialIcon__container___q8gKIx8"],
+  MaterialWrapperWrapper: ["GridItemView__image___yMoKOZV"],
+  MaterialNumberWrapper: ["MaterialIcon__indicatorContainer___Cqtax_Y"],
+  MaterialNumber: ["MaterialIcon__indicator___SHwlndJ", "MaterialIcon__type-very-small___UMzQ3ir", "MaterialIcon__neutral___SYsHXAa"],
+  MaterialOuter: ["GridItemView__container___xP2uJz8"],
+  MaterialNameText: ["GridItemView__name___h3yX9Lm", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  SmallButton: ["Button__darkInline___z_YKa91", "Button__dark___vdJbcc8", "Button__btn___UJGZ1b7", "Button__inline___Ffw9bbn"],
+  HeaderRow: ["FormComponent__containerPassive___FrBdyGU", "forms__passive___biRUiE5", "forms__form-component___yTgP_Qa"],
+  HeaderLabel: ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  HeaderContent: ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"]
 }
 
 // A function to apply multiple classes to an element in one go
@@ -118,7 +118,7 @@ export const PMMGStyle = `
 	height: 48px;
 	width: 48px;
 }
-.mat-element-large div.E7OLUChYCexMUgOolKYjOQ\\=\\= {
+.mat-element-large div.ColoredIcon__container___djaR4r2 {
 	height: 48px;
 	width: 48px;
 	font-size: 15.84px;
@@ -127,12 +127,6 @@ export const PMMGStyle = `
 .mat-element-small {
 	height: 32px;
 	width: 32px;
-}
-.mat-element-large div.E7OLUChYCexMUgOolKYjOQ\\=\\= {
-	height: 48px;
-	width: 48px;
-	font-size: 15.84px;
-	cursor: pointer;
 }
 .check-time-complete {
 	text-decoration: line-through;
@@ -591,11 +585,11 @@ div[data-tooltip-content="#tooltip_H2O"]
 background: linear-gradient(135deg, #67a8da, #6098c3) !important;
 color: #f1ffff !important;
 }
-div.HWbVOIC2rYGNug3UC2dV\\+Q\\=\\= {
+div.GridItemView__container___xP2uJz8 {
 	background-color: #222;
 }
 /* full item name centering */
-span.YCp8jhRg4EBG3aQxcizskQ\\=\\= {
+span.GridItemView__name___h3yX9Lm {
   display: block;
   text-align: center;
   padding-top: 1px;

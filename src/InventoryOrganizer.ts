@@ -185,7 +185,7 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 	if(sortOptions.children[sortOptions.children.length - 1] && (sortOptions.children[sortOptions.children.length - 1] as HTMLElement).textContent != "+")	// Create the plus button to open the sorting option editing inventory
 	{
 		const addButton = document.createElement("div");
-		addButton.classList.add("LgjAIPjxxF1iSm2VWQSmPw==");
+		addButton.classList.add("InventorySortControls__criteria___ijLMgjm");
 		sortOptions.appendChild(addButton);
 		const addLabel = document.createElement("div");
 		addLabel.textContent = "+";
@@ -439,7 +439,7 @@ function findIfActive(sortSettings, screenPlanet, sortModeName)
 function createToggle(result, sortOptions, abbreviation, selected, combinedName, inventory)
 {	
 	const customSortButton = document.createElement("div");	// Create the button and style it
-	customSortButton.classList.add("LgjAIPjxxF1iSm2VWQSmPw==");
+	customSortButton.classList.add("InventorySortControls__criteria___ijLMgjm");
 	customSortButton.classList.add("pb-toggle");	// Add a class signifying it is created by PMMGExtended, but not to clean up
 	
 	const toggleLabel = document.createElement("div");	// Create the inner text label

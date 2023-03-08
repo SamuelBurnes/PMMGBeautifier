@@ -409,6 +409,7 @@ function createSettingsButton(text, width, toggled, f)
 	button.classList.add(...Style.SettingsButton);
 	bar.style.width = width + "px";
 	bar.style.maxWidth = width + "px";
+	bar.style.height = "2px";
 	button.appendChild(bar);
 	button.appendChild(textBox);
 	button.addEventListener("click", function() {

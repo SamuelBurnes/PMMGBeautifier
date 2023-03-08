@@ -6,7 +6,7 @@ import { ConsumableTimers } from "./ConsumableTimers";
 import { FleetETAs } from "./FleetETAs";
 import { PostLM } from "./PostLM";
 import { ShippingAds } from "./ShippingAds";
-import { QueueLoad } from "./QueueLoad";
+//import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors, IconStyle } from "./Style";
@@ -14,7 +14,7 @@ import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
 import { CalculatorButton } from "./CalculatorButton";
-import { ContractDrafts } from "./ContractDrafts";
+//import { ContractDrafts } from "./ContractDrafts";
 import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
 import { HeaderMinimizer } from "./HeaderMinimizer";
@@ -93,11 +93,11 @@ function mainRun(result)
 		  new ShippingAds(),
 		  new LocalMarketAds(),
 		  new PostLM(prices),
-		  new ContractDrafts(prices),
+		  //new ContractDrafts(prices),
 		  new OrderETAs(),
 		  new FlightETAs(),
 		  new FleetETAs(),
-		  new QueueLoad(),
+		  //new QueueLoad(),
 		  new ConsumableTimers(result["PMMGExtended"]["username"], burn, result["PMMGExtended"]["burn_thresholds"]),
 		  new InventoryOrganizer(result["PMMGExtended"]["username"], burn, result),
 		  new Notifications(),

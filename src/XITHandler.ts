@@ -96,12 +96,13 @@ export class XITHandler implements Module {
 	const burn = this.burn;
 	const burnSettings = this.burnSettings;
 	buffers.forEach(buffer => {
-		const tile = (buffer.querySelector(Selector.XITTile) || buffer.querySelector(Selector.XITTileFloat)) as HTMLElement;
+		const tile = (buffer.querySelector(Selector.XITTile)) as HTMLElement;
 		if(!tile){return;}
 		
 		if(tile.firstChild && ((tile.firstChild as HTMLElement).id == "pmmg-load-success" || (tile.firstChild as HTMLElement).id == "pmmg-no-match")){return;}
 		
 		const parametersRaw = Array.from(buffer.getElementsByClassName(Selector.BufferHeader))[0].textContent;
+		
 		if(!parametersRaw) return;
 		var parameters = [] as string[];
 		if(parametersRaw.charAt(4) == "1")
@@ -121,6 +122,10 @@ export class XITHandler implements Module {
 		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, burn, burnSettings, this.modules);return;}
 		
 		tile.classList.add("xit-tile");
+		if(tile.firstChild)
+		{
+			(tile.firstChild as HTMLElement).style.backgroundColor = "#222222";
+		}
 		
 		const refreshButton = document.createElement("div");
 		if(!tile.firstChild || (tile.firstChild && ((tile.firstChild as HTMLElement).id != "pmmg-no-match")))

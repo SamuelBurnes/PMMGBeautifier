@@ -48,7 +48,7 @@ export class ContractDrafts implements Module {
 			const material = ((tbody.children[0].children[1].textContent || "").match(/(?<=units of )(.*)(?= \@ )/) || (tbody.children[0].children[1].textContent || "").match(/(?<=unit of )(.*)(?= \@ )/) || [""])[0]
 			
 			if(condition.children[1] == null || condition.children[1].children[1] == null || condition.children[1].children[1].firstChild == null || !Materials[material]){return;}
-			if((((condition.children[1] || condition).children[1] || condition).firstChild || condition).textContent === "Currency")
+			if((((condition.children[1] || condition).children[1] || condition).firstChild || condition).textContent === "Currency")	// Jesus Christ this is an ugly line of code
 			{
 				const inputPriceDiv = condition.querySelector("div[class~='xuy2wpBCdzgc8G3w3AlXTw==']");
 				if(inputPriceDiv == null || inputPriceDiv.firstChild == null){return;}
