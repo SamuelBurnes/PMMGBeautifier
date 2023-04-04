@@ -450,22 +450,27 @@ export function showBuffer(command) {
 }
 
 // Change the value of a new buffer box
-export function changeValue(input, value){
+export function changeValue(input, value) {
+    // Get the property descriptor for the input element's value property
     var propDescriptor = Object.getOwnPropertyDescriptor(
-      window["HTMLInputElement"].prototype,
-      "value"
+        window["HTMLInputElement"].prototype,
+        "value"
     );
-	if(propDescriptor == undefined){return;}
-	var nativeInputValueSetter = propDescriptor.set;
-	if(nativeInputValueSetter == undefined){return;}
+    // Return if the property descriptor is undefined
+    if (propDescriptor == undefined) { return; }
+    // Get the native input value setter
+    var nativeInputValueSetter = propDescriptor.set;
+    // Return if the native input value setter is undefined
+    if (nativeInputValueSetter == undefined) { return; }
+    // Call the native input value setter with the input element and the new value
     nativeInputValueSetter.call(input, value);
-	
-	var inputEvent = new Event('input');
-	
-	inputEvent.initEvent('input', true, false);	// This function is depracated, but is necessary for FF to work. Consider removing or changing.
-	//Object.defineProperty(inputEvent, 'explicitOriginalTarget', {writable: false, value: input});
+
+    // Create a new input event
+    var inputEvent = document.createEvent('Event');
+    // Initialize the event as an "input" event, bubbling and cancelable
+    inputEvent.initEvent('input', true, true);
+    // Dispatch the event to the input element
     input.dispatchEvent(inputEvent);
-	return;
 }
 
 // Wait for a new buffer to be created

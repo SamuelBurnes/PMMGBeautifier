@@ -2,8 +2,6 @@ import { Module } from "./ModuleRunner";
 import { createTextSpan, genericCleanup, createContractDict} from "./util";
 
 
-
-// Adds the rate per unit ton or m^3 to LM ads
 export class PendingContracts implements Module {
     private tag = "pb-pending-contracts";
     private username;

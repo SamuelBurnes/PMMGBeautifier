@@ -19,7 +19,6 @@ import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
 import { HeaderMinimizer } from "./HeaderMinimizer";
 import { PendingContracts } from "./PendingContracts";
-import {createContractDict} from "./util";
 
 try
 {
