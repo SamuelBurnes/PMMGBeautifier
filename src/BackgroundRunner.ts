@@ -226,3 +226,52 @@ export function getBurnSettings(burnSettings, username, apikey)
     xhr.send(null);
 	return;
 }
+
+// Get FIO contract data
+// "burnSettings" will contain the settings at the end of the web request
+export function getContracts(contracts, username, apikey)
+{
+	console.log("Getting FIO Contract data");
+	if(!contracts){contracts = {};}
+	if(!apikey || !username){return;}	// If API key or username is missing, abort
+	contracts[username] = [];
+	
+	// Create an XML Http Request
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {	// On timeout, try again
+		console.log("PMMG: FIO Contract Timeout");
+		contracts[username] = undefined;
+		getContracts(contracts, username, apikey);
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			try
+			{
+				// Parse the results
+				console.log("PMMG: Retreived Burn from FIO");
+				var burnData = JSON.parse(xhr.responseText);
+				burnData.forEach(data => {	// Copy the data into the contract variable
+					contracts[username].push(data);
+				});
+			}
+			catch(SyntaxError)
+			{
+				console.log("PMMG: Bad Data from FIO");
+				contracts[username] = undefined;
+			}
+		}
+		return;
+    };
+    console.log("PMMG: FIO Sending Contract Request");
+	// Send the request
+	xhr.timeout = 20000;
+	xhr.open("GET", "https://rest.fnar.net" + "/contract/allcontracts");
+    xhr.setRequestHeader("Authorization", apikey);
+    xhr.send(null);
+	console.log("Contract Data");
+	console.log(contracts);
+	return;
+}

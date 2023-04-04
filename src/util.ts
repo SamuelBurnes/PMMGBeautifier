@@ -697,3 +697,12 @@ export function createSmallButton(label, clickFunction, parameters)
 	button.addEventListener("click", function(){clickFunction(...parameters);});
 	return button;
 }
+
+
+export function createContractDict(contracts, username, contractdict)
+{
+	for (let i = 0; i < contracts[username].length; i++) {
+		const element = contracts[username][i];
+		contractdict[element['ContractLocalId']] = element
+	}
+}
