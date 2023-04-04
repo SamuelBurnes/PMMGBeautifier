@@ -8,7 +8,7 @@ import { PostLM } from "./PostLM";
 import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
-import { getPrices, getBurn, getBurnSettings } from "./BackgroundRunner";
+import { getPrices, getBurn, getBurnSettings, getContracts} from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors, IconStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
@@ -18,6 +18,8 @@ import { ContractDrafts } from "./ContractDrafts";
 import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
 import { HeaderMinimizer } from "./HeaderMinimizer";
+import { PendingContracts } from "./PendingContracts";
+import {createContractDict} from "./util";
 
 try
 {
@@ -88,6 +90,8 @@ function mainRun(result)
 	var burnSettings = [];
 	getBurnSettings(burnSettings, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
 	
+	var contracts = [];
+	getContracts(contracts, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
 		  new ShippingAds(),
@@ -106,7 +110,8 @@ function mainRun(result)
 		  new HeaderMinimizer(result["PMMGExtended"]["minimize_by_default"]),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
-		  new Sidebar(result["PMMGExtended"]["sidebar"])
+		  new Sidebar(result["PMMGExtended"]["sidebar"]),
+		  new PendingContracts(result["PMMGExtended"]["username"], contracts),
 	], result, burn, burnSettings);
 	
 	// Start the loop
