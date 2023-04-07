@@ -1,11 +1,12 @@
 import { Module } from "./ModuleRunner";
 import { createTextSpan, genericCleanup, createContractDict} from "./util";
+import { Selector } from "./Selector";
 
 
 export class PendingContracts implements Module {
     private tag = "pb-pending-contracts";
     private username;
-	private contracts;
+	private contracts;	// Dictionary storing an array of contract data under the key of the user's username
 	constructor(username, contracts)
 	{
 		this.username = username;
@@ -17,32 +18,37 @@ export class PendingContracts implements Module {
         genericCleanup(this.tag);
     }
     run() {
-        if(this.username == null)
+        if(!this.username)
             return;
 
-        const elements = document.getElementsByClassName("Sidebar__contract___J0gmlzN");
+        const contractLines = Array.from(document.querySelectorAll(Selector.SidebarContract)) as HTMLElement[];	// All the contract lines
         var contractdict = {};
-	    createContractDict(this.contracts, this.username, contractdict);
-
-        //.getElementsByClassName("Sidebar__contract___J0gmlzN Sidebar__sidebar-line___bE2rbRb");
-
-        for (let i = 0; i < elements.length; i++) {
-            const element = elements[i].getElementsByClassName("Sidebar__contractId___Lg85TRZ")[0];
-            const contractID = element.textContent;
-            //const nameelement = elements[i].getElementsByClassName("Sidebar__contract___J0gmlzN")[0];
-            if(contractID != null && contractdict[contractID])//&& getLocalStorage(contractID) == null
+	    createContractDict(this.contracts, this.username, contractdict);	// Turn the array into a dictionary with keys being contract IDs
+		
+        contractLines.forEach(contract => {	// For each contract...
+            const contractIDElement = contract.querySelector(Selector.SidebarContractId);	// Find the ID and store it
+			if(!contractIDElement){return;}
+            const contractID = contractIDElement.textContent;
+			if(!contractID){return;}
+			
+            if(contractdict[contractID] && contractdict[contractID]["PartnerName"])	// If the contract ID is in FIO
             {
-                var partnercode = contractdict[contractID]["PartnerName"]
-                if(partnercode == null || partnercode.length > 25)
+                var partnercode = contractdict[contractID]["PartnerName"]	// Label with partner's name
+                if(partnercode.length > 19)	// Unless unknown or too long, then use company code
                 {
-                    partnercode = contractdict[contractID]["PartnerCompanyCode"]
-                    if(partnercode == null)
-                        partnercode = contractdict[contractID]["PartnerName"].split(" ")[0];
+                    partnercode = contractdict[contractID]["PartnerCompanyCode"] || contractdict[contractID]["PartnerName"].split(" ")[0];
                 }
-                elements[i].prepend(createTextSpan(`${partnercode}`, this.tag))
+				const nameSpan = createTextSpan(`${partnercode}`, this.tag);	// Add it to the row
+				nameSpan.style.width = "100px";
+                contract.insertBefore(nameSpan, contract.firstChild)
+				return;
             }
+			
+			const nameSpan = createTextSpan("Unknown", this.tag);	// If unknown, add unknown to the row
+			nameSpan.style.width = "100px";
+            contract.insertBefore(nameSpan, contract.firstChild);
 
-        }
+        });
         return;
     }
 }

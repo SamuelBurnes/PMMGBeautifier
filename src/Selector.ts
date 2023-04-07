@@ -48,5 +48,7 @@ export const Selector = {
   ContDForm: "div[class~='DraftConditionEditor__form___fF72bJM'] > form",
   ContDConditionsTable: "div[class~='Draft__conditions___bcIUndH'] > table > tbody",
   ContDFormLabel: "label[class~='FormComponent__label___aQB15eB']",
-  ContDFormRowSpacer: "div[class~='DynamicInput__dynamic___Cd4Gkbz']"
+  ContDFormRowSpacer: "div[class~='DynamicInput__dynamic___Cd4Gkbz']",
+  SidebarContract: "div[class~='Sidebar__contract___J0gmlzN']",
+  SidebarContractId: "span[class~='Sidebar__contractId___Lg85TRZ']"
 }
