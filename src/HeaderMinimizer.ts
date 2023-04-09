@@ -57,6 +57,7 @@ function minimizeHeaders(buffer, minByDefault, tag)
 	const minimizeButton = document.createElement("div");
 	minimizeButton.textContent = minByDefault ? "+" : "-";
 	minimizeButton.classList.add("pb-minimize");
+	minimizeButton.classList.add("pb-minimize-cx");
 	minimizeButton.addEventListener("click", function(){
 		const minimize = minimizeButton.textContent == "-";
 		minimizeButton.textContent = minimize ? "+" : "-";

@@ -106,13 +106,18 @@ export const PMMGStyle = `
 	margin-top: 1px;
 	text-align: center;
 	width: 18px;
-	background-color: #26353e;
-	color: #3fa2de;
 	cursor: pointer;
 }
-.pb-minimize:hover {
+.pb-minimize-cx:hover {
 	color: #26353e;
 	background-color: #3fa2de;
+}
+.pb-minimize-cx {
+	background-color: #26353e;
+	color: #3fa2de;
+}
+.pb-minimize-settings:hover {
+	color: #ddd;
 }
 .mat-element-large {
 	height: 48px;
@@ -600,15 +605,15 @@ span.GridItemView__name___h3yX9Lm {
 export const IconStyle = `
  
 /* item ticker color */
-.rjpYL1i9cZmf47fM9qWyZQ\\=\\= {
+.ColoredIcon__label___OU1I4oP {
     color: #cccccc;
 }
- div.HWbVOIC2rYGNug3UC2dV\\+Q\\=\\= {
+ div.GridItemView__container___xP2uJz8 {
 	background-color: #222;
 }
  
 /* full item name centering */
-.YCp8jhRg4EBG3aQxcizskQ\\=\\= {
+.GridItemView__name___h3yX9Lm {
   display: block;
   text-align: center;
   padding-top: 1px;

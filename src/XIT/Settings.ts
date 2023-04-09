@@ -7,7 +7,19 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	const warningDiv = document.createElement("div");
 	tile.appendChild(warningDiv);
 	warningDiv.style.marginTop = "4px";
-	warningDiv.appendChild(createTextSpan("Settings changes require a refresh to take effect."));
+	warningDiv.appendChild(createTextSpan("Changes require a refresh to take effect."));
+	
+	const helpDiv = document.createElement("div");
+	tile.appendChild(helpDiv);
+	helpDiv.style.marginTop = "4px";
+	helpDiv.appendChild(createTextSpan("See a full list of features on "));
+	const websiteLink = document.createElement("a");
+	websiteLink.href = "https://sites.google.com/view/pmmgextended/features?authuser=0";
+	websiteLink.target = "_blank";
+	websiteLink.style.display = "inline-block";
+	websiteLink.classList.add("link");
+	websiteLink.textContent = "PMMG's Website";
+	helpDiv.appendChild(websiteLink);
 	
 	const authenticationHeader = document.createElement('h3');
     authenticationHeader.appendChild(document.createTextNode("Authentication Settings"));
@@ -57,68 +69,6 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	webDiv.appendChild(webLabel);
 	webDiv.appendChild(webInput);
 	tile.appendChild(webDiv);
-	
-	const moduleSettingsHeader = document.createElement('h3');
-    moduleSettingsHeader.appendChild(document.createTextNode("Toggle Features"));
-	moduleSettingsHeader.appendChild(createToolTip("Toggle features on and off. The yellow X cleans up any stray elements.", "right"));
-    moduleSettingsHeader.classList.add(...Style.SidebarSectionHead);
-	tile.appendChild(moduleSettingsHeader);
-	const content = document.createElement("div");
-	content.classList.add(...Style.SidebarSectionContent);
-    tile.appendChild(content);
-	modules.forEach(mp => {
-		// Div for the whole line
-		const line = document.createElement('div');
-		line.classList.add(...WithStyles(Style.SidebarLine, Style.FontsRegular));
-		content.appendChild(line);
-
-		// Left
-		line.appendChild(createTextSpan(mp.friendlyName));
-		content.appendChild(line);
-		
-		// Right
-		const right = document.createElement("span");
-        right.style.flexGrow = "1";
-        right.style.textAlign = "right";
-        line.appendChild(right);
-		
-	    if(result["PMMGExtended"]["disabled"] == undefined){result["PMMGExtended"]["disabled"] = [];}
-        const toggle = makeToggleButton("On", "Off", () => {
-			mp.enabled = !mp.enabled;
-			if(result["PMMGExtended"]["disabled"].includes(mp.name))
-			{
-				if(mp.enabled){
-					for(var i = 0; i < result["PMMGExtended"]["disabled"].length; i++)
-					{
-						if(result["PMMGExtended"]["disabled"][i] == mp.name)
-						{
-							result["PMMGExtended"]["disabled"].splice(i, 1);
-							i--;
-						}
-					}
-				} // Was just enabled, remove disabled label
-			}
-			else
-			{
-				if(!mp.enabled){result["PMMGExtended"]["disabled"].push(mp.name);}	// Was just disabled, add disabled label
-			}
-			setSettings(result);
-		}, mp.enabled);
-		if(result["PMMGExtended"]["disabled"].includes(mp.name))
-		{
-			toggle.setAttribute("data-state", "false");
-			mp.enabled = false;
-			toggle.classList.remove(...Style.ButtonSuccess);
-			toggle.classList.add(...Style.ButtonPrimary);
-			toggle.innerText = "Off";
-		}
-		right.appendChild(toggle);
-
-		const cleanup = makePushButton("x", () => mp.module.cleanup(true));
-		cleanup.style.marginRight = "8px";
-		right.appendChild(cleanup);
-		return;
-	});
 	
 	const enhancedColorHeader = document.createElement('h3');
     enhancedColorHeader.appendChild(document.createTextNode("Color Scheme"));
@@ -221,24 +171,6 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	tile.appendChild(burnDiv);
 	
-	const screenUnpackHeader = document.createElement('h3');
-    screenUnpackHeader.appendChild(document.createTextNode("Screen Unpack Exclusions"));
-	screenUnpackHeader.appendChild(createToolTip("List screens to be excluded from screen unpack. Separate screens with a comma.", "right"));
-    screenUnpackHeader.classList.add(...Style.SidebarSectionHead);
-	tile.appendChild(screenUnpackHeader);
-	const notifDiv = document.createElement("div");
-	tile.appendChild(notifDiv);
-	notifDiv.appendChild(createTextSpan("List screen names separated by commas, no spaces."));
-	const exclusionInput = document.createElement("input");
-	exclusionInput.classList.add("input-text");
-	exclusionInput.value = result["PMMGExtended"]["unpack_exceptions"] == undefined ? "" : result["PMMGExtended"]["unpack_exceptions"].join(",");
-	exclusionInput.addEventListener("input", function(){
-		result["PMMGExtended"]["unpack_exceptions"] = exclusionInput.value.split(",");
-		setSettings(result);
-	});
-	
-	tile.appendChild(exclusionInput);
-	
 	const hotkeyHeader = document.createElement('h3');
     hotkeyHeader.appendChild(document.createTextNode("Left Sidebar Buttons"));
 	hotkeyHeader.appendChild(createToolTip("Create hotkeys on the left sidebar. The first value is what will be displayed, the second is the command.", "right"));
@@ -259,9 +191,89 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	}, Style.ButtonSuccess);
 	addButton.style.marginLeft = "4px";
 	addButton.style.marginBottom = "4px";
-	
 	tile.appendChild(addButton);
 	
+	const screenUnpackHeader = document.createElement('h3');
+    screenUnpackHeader.appendChild(document.createTextNode("Screen Unpack Exclusions"));
+	screenUnpackHeader.appendChild(createToolTip("List screens to be excluded from screen unpack. Separate screens with a comma.", "right"));
+    screenUnpackHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(screenUnpackHeader);
+	const notifDiv = document.createElement("div");
+	tile.appendChild(notifDiv);
+	notifDiv.appendChild(createTextSpan("List screen names separated by commas, no spaces."));
+	const exclusionInput = document.createElement("input");
+	exclusionInput.classList.add("input-text");
+	exclusionInput.value = result["PMMGExtended"]["unpack_exceptions"] == undefined ? "" : result["PMMGExtended"]["unpack_exceptions"].join(",");
+	exclusionInput.addEventListener("input", function(){
+		result["PMMGExtended"]["unpack_exceptions"] = exclusionInput.value.split(",");
+		setSettings(result);
+	});
+	
+	tile.appendChild(exclusionInput);
+	
+	const moduleSettingsHeader = document.createElement('h3');
+    moduleSettingsHeader.appendChild(document.createTextNode("Toggle Features"));
+	moduleSettingsHeader.appendChild(createToolTip("Toggle features on and off. The yellow X cleans up any stray elements.", "right"));
+    moduleSettingsHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(moduleSettingsHeader);
+	const content = document.createElement("div");
+	content.classList.add(...Style.SidebarSectionContent);
+    tile.appendChild(content);
+	modules.forEach(mp => {
+		// Div for the whole line
+		const line = document.createElement('div');
+		line.classList.add(...WithStyles(Style.SidebarLine, Style.FontsRegular));
+		content.appendChild(line);
+
+		// Left
+		line.appendChild(createTextSpan(mp.friendlyName));
+		content.appendChild(line);
+		
+		// Right
+		const right = document.createElement("span");
+        right.style.flexGrow = "1";
+        right.style.textAlign = "right";
+        line.appendChild(right);
+		
+	    if(result["PMMGExtended"]["disabled"] == undefined){result["PMMGExtended"]["disabled"] = [];}
+        const toggle = makeToggleButton("On", "Off", () => {
+			mp.enabled = !mp.enabled;
+			if(result["PMMGExtended"]["disabled"].includes(mp.name))
+			{
+				if(mp.enabled){
+					for(var i = 0; i < result["PMMGExtended"]["disabled"].length; i++)
+					{
+						if(result["PMMGExtended"]["disabled"][i] == mp.name)
+						{
+							result["PMMGExtended"]["disabled"].splice(i, 1);
+							i--;
+						}
+					}
+				} // Was just enabled, remove disabled label
+			}
+			else
+			{
+				if(!mp.enabled){result["PMMGExtended"]["disabled"].push(mp.name);}	// Was just disabled, add disabled label
+			}
+			setSettings(result);
+		}, mp.enabled);
+		if(result["PMMGExtended"]["disabled"].includes(mp.name))
+		{
+			toggle.setAttribute("data-state", "false");
+			mp.enabled = false;
+			toggle.classList.remove(...Style.ButtonSuccess);
+			toggle.classList.add(...Style.ButtonPrimary);
+			toggle.innerText = "Off";
+		}
+		right.appendChild(toggle);
+
+		const cleanup = makePushButton("x", () => mp.module.cleanup(true));
+		cleanup.style.marginRight = "8px";
+		right.appendChild(cleanup);
+		return;
+	});
+	
+	// Import/export settings and notes
 	const importHeader = document.createElement('h3');
     importHeader.appendChild(document.createTextNode("Import/Export Settings"));
     importHeader.classList.add(...Style.SidebarSectionHead);
