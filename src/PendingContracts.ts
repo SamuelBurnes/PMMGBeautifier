@@ -23,6 +23,7 @@ export class PendingContracts implements Module {
 
         const contractLines = Array.from(document.querySelectorAll(Selector.SidebarContract)) as HTMLElement[];	// All the contract lines
         var contractdict = {};
+		if(!this.contracts[this.username]){return;}	// Break if contracts haven't loaded
 	    createContractDict(this.contracts, this.username, contractdict);	// Turn the array into a dictionary with keys being contract IDs
 		
         contractLines.forEach(contract => {	// For each contract...
