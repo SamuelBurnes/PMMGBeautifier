@@ -8,11 +8,12 @@ export class CompactUI implements Module {
     private tag = "pb-compactui";
     //private username;
     private result;
+	private minByDefault
 	//private contracts;
-	constructor(result)//username
+	constructor(result, minByDefault)
 	{
-        document
-        this.result = result
+        this.minByDefault = minByDefault;
+        this.result = result;
 		//this.username = username;
 	}
 	
@@ -22,7 +23,7 @@ export class CompactUI implements Module {
         //genericUnhide(this.tag);
     }
     run() {
-
+		if(!this.minByDefault){return;}
         var buffers = getBuffers("BBL");
         //console.log("Clearning Buildings");
         if (buffers){
@@ -208,7 +209,7 @@ export function ClearBuildingLists(buffer, result, tag)
                                     //console.log(row);
                                     var newbar = document.createElement("progress");
 
-                                    console.log(newbar.classList);                           
+                                    //console.log(newbar.classList);                           
                                     newbar.classList.add(...WithStyles(Style.ProgressBar));
                                     if(linetype == Line.Condition)
                                         newbar.max = 100
@@ -240,7 +241,7 @@ export function ClearBase(buffer, tag)
 {
 
     const elements = Array.from(buffer.querySelectorAll(Selector.HeaderRow) as HTMLElement[]);
-    
+    if(elements.length == 0){return;}
 
     elements[0].style.display = "none";
     var editdiv = elements[1].getElementsByTagName("div")[0]

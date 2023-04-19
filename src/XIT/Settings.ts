@@ -113,8 +113,8 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const minDiv = document.createElement("div");
 	const minLabel = document.createElement('h3');
-	minLabel.appendChild(createTextSpan("Minimize Headers By Default"));
-	minLabel.appendChild(createToolTip("Minimize header rows on CXs and contracts by default.", "right"));
+	minLabel.appendChild(createTextSpan("Enable Compact UI"));
+	minLabel.appendChild(createToolTip("Enables additional changes that remove unnecessary parts of the interface.", "right"));
 	minLabel.classList.add(...Style.SidebarSectionHead);
 	minLabel.style.marginBottom = "4px";
 	minDiv.appendChild(minLabel);

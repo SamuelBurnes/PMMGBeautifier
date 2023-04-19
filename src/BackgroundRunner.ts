@@ -231,7 +231,6 @@ export function getBurnSettings(burnSettings, username, apikey)
 // "burnSettings" will contain the settings at the end of the web request
 export function getContracts(contracts, username, apikey)
 {
-	console.log("Getting FIO Contract data");
 	if(!contracts){contracts = {};}
 	if(!apikey || !username){return;}	// If API key or username is missing, abort
 	contracts[username] = [];
@@ -251,7 +250,7 @@ export function getContracts(contracts, username, apikey)
 			try
 			{
 				// Parse the results
-				console.log("PMMG: Retreived Burn from FIO");
+				console.log("PMMG: Retreived Contracts from FIO");
 				var burnData = JSON.parse(xhr.responseText);
 				burnData.forEach(data => {	// Copy the data into the contract variable
 					contracts[username].push(data);
@@ -265,13 +264,10 @@ export function getContracts(contracts, username, apikey)
 		}
 		return;
     };
-    console.log("PMMG: FIO Sending Contract Request");
 	// Send the request
 	xhr.timeout = 20000;
 	xhr.open("GET", "https://rest.fnar.net" + "/contract/allcontracts");
     xhr.setRequestHeader("Authorization", apikey);
     xhr.send(null);
-	console.log("Contract Data");
-	console.log(contracts);
 	return;
 }

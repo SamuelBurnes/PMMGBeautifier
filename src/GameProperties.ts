@@ -44,8 +44,9 @@ export const FriendlyNames = {
 	"CommandCorrecter": "Command Correcter",
 	"CalculatorButton": "Calculator Button",
 	"Sidebar": "Sidebar",
-	"HeaderMinimizer": "Minimize Headers",
-	"PendingContracts": "Pending Contracts"
+	"HeaderMinimizer": "Minimize Headers (Master)",
+	"PendingContracts": "Pending Contracts",
+	"CompactUI": "Compact UI (Master)"
 }
 
 export const SortingTriangleHTML = `

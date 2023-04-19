@@ -82,7 +82,7 @@ function createHeaderRow(labelText: string, rightSideContents: Element, tag: str
 	row.classList.add(...Style.HeaderRow);
 	row.classList.add(tag);
 	const label = document.createElement("label");
-	label.classList.add(...Style.HeaderLabel);
+	label.classList.add(...Style.FormLabel);
 	label.textContent = labelText;
 	row.appendChild(label);
 	const content = document.createElement("div");
