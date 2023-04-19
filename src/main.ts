@@ -112,7 +112,7 @@ function mainRun(result)
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
 		  new PendingContracts(result["PMMGExtended"]["username"], contracts),
-		  new CompactUI(result, result["PMMGExtended"]["minimize_by_default"])
+		  new CompactUI(result)
 	], result, burn, burnSettings);
 	
 	// Start the loop

@@ -8,11 +8,9 @@ export class CompactUI implements Module {
     private tag = "pb-compactui";
     //private username;
     private result;
-	private minByDefault
 	//private contracts;
-	constructor(result, minByDefault)
+	constructor(result)
 	{
-        this.minByDefault = minByDefault;
         this.result = result;
 		//this.username = username;
 	}
@@ -23,7 +21,6 @@ export class CompactUI implements Module {
         //genericUnhide(this.tag);
     }
     run() {
-		if(!this.minByDefault){return;}
         var buffers = getBuffers("BBL");
         //console.log("Clearning Buildings");
         if (buffers){
