@@ -19,6 +19,7 @@ import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
 import { HeaderMinimizer } from "./HeaderMinimizer";
 import { PendingContracts } from "./PendingContracts";
+import { CompactUI } from "./CompactUI";
 
 try
 {
@@ -111,6 +112,7 @@ function mainRun(result)
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
 		  new PendingContracts(result["PMMGExtended"]["username"], contracts),
+		  new CompactUI(result)
 	], result, burn, burnSettings);
 	
 	// Start the loop

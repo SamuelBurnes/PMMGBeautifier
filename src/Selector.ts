@@ -50,5 +50,7 @@ export const Selector = {
   ContDFormLabel: "label[class~='FormComponent__label___aQB15eB']",
   ContDFormRowSpacer: "div[class~='DynamicInput__dynamic___Cd4Gkbz']",
   SidebarContract: "div[class~='Sidebar__contract___J0gmlzN']",
-  SidebarContractId: "span[class~='Sidebar__contractId___Lg85TRZ']"
+  SidebarContractId: "span[class~='Sidebar__contractId___Lg85TRZ']",
+  BuildingList: "div[class~='SectionList__container___EtUzWyi']",
+  Divider: "div[class~='SectionList__divider___cwWO45v']"
 }

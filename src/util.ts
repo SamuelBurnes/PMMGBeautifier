@@ -508,6 +508,15 @@ export function genericCleanup(className: string = "prun-remove-js") {
   return;
 }
 
+export function genericUnhide(className: string = "prun-remove-js") {
+  
+	Array.from(document.getElementsByClassName(className + "-hidden")).forEach((elem : HTMLElement) => {
+	  elem.style.display = "";
+	  elem.classList.remove(className + "-hidden")
+	  return;
+	});
+	return;
+  }
 // Remove all elements from an HTML Element added in the last run with a class name
 export function targetedCleanup(className: string, element: Element) {
   

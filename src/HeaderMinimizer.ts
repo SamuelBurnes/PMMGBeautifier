@@ -86,7 +86,7 @@ function createHeaderRow(labelText: string, rightSideContents: Element, tag: str
 	label.textContent = labelText;
 	row.appendChild(label);
 	const content = document.createElement("div");
-	content.classList.add(...Style.HeaderContent);
+	content.classList.add(...Style.FormSaveInput);
 	
 	const rightSideDiv = document.createElement("div");
 	rightSideDiv.appendChild(rightSideContents);

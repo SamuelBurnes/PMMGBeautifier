@@ -1,46 +1,61 @@
 // A list of PrUN class names that can be applied to style elements
 export const Style = {
   Button: ["Button__btn___UJGZ1b7"],
-  ButtonPrimary: ["Button__primary____lObPiw"],
-  ButtonSuccess: ["Button__success___bCiIVXw"],
-  ButtonDanger: ["Button__danger___S2rSOES"],
-  SidebarSectionHead: ["Sidebar__sectionHead____NHLKDT", "fonts__font-regular___Sxp1xjo"],
+  ButtonPrimary:   ["Button__primary____lObPiw"],
+  ButtonSuccess:   ["Button__success___bCiIVXw"],
+  ButtonDisabled : ["Button__disabled____x8i7XF"],
+  ButtonEnabled :  ["Button__primary____lObPiw"],
+  ButtonDanger:    ["Button__danger___S2rSOES"],
+  SmallButton:     ["Button__darkInline___z_YKa91", "Button__dark___vdJbcc8", "Button__btn___UJGZ1b7", "Button__inline___Ffw9bbn"],
+  
+  SidebarSectionHead:    ["Sidebar__sectionHead____NHLKDT", "fonts__font-regular___Sxp1xjo"],
   SidebarSectionContent: ["Sidebar__sectionContent___wgGYFop", "fonts__font-regular___Sxp1xjo"],
-  SidebarLine: ["Sidebar__contract___J0gmlzN", "Sidebar__sidebar-line___bE2rbRb"],
+  SidebarLine:           ["Sidebar__contract___J0gmlzN", "Sidebar__sidebar-line___bE2rbRb"],
   FontsRegular: ["fonts__font-regular___Sxp1xjo"],
-  SidebarText: ["Frame__toggleLabel___BTFce8H", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  SidebarText:   ["Frame__toggleLabel___BTFce8H", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
   SidebarSliver: ["Frame__toggleIndicatorSecondary___frX4CGi", "Frame__toggleIndicator___ZKQQgAL"],
   SidebarButton: ["Frame__toggle___V3iHpB7"],
   ContractLine: ["y84EUI8gCP-SV91X7vIihQ==", "fVd3aYJhFY-uuaH+QTByhA=="],
   ContractName: ["zhixp408YF082IzA5KPvfA=="],
   ContractView: ["kq5BrGKnTUTqCDYMpLQ90g=="],
-  SettingsButton: ["RadioItem__container___CSczqmG", "RadioItem__containerHorizontal____trlXDo"],
-  SettingsBarUntoggled: ["RadioItem__indicator___QzQtjhA", "RadioItem__indicatorHorizontal___SwtwTIh"],
-  SettingsBarToggled: ["RadioItem__indicator___QzQtjhA", "RadioItem__indicatorHorizontal___SwtwTIh", "RadioItem__active___CDscOQV", "effects__shadowPrimary___EbXJQor"],
-  SettingsText: ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO", "RadioItem__valueHorizontal___D5AXJ9P"],
+
+  RadioButton:           ["RadioItem__container___CSczqmG"],
+  SettingsButton:        ["RadioItem__container___CSczqmG", "RadioItem__containerHorizontal____trlXDo"],
+  RadioButtonUnToggled:  ["RadioItem__indicator___QzQtjhA"],
+  SettingsBarUntoggled:  ["RadioItem__indicator___QzQtjhA", "RadioItem__indicatorHorizontal___SwtwTIh"],
+  RadioButtonToggled:    ["RadioItem__indicator___QzQtjhA", "RadioItem__active___CDscOQV", "effects__shadowPrimary___EbXJQor"],
+  SettingsBarToggled:    ["RadioItem__indicator___QzQtjhA", "RadioItem__indicatorHorizontal___SwtwTIh", "RadioItem__active___CDscOQV", "effects__shadowPrimary___EbXJQor"],
+  RadioButtonValue:      ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO"],
+  SettingsText:          ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO", "RadioItem__valueHorizontal___D5AXJ9P"],
+  
   OverlappingDiv: ["Overlay__overlay___NA9HV8y"],
-  GreyStripes: ["Overlay__background___ieZpHiF", "Overlay__overlay___NA9HV8y"],
-  Spacer: ["Overlay__close___bxGoMIl"],
+  GreyStripes:    ["Overlay__background___ieZpHiF", "Overlay__overlay___NA9HV8y"],
+  Spacer:         ["Overlay__close___bxGoMIl"],
+  ProgressBar:        ["ProgressBar__primary___O30jBqq", "ProgressBar__progress___eb4KhuW"],
+  ProgressBarColors:  ["ProgressBar__primary___O30jBqq", "grey-progress-bar", "good-progress-bar", "warning-progress-bar", "danger-progress-bar"],
+  ProgressBarGood:    ["good-progress-bar"],
+  ProgressBarWarning: ["warning-progress-bar"],
+  ProgressBarDanger:  ["danger-progress-bar"],
   CenterInterface: ["Overlay__children___rgtVaxc"],
-  FormRow: ["FormComponent__containerActive___HZv9jHd", "forms__active___wn9KQTZ", "forms__form-component___yTgP_Qa"],
-  FormLabel: ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
-  FormInput: ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"],
-  FormSaveRow: ["FormComponent__containerCommand___B4XLERf", "forms__cmd___IMzt7Ug", "forms__form-component___yTgP_Qa"],
+
+  FormRow:       ["FormComponent__containerActive___HZv9jHd", "forms__active___wn9KQTZ", "forms__form-component___yTgP_Qa"],
+  HeaderRow:     ["FormComponent__containerPassive___FrBdyGU", "forms__passive___biRUiE5", "forms__form-component___yTgP_Qa"],
+  FormLabel:     ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  FormInput:     ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"],
+  FormSaveRow:   ["FormComponent__containerCommand___B4XLERf", "forms__cmd___IMzt7Ug", "forms__form-component___yTgP_Qa"],
   FormSaveLabel: ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
   FormSaveInput: ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"],
-  MatText: ["ColoredIcon__label___OU1I4oP"],
-  MatTextWrapper: ["ColoredIcon__labelContainer___YVfgzOk"],
+
+  MatText:         ["ColoredIcon__label___OU1I4oP"],
+  MatTextWrapper:  ["ColoredIcon__labelContainer___YVfgzOk"],
   MaterialElement: ["ColoredIcon__container___djaR4r2"],
-  MaterialWrapper: ["MaterialIcon__container___q8gKIx8"],
+  MaterialWrapper:        ["MaterialIcon__container___q8gKIx8"],
+  MaterialNumberWrapper:  ["MaterialIcon__indicatorContainer___Cqtax_Y"],
+  MaterialNumber:         ["MaterialIcon__indicator___SHwlndJ", "MaterialIcon__type-very-small___UMzQ3ir", "MaterialIcon__neutral___SYsHXAa"],
   MaterialWrapperWrapper: ["GridItemView__image___yMoKOZV"],
-  MaterialNumberWrapper: ["MaterialIcon__indicatorContainer___Cqtax_Y"],
-  MaterialNumber: ["MaterialIcon__indicator___SHwlndJ", "MaterialIcon__type-very-small___UMzQ3ir", "MaterialIcon__neutral___SYsHXAa"],
-  MaterialOuter: ["GridItemView__container___xP2uJz8"],
-  MaterialNameText: ["GridItemView__name___h3yX9Lm", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
-  SmallButton: ["Button__darkInline___z_YKa91", "Button__dark___vdJbcc8", "Button__btn___UJGZ1b7", "Button__inline___Ffw9bbn"],
-  HeaderRow: ["FormComponent__containerPassive___FrBdyGU", "forms__passive___biRUiE5", "forms__form-component___yTgP_Qa"],
-  HeaderLabel: ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
-  HeaderContent: ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"]
+  MaterialOuter:          ["GridItemView__container___xP2uJz8"],
+  MaterialNameText:       ["GridItemView__name___h3yX9Lm", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+
 }
 
 // A function to apply multiple classes to an element in one go
@@ -308,6 +323,12 @@ tr:hover td.burn-red {
 	margin: 1px 2px;
 }
 .progress-bar::-webkit-progress-value {background: #f7a600;}
+
+.grey-progress-bar::-webkit-progress-value {background: #d9534f;}
+.good-progress-bar::-webkit-progress-value {background: #5cb85c;}
+.warning-progress-bar::-webkit-progress-value {background: #ffc856;}
+.danger-progress-bar::-webkit-progress-value {background: #d9534f;}
+
 .xit-tile {
 	background-color: #222222 !important;
 	padding-top: 4px;
