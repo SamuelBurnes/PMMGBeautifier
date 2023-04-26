@@ -62,7 +62,7 @@ export class InventoryOrganizer implements Module {
 					observer.disconnect();
 					setTimeout(() => {
 						observer.observe(target, config)
-					}, "250");	// Just chill...
+					}, 250);	// Just chill...
 					targetedCleanup(tag, inventory)	// Cleanup old sorting stuff
 					sortInventory(inventory, sortOptions, result, tag, screenName, invName, burn);	// Now apply sorting and sorting select options
 					return;
@@ -104,7 +104,7 @@ export class InventoryOrganizer implements Module {
 					observer.disconnect();
 					setTimeout(() => {
 						observer.observe(target, config)
-					}, "250");	// Just chill...
+					}, 250);	// Just chill...
 					targetedCleanup(tag, inventory)	// Cleanup old sorting stuff
 					sortInventory(inventory, sortOptions, result, tag, screenName, shipName, undefined);	// Now apply sorting and sorting select options
 					return;

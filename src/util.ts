@@ -475,7 +475,7 @@ export function changeValue(input, value) {
 
 // Wait for a new buffer to be created
 function monitorOnElementCreated(selector, callback, onlyOnce = true) {
-    const getElementsFromNodes = (nodes) => (Array.from(nodes)).flatMap(node => node.nodeType === 3 ? null : Array.from(node.querySelectorAll(selector))).filter(item => item !== null);
+    const getElementsFromNodes = (nodes) => (Array.from(nodes)).flatMap(node => (node as Node).nodeType === 3 ? null : Array.from((node as HTMLElement).querySelectorAll(selector))).filter(item => item !== null);
     let onMutationsObserved = function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.addedNodes.length) {
@@ -491,10 +491,11 @@ function monitorOnElementCreated(selector, callback, onlyOnce = true) {
 
     let containerSelector = 'body';
     let target = document.querySelector(containerSelector);
+	if(!target){return;}
     let config = { childList: true, subtree: true };
     let MutationObserver = window["MutationObserver"] || window["WebKitMutationObserver"];
     let observer = new MutationObserver(onMutationsObserved);
-    observer.observe(target, config);
+    observer.observe(target as Node, config);
 	return;
 }
 

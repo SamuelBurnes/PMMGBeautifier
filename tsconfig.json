@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "removeComments": true,
-    "lib": ["es2015", "es2017", "dom"],
+    "lib": ["es2015", "es2017", "es2019", "dom"],
     "strictNullChecks": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
@@ -13,6 +13,10 @@
     "emitDecoratorMetadata": true,
     "types": [
       "chrome"
+    ],
+	"typeRoots": [
+      "./node_modules/@types",
+      "./typings"
     ]
   },
   "exclude": [

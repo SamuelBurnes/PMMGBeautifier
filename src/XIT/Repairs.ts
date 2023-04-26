@@ -153,7 +153,7 @@ function Repairs_post(tile, parameters, jsondata)
 			header.style.paddingTop = "0";
 			hr.appendChild(header);
 		}
-		siteData["Buildings"].sort(buildingSort);
+		(siteData["Buildings"] as any[]).sort(buildingSort);
 		
 		const body = document.createElement("tbody");
 		table.appendChild(body);

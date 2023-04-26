@@ -309,7 +309,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 			if(!e || !e.target){return;}
 			try
 			{
-				const fileOutput = JSON.parse(e.target.result);
+				const fileOutput = JSON.parse(e.target.result as string);
 				const exclude = ["username", "apikey", "webappid"];	// Don't overwrite username, apikey, and webappid
 				Object.keys(fileOutput).forEach(key => {
 					if(!exclude.includes(key))
@@ -383,7 +383,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 			if(!e || !e.target){return;}
 			try
 			{
-				const fileOutput = JSON.parse(e.target.result);
+				const fileOutput = JSON.parse(e.target.result as string);
 				setSettings(fileOutput);
 				errorNoteTextBox.style.display = "none";
 			} catch(ex)

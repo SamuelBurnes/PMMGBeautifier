@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "ts-loader": "^3.1.0",
-    "typescript": "^2.5.3",
+    "typescript": "^5.0.4",
     "webextension-polyfill-ts": "^0.26.0",
     "webpack": "^3.8.1"
   },
