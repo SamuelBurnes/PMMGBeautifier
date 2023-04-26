@@ -118,6 +118,10 @@ export class XITHandler implements Module {
 			parameters = parametersRaw.slice(4).split("_");
 		}
 		if(!parameters) return;
+		for(var i = 0; i < parameters.length; i++)
+		{
+			parameters[i] = parameters[i].trim()
+		}
 		
 		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, burn, burnSettings, this.modules);return;}
 		

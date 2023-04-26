@@ -624,17 +624,30 @@ span.GridItemView__name___h3yX9Lm {
 
 // allocater's icon style
 export const IconStyle = `
+ /* PrUnIcon v0.90
+* ===============
+*
+* Install Chrome addon: StyleBot 
+* goto: apex.prosperousuniverse.com
+* right-click anywhere, select: StyleBot -> Style Element
+* Copy&Paste this file into the StyleBot window
+*
+* CSS script to give icons to all commodities and some other UI color and layout changes.
+*/
+ 
+/* controversial UI changes and colors */
+/* (comment/delete if not desired)
+/* ----------------------------------- */
+
  
 /* item ticker color */
 .ColoredIcon__label___OU1I4oP {
     color: #cccccc;
 }
- div.GridItemView__container___xP2uJz8 {
-	background-color: #222;
-}
+ 
  
 /* full item name centering */
-.GridItemView__name___h3yX9Lm {
+.GridItemView__name___h3yX9Lm  {
   display: block;
   text-align: center;
   padding-top: 1px;
@@ -650,22 +663,30 @@ table tbody td:nth-child(odd)
 /* end UI changes -------------------- */
  
 /* items in production view and market view */
-div.I\\+wRdIa9eLSzRZvSi9Grew\\=\\= div.T5C45pTOW9QTzokWPqLQJg\\=\\= div.E7OLUChYCexMUgOolKYjOQ\\=\\=
+div.MaterialInformation__recipeInputs___eLvfoop div.BuildingIcon__container___jF5GUsz div.BuildingIcon__tickerContainer___NZx3G8C
 {
   height: 36px;
   width: 36px;
 }
  
 /* items in planet view */
-div.\\_96GJG8NkoHVb-vZDam7qHg\\=\\= div.T5C45pTOW9QTzokWPqLQJg\\=\\= div.E7OLUChYCexMUgOolKYjOQ\\=\\=:before
+div.ResourceTable__gridContainer___ymrzTcD div.MaterialIcon__container___q8gKIx8 div.ColoredIcon__container___djaR4r2:before
 {
   height: 20px;
-  width: 20x;
+  width: 20px;
   font-size: 20px;
 }
  
+/*
+GridItemView__container___xP2uJz8
+GridItemView__image___yMoKOZV
+MaterialIcon__container___q8gKIx8
+ColoredIcon__container___djaR4r2
+ColoredIcon__labelContainer___YVfgzOk
+*/
+ 
 /* default :before element to prepare for new icon*/
-div.E7OLUChYCexMUgOolKYjOQ\\=\\=:before
+div.ColoredIcon__container___djaR4r2:before
 {
   position: absolute;
   width: 100%;
@@ -674,44 +695,22 @@ div.E7OLUChYCexMUgOolKYjOQ\\=\\=:before
   justify-content: center;
   display: flex;
   content: "";
- 
+  
   /*while it is icon*/
   opacity: .3;
   font-size: 30px;
 }
- 
-/* default :before element to prepare for new secondary corner icon */
-/*
-div.nlQirpSkdLH0a6\\+C4lhduA\\=\\=:before
-{
-  position: absolute;
-  content: "";
- 
-  opacity: 0.2;
-  z-index: -1;
-  -justify-content: right;
-  -align-items: right;
-  -display: flex;
-  -vertical-align: bottom;
-  -align-content: right;
-  -width: 10%;
-  -height: 10%;
-  font-size: 15px;
-  bottom: 1px;
-  left: -1px;
-  -top: 20px;
-}
 */
  
 /* colored overlay icon */
-div.nlQirpSkdLH0a6\\+C4lhduA\\=\\=:before
+div.ColoredIcon__labelContainer___YVfgzOk:before
 {
   position: absolute;
   content: ""; /* will become icon */
  
   opacity: 0.1;
   z-index: -1;
-  font-size: 20pt;
+  font-size: 30px;
   color: rgba(100%, 0%, 0%, 0);
 }
  
@@ -792,7 +791,7 @@ div[title="alpha-stabilized tungsten"i] div:before
 div[title^="Basic Thermal"i] div:before 
 {
   content: "🔥";
-  font-size: 15px;
+  font-size: 20px;
   color: rgba(1,1,1,1);
   opacity: 0.2;
 }
@@ -800,7 +799,7 @@ div[title^="Basic Thermal"i] div:before
 div[title^="Advanced Thermal"i] div:before 
 {
   content: "🔥";
-  font-size: 20px;
+  font-size: 25px;
   color: rgba(1,1,1,1);
   opacity: 0.2;
 }
@@ -808,22 +807,209 @@ div[title^="Advanced Thermal"i] div:before
 div[title*="Anti-Rad"i] div:before 
 {
   content: "⚛";
-  font-size: 20px;
+  font-size: 25px;
   color: rgba(1,1,1,1);
   opacity: 0.4;
 }
  
 div[title^="Advanced Anti-Rad"i] div:before 
 {
-  font-size: 25px;
+  font-size: 30px;
 }
  
 div[title^="Specialized Anti-Rad"i] div:before 
 {
+  font-size: 35px;
+}
+ 
+div[title*="High-Capacity C"i] div:before 
+{
+  content: "🔌";
+  font-size: 30px;
+  text-shadow: 0 0 0 gold;
+  opacity: .25;
+}
+ 
+div[title*="Shielded C"i] div:before 
+{
+  content: "🔌";
+  font-size: 30px;
+  text-shadow: 0 0 0 blue;
+  opacity: .01;
+}
+ 
+div[title*="Budget C"i] div:before 
+{
+  content: "🔌";
+  font-size: 30px;
+  text-shadow: 0 0 0 chocolate;
+  opacity: .2;
+}
+ 
+div[title*="raw "i] div:before 
+{
+  content: "🧶";
   font-size: 30px;
 }
  
+div[title*="raw cotton"i] div:before 
+{
+  text-shadow: 0 0 0 grey;
+  opacity: .2;
+}
+ 
+div[title*="raw silk"i] div:before 
+{
+  text-shadow: 0 0 0 plum;
+  opacity: .3;
+}
+ 
+div[title*=" fabric"i] div:before 
+{
+  content: "🧵";
+  font-size: 30px;
+}
+ 
+div[title*="kevlar fabric"i] div:before 
+{
+  text-shadow: 0 0 0 green;
+  opacity: .15;
+}
+ 
+ 
+div[title*="technokevlar fabric"i] div:before 
+{
+  text-shadow: 0 0 0 blueviolet;
+  opacity: .2;
+}
+ 
+div[title*="nylon fabric"i] div:before 
+{
+  text-shadow: 0 0 0 black;
+  opacity: .1;
+}
+ 
+div[title*="cotton fabric"i] div:before 
+{
+  text-shadow: 0 0 0 grey;
+  opacity: .2;
+}
+ 
+div[title*="silken fabric"i] div:before 
+{
+  text-shadow: 0 0 0 plum;
+  opacity: .3;
+}
+ 
+div[title*="ceramic fabric"i] div:before 
+{
+  text-shadow: 0 0 0 orangered;
+  opacity: .15;
+}
+ 
+div[title*="ceramic-tungsten fabric"i] div:before 
+{
+  text-shadow: 0 0 0 brown;
+  opacity: .3;
+}
+ 
+div[title="nutrient solution"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 green;
+  opacity: .3;
+}
+ 
+div[title="nano-enhanced resin"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 blueviolet;
+  opacity: .3;
+  font-size: 32px;
+}
+ 
+div[title="flux"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 yellow;
+  opacity: .15;
+}
+ 
+div[title="indigo colorant"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 indigo;
+  opacity: .3;
+}
+ 
+div[title="Olfactory Substances"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 olive;
+  opacity: .3;
+}
+ 
+div[title="DDT Plant Agent"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 red;
+  opacity: .3;
+}
+ 
+div[title="Sedative Substance"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 orange;
+  opacity: .3;
+}
+ 
+div[title="desaturation agent"i] div:before 
+{
+  content: "🧪";
+  text-shadow: 0 0 0 white;
+  opacity: .1;
+}
+ 
+div[title="breathable liquid"i] div:before 
+{
+  content: "💧";
+  text-shadow: 0 0 0 aquamarine;
+  opacity: .25;
+}
+ 
+div[title="thermofluid"i] div:before 
+{
+  content: "💧";
+  text-shadow: 0 0 0 orange;
+  opacity: .5;
+}
+ 
+div[title*="fertilizer"i] div:before 
+{
+  content: "⛰";
+  text-shadow: 0 0 0 yellowgreen;
+  opacity: .3;
+}
+ 
+div[title*="acid"i] div:before 
+{
+  content: "☣";
+  text-shadow: 0 0 0 greenyellow;
+  opacity: .1;
+  font-size: 40px;
+}
+ 
 /*
+ 
+div[title*="solar"i] div:before 
+{
+  content: "🌞";
+  opacity: .1;
+  font-size: 30px;
+  text-shadow: 0 0 0 yellow;
+  color: rgba(1,1,1,1);
+}
+ 
 div[title="large cargo bay kit"i] div:before 
 {
   content: "⚖"; opacity: 0.6; font-size: 20px;
@@ -860,13 +1046,13 @@ div[title="aluminium ore"i] div:before
 div[title="High-Capacity Connectors"],
 div[title="Red Gold"]
 {
-  background: linear-gradient(135deg, rgb(145 129 43), rgb(120 72 7))
+  -background: linear-gradient(135deg, rgb(145 129 43), rgb(120 72 7))
 }
  
 div[title="Shielded Connectors"],
 div[title="Blue Gold"]
 {
-  background: linear-gradient(135deg, rgb(145 129 43), rgb(70 72 200))
+  -background: linear-gradient(135deg, rgb(145 129 43), rgb(70 72 200))
 }
  
 div[title="Air Scrubber"]
@@ -874,6 +1060,7 @@ div[title="Air Scrubber"]
   background: linear-gradient(135deg, rgb(30 96 58),  rgb(51, 26, 76));
 }
  
+/* dw and all consumables */
  
 /* "normal" icons and colors */
 /* ------------------------- */
@@ -912,6 +1099,10 @@ div[title^="Basic Ra"] {
   background: linear-gradient(135deg, rgb(71 126 174), rgb(46 66 149))
 }
  
+/* liquids */
+div[title*="Heliotrope"],
+div[title*="Liquid Eins"],
+div[title*="Bacterial Tun"],
 div[title^="Water"] {
   background: linear-gradient(135deg, rgb(122 80 55), rgb(18 74 124))
 }
@@ -920,18 +1111,41 @@ div[title^="Water"] {
 div[title*="Substance"], 
 div[title*="Chemical"], 
 div[title="Liquid Crystals"], 
+div[title*="Breathable Liquid"], 
 div[title*="Agent"], 
 div[title*="Flux"], 
 div[title*="Resin"], 
 div[title*="Colorant"],
 div[title*="Acid"], 
-div[title*="Bacteria"], 
+div[title*=" Bacteria"], 
 div[title*="Soil"],
 div[title*="Stabilizer"],
 div[title*="Fertilizer"],
 div[title*="ThermoFluid"],
-div[title*="Solution"] {
+div[title*="Enriched"],
+div[title*="Nutrient"] {
   background: linear-gradient(135deg, rgb(183, 46, 91), rgb(114 37 62))
+}
+ 
+/* prefabs */
+div[title^="Basic Str"],
+div[title^="Basic Deck"],
+div[title^="Basic Bulk"],
+div[title^="Basic Trans"] {
+  background: linear-gradient(135deg, rgb(51 54 66 ), rgb(15, 30, 98))
+}
+div[title^="Lightweight"] {
+  background: linear-gradient(135deg, rgb(85 94 35), rgb(15, 30, 98))
+}
+div[title^="Hardened"], 
+div[title^="Reinforced"] {
+  background: linear-gradient(135deg, rgb(78 44 27), rgb(15, 30, 98))
+}
+div[title^="Advanced Deck"],
+div[title^="Advanced Transp"],
+div[title^="Advanced Str"],
+div[title^="Advanced Bulk"] {
+  background: linear-gradient(135deg, rgb(71 35 94), rgb(15, 30, 98))
 }
  
 /* construction bg colors */
@@ -996,28 +1210,6 @@ div[title="Life Support System"]
   background: linear-gradient(135deg, rgb(30 96 58),  rgb(51, 26, 76));
 }
  
- 
-/* prefabs */
-div[title^="Basic Str"],
-div[title^="Basic Deck"],
-div[title^="Basic Bulk"],
-div[title^="Basic Trans"] {
-  background: linear-gradient(135deg, rgb(51 54 66 ), rgb(15, 30, 98))
-}
-div[title^="Lightweight"] {
-  background: linear-gradient(135deg, rgb(85 94 35), rgb(15, 30, 98))
-}
-div[title^="Hardened"], 
-div[title^="Reinforced"] {
-  background: linear-gradient(135deg, rgb(78 44 27), rgb(15, 30, 98))
-}
-div[title^="Advanced Deck"],
-div[title^="Advanced Transp"],
-div[title^="Advanced Str"],
-div[title^="Advanced Bulk"] {
-  background: linear-gradient(135deg, rgb(71 35 94), rgb(15, 30, 98))
-}
- 
 div[title*="ium"]:before, 
 div[title*="site"]:before, 
 div[title*="mineral"i]:before {
@@ -1030,6 +1222,10 @@ div[title*="filter"i]:before,
 div[title*="device"i]:before,
 div[title*=" MK"i]:before {
   content: "📻";
+}
+/* 🛹🚿⛲ */
+div[title*="flow control device"i]:before {
+  content: "🚿";
 }
 div[title*="glass"i]:before {
   content: "🔲";
@@ -1052,14 +1248,23 @@ div[title*="sensor"i]:before {
 div[title*="Foundation"]:before {
   content: "🧇";
 }
-/* 🧮🎫🎟 */
+/* 🧮🎫🎟🎞 */
 div[title*="memory"i]:before,
 div[title*="process"i]:before,
 div[title*="transistor"i]:before,
 div[title*="circuit"i]:before {
   content: "🎟";
 }
-/*🧧🎟💿📼*/
+div[title*="tensor"i]:before {
+  content: "🧮";
+}
+div[title="memory bank"i]:before {
+  content: "🎞";
+}
+div[title*="circuit"i]:before {
+  content: "🎫";
+}
+/*🧧🎟💿📼🎞*/
 div[title="Non-Volatile Memory"i]:before
 {
   content: "📀";
@@ -1124,12 +1329,25 @@ div[title*="Power"]:before,
 div[title*="Capacitor"]:before {
   content: "🔋";
 }
-div[title*="Kit"]:before {
-  content: "🛠";
+div[title*="Power Cell"]:before
+{
+  font-size: 20px;
+}
+/* 🔨⛏⚒🛠🔧🔩⚙🗜🧰 */
+div[title*="Fastener Kit"]:before {
+  content: "🔧";
+  font-size: 35px;
+}
+div[title*="Repair Kit"]:before {
+  content: "🧰";
   font-size: 35px;
 }
 div[title*="Tank"]:before {
   content: "🛢";
+  font-size: 35px;
+}
+div[title*="FTL Fuel Tank"i]:before {
+  content: "🧳";
   font-size: 35px;
 }
 div[title*="Protection"]:before,
@@ -1138,9 +1356,14 @@ div[title*="Shield"]:before {
   content: "🛡";
   font-size: 40px;
 }
+div[title*="Protection Material"]:before {
+  content: "🧱";
+  font-size: 30px;
+}
 div[title*="Connectors"]:before {
   content: "🔌";
   font-size: 30px;
+  opacity: 0.4
 }
 div[title*="Seats"]:before {
   content: "🪑";
@@ -1168,19 +1391,31 @@ div[title*="Soil"]:before {
   content: "🥔";
 }
 /* 🧰🔪🩺 */
-div[title*="Surgical"i]:before,
-div[title*="Medical"i]:before {
+div[title*="Surgical"i]:before {
   content: "🩺";
   font-size: 30px;
+}
+/* 🎞🛏🛌 */
+div[title*="Medical stretcher"i]:before {
+  content: "🎞";
+  font-size: 35px;
+}
+/* 🧰🔪🩺💊 */
+div[title*="Medical kit"i]:before {
+  content: "🩺";
 }
 div[title*="Magnet"]:before {
   content: "🧲";
 }
+/* 🗿🖼 */
 div[title*="Deco"]:before {
   content: "🖼";
 }
 div[title*="Solar"]:before {
   content: "⚡";
+}
+div[title*="Solar Cell"]:before {
+  font-size: 20px;
 }
  
 /* alloys ♒ 🟪*/
@@ -1224,7 +1459,7 @@ div[title="Surgical Equipment"]:before {
 div[title*="Tube"]:before {
   content: "🧪";
 }
-/* 🛌 */
+/* 🛌🛏⚕ */
 div[title*="Crew Quarters"]:before,
 div[title*="Trauma Care"]:before {
   content: "🛏";
@@ -1448,9 +1683,15 @@ div[title^="Vita Essence"]:before {
   content: "🍶";
 }
  
- 
+/* liquids */
 div[title^="Water"]:before {
   content: "💧";
+}
+div[title*="Heliotrope"]:before {
+  content: "🥃";
+}
+div[title*="Liquid Eins"]:before {
+  content: "🥛";
 }
  
 /* 🎨🏀🏐⚾ */
@@ -1726,8 +1967,45 @@ div[title*="transistor"i]:before
   font-size: 25px; opacity: 0.4
 }
  
+ 
 /* buildings - kill stray icons */
-div.\\_6UivsDhXJylBr\\+\\+R9f05OQ\\=\\=:before
+div.BuildingIcon__container___jF5GUsz:before
 {
   content: "";
+}
+    
+    /* items in market view */
+table.BrokerList__table___ylgeiyg >
+tbody >
+tr >
+td >
+div.MaterialIcon__container___q8gKIx8 >
+div.ColoredIcon__container___djaR4r2:before 
+{
+  font-size: 24px;
+}
+
+/* items in building view */
+div.BuildingInformation__recipe___uzanxXw >
+div >
+div.MaterialIcon__container___q8gKIx8 >
+div.ColoredIcon__container___djaR4r2:before
+{
+  font-size: 26px;
+}
+
+/* items in recipe view */
+div.MaterialInformation__recipeInputs___eLvfoop >
+div.MaterialIcon__container___q8gKIx8 >
+div.ColoredIcon__container___djaR4r2:before
+{
+  font-size: 26px;
+}
+
+/* items in planet view */
+div.ResourceTable__gridContainer___ymrzTcD >
+div.MaterialIcon__container___q8gKIx8 >
+div.ColoredIcon__container___djaR4r2:before
+{
+  font-size: 18px;
 }`;

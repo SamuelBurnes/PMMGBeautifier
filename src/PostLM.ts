@@ -23,7 +23,7 @@ export class PostLM implements Module {
   run() {
     Array.from(document.querySelectorAll(Selector.LMPostForm)).forEach(form => {
 		
-	  const type = 	Array.from(form.getElementsByClassName("C-ECb-ove1tla6qsiV43ew== ivG24qtQ92kbysLTNeWJvw=="));
+	  const type = 	Array.from(form.getElementsByClassName("StaticInput__static___Vpn1u0n forms__static___a4biDi4"));
 	  var shipping = false;
 	  for(let elem of type)
 	  {
