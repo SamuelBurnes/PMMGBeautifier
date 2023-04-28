@@ -64,7 +64,8 @@ function generateListTable(result, tile)
 		deleteButton.textContent = "DELETE";
 		deleteColumn.appendChild(deleteButton);
 		deleteButton.addEventListener("click", function(){
-			// Delete stuff
+			getLocalStorage("PMMG-Lists", updateThenStoreList, [name, ""]);
+			row.style.display = "none";
 			return;
 		});
 	});
@@ -78,6 +79,19 @@ function generateListTable(result, tile)
 		line.appendChild(textColumn);
 		body.appendChild(line);
 	}
+	return;
+}
+function updateThenStoreList(result, params)
+{
+	if(!params || !params[0]){return;}
+	const noteName = params[0];
+	const noteText = params[1];
+	if(!result["PMMG-Lists"])
+	{
+		result["PMMG-Lists"] = {};
+	}
+	result["PMMG-Lists"][noteName] = noteText.length == 0 ? undefined : noteText;
+	setSettings(result);
 	return;
 }
 
