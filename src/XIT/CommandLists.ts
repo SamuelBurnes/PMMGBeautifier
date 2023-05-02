@@ -1,4 +1,4 @@
-import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan, makePopupSpacer, createPopupInputRow, getValueOfPopupRow} from "../util";
+import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan, makePopupSpacer, createPopupInputRow, getValueOfPopupRow, showWarningDialog} from "../util";
 import {Style} from "../Style";
 
 export function CommandLists(tile, parameters)
@@ -64,8 +64,10 @@ function generateListTable(result, tile)
 		deleteButton.textContent = "DELETE";
 		deleteColumn.appendChild(deleteButton);
 		deleteButton.addEventListener("click", function(){
+			showWarningDialog(tile, "Are you sure you want to delete " + name + "?", "Confirm", function()
+			{
 			getLocalStorage("PMMG-Lists", updateThenStoreList, [name, ""]);
-			row.style.display = "none";
+			row.style.display = "none";return;})
 			return;
 		});
 	});

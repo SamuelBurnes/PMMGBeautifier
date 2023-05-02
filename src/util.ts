@@ -721,3 +721,62 @@ export function createContractDict(contracts, username, contractdict)
 		contractdict[element['ContractLocalId']] = element
 	}
 }
+
+// Create a warning dialog with a confirmation button before running the callback function with the passed parameters
+export function showWarningDialog(tile, message: string="Are you sure?", confirmButtonText: string="Confirm", callbackFunction, parameters?)
+{
+	const overlay = document.createElement("div");	// Main striped overlay
+	tile.appendChild(overlay);
+	overlay.classList.add(...Style.ActionOverlay);
+	
+	const centerInterface = document.createElement("div");	// Center yellow block
+	overlay.appendChild(centerInterface);
+	centerInterface.classList.add(...Style.ActionCenterInterface);
+	
+	const confirm = document.createElement("span");	// "Confirmation Required" text
+	centerInterface.appendChild(confirm);
+	confirm.textContent = "Confirmation Required";
+	confirm.classList.add(...Style.ActionConfirm);
+	
+	const confirmMessage = document.createElement("span");	// Message below "Confirmation Required"
+	centerInterface.appendChild(confirmMessage);
+	confirmMessage.textContent = message;
+	confirmMessage.classList.add(...Style.ActionConfirmMessage);
+	
+	const buttonDiv = document.createElement("div");	// Div holding both buttons
+	centerInterface.appendChild(buttonDiv);
+	buttonDiv.classList.add(...Style.ActionButtons);
+	
+	const cancelButton = document.createElement("button");	// Cancel Button
+	cancelButton.classList.add(...Style.Button);
+	cancelButton.classList.add(...Style.ButtonNeutral);
+	cancelButton.textContent = "Cancel";
+	buttonDiv.appendChild(cancelButton);
+	
+	const confirmButton = document.createElement("button");	// Confirm Button
+	confirmButton.classList.add(...Style.Button);
+	confirmButton.classList.add(...Style.ButtonDanger);
+	confirmButton.textContent = confirmButtonText;
+	buttonDiv.appendChild(confirmButton);
+	
+	cancelButton.addEventListener("click", function()	// Just remove the overlay to cancel
+	{
+		tile.removeChild(overlay);
+		return;
+	});
+	
+	confirmButton.addEventListener("click", function()	// Remove the overlay and call the callback function
+	{
+		tile.removeChild(overlay);
+		if(parameters)
+		{
+			callbackFunction(parameters);
+		}
+		else
+		{
+			callbackFunction();
+		}
+		return;
+	});
+	return;
+}

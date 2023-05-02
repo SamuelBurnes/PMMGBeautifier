@@ -1,4 +1,4 @@
-import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan} from "../util";
+import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan, showWarningDialog} from "../util";
 import {CHECK_INDICATOR} from "./Checklists";
 
 export function Notes(tile, parameters)
@@ -82,8 +82,11 @@ function generateNotesTable(result, tile)
 		deleteButton.textContent = "DELETE";
 		deleteColumn.appendChild(deleteButton);
 		deleteButton.addEventListener("click", function(){
+			showWarningDialog(tile, "Are you sure you want to delete " + name + "?", "Confirm", function()
+			{
 			getLocalStorage("PMMG-Notes", updateThenStoreNote, [name, ""]);
-			row.style.display = "none";
+			row.style.display = "none";return;})
+			
 			return;
 		});
 		return;
