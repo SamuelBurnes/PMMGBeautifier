@@ -1,5 +1,5 @@
 import { Module } from "./ModuleRunner";
-import { getBuffers} from "./util";//createTextSpan, genericCleanup, genericUnhide
+import { getBuffers, createTextSpan } from "./util";
 import { Selector } from "./Selector";
 import { WithStyles, Style } from "Style";
 
@@ -90,13 +90,11 @@ export function ClearBuildingLists(buffer, result, tag)
             //console.log(row.innerText);
             if( row.innerText.includes("Infrastructure"))
             {
-                console.log(row);
                 var event = new CustomEvent("click", { "detail": "fake click" });
                 newmenu.dispatchEvent(event);
             }
         }
     });
-
 
     Array.from(nameElem.getElementsByTagName("table")).forEach((table : HTMLTableElement) => {
         
@@ -107,7 +105,7 @@ export function ClearBuildingLists(buffer, result, tag)
         var buttons = (table.parentNode as HTMLElement).getElementsByTagName("button")
         buttons[1].classList.remove(...WithStyles(Style.ButtonEnabled))
         buttons[1].classList.add(...WithStyles(Style.ButtonDanger))
-
+		
         Array.from(table.rows).forEach(row => {
             
             //console.log(text);
@@ -136,6 +134,10 @@ export function ClearBuildingLists(buffer, result, tag)
                 var text = data.innerText 
                 //console.log("TEXT " + text);
                 //console.log("CLIN " + linetype);
+				if(!text)
+				{
+					return;
+				}
                 if (dict[text] != null) 
                 {
                     linetype = dict[text]
@@ -150,7 +152,6 @@ export function ClearBuildingLists(buffer, result, tag)
                     HideElement(row, tag);
                 else
                 {
-                    
                     text.split(" ").forEach(word => {
                         var value = parseFloat(word)
                         if(!Number.isNaN(value))
@@ -164,7 +165,7 @@ export function ClearBuildingLists(buffer, result, tag)
                                 if(value > 180)
                                     HideElement(row, tag);
                                 
-                                else if(bar != null && bar.length > 0)
+                                else if(bar && bar.length > 0)
                                 {
                                     //console.log(bar);
                                     bar[0].classList.remove(...WithStyles(Style.ProgressBarColors));
@@ -212,7 +213,7 @@ export function ClearBuildingLists(buffer, result, tag)
                                         newbar.max = 100
                                     else
                                         newbar.max = 180
-                                    data.innerHTML = newbar.outerHTML + data.innerHTML
+									data.insertBefore(newbar, data.firstChild);
                                 }
 
                             }
@@ -239,10 +240,17 @@ export function ClearBase(buffer, tag)
 
     const elements = Array.from(buffer.querySelectorAll(Selector.HeaderRow) as HTMLElement[]);
     if(elements.length == 0){return;}
-
-    elements[0].style.display = "none";
-    var editdiv = elements[1].getElementsByTagName("div")[0]
-    editdiv.innerHTML = elements[0].getElementsByTagName("progress")[0].outerHTML + editdiv.getElementsByTagName("div")[0].outerHTML;
+	
+	elements[0].style.display = "none";	// Hide the "area" row
+	const areaBarCopy = elements[0].getElementsByTagName("progress")[0].cloneNode(true) as HTMLElement
+	areaBarCopy.classList.add(tag);
+	const editdiv = elements[1].getElementsByTagName("div")[0] as HTMLElement
+	if((editdiv.firstChild as HTMLElement).classList.contains(tag) && editdiv.firstChild)
+	{
+		editdiv.removeChild(editdiv.firstChild);
+	}
+	editdiv.insertBefore(areaBarCopy, editdiv.lastChild);
+	//editdiv.innerHTML = areaBarCopy.outerHTML + editdiv.getElementsByTagName("div")[0].outerHTML;
         
     Array.from(buffer.getElementsByTagName("table")).forEach((table : HTMLTableElement) => {
         Array.from(table.rows).forEach(row => {
@@ -271,9 +279,14 @@ export function ClearBase(buffer, tag)
                 //var newworkers = parseFloat(data[2].innerText.split(" ")[1].slice(1,-1));
                 var capacity = parseFloat(data[3].innerText);
                 
-                var bar = data[4].getElementsByTagName("div")[0];
-
-                bar.innerHTML =  bar.getElementsByTagName("progress")[0].outerHTML + bar.getElementsByTagName("progress")[0].title
+                const bar = data[4].getElementsByTagName("div")[0];
+				const barValue = bar.getElementsByTagName("progress")[0].title;
+				if(bar.lastChild && (bar.lastChild as HTMLElement).classList.contains(tag))
+				{
+					bar.removeChild(bar.lastChild);
+				}
+				bar.appendChild(createTextSpan(barValue, tag));
+                //bar.innerHTML =  bar.getElementsByTagName("progress")[0].outerHTML + bar.getElementsByTagName("progress")[0].title
                 bar.style.display = "flex"
                 bar.style.flexDirection = "row"
 
