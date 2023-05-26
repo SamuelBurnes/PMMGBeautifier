@@ -48,6 +48,15 @@ function minimizeHeaders(buffer, minByDefault, tag)
 	if(minByDefault)
 	{
 		(Array.from(headers) as HTMLElement[]).forEach(header => {
+			const label = header.querySelector(Selector.ContDFormLabel);
+			if(label && label.textContent == "Termination request")
+			{
+				const value = header.querySelector(Selector.ContDFormInput);
+				if(value && value.textContent != "--")
+				{
+					return;
+				}
+			}
 			if(!header.classList.contains(tag))
 			{
 				header.style.display = "none";
@@ -62,6 +71,15 @@ function minimizeHeaders(buffer, minByDefault, tag)
 		const minimize = minimizeButton.textContent == "-";
 		minimizeButton.textContent = minimize ? "+" : "-";
 		(Array.from(headers) as HTMLElement[]).forEach(header => {
+			const label = header.querySelector(Selector.ContDFormLabel);
+			if(label && label.textContent == "Termination request")
+			{
+				const value = header.querySelector(Selector.ContDFormInput);
+				if(value && value.textContent != "--")
+				{
+					return;
+				}
+			}
 			if(!header.classList.contains(tag))
 			{
 				header.style.display = minimize ? "none" : "flex";

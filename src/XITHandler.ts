@@ -11,12 +11,13 @@ import {Fin_pre} from "./XIT/Finances";
 import {EnhancedBurn_pre} from "./XIT/Burn";
 import {SheetTable_pre} from "./XIT/SheetTable";
 import {Contracts_pre} from "./XIT/Contracts";
-import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre} from "./XIT/Web";
+import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre, PrunPlanner, Wiki} from "./XIT/Web";
 import {FIOInv_pre} from "./XIT/Inventory";
 import {Notes} from "./XIT/Notes";
 import {Checklists} from "./XIT/Checklists";
 import {Sort} from "./XIT/Sort";
 import {CommandLists} from "./XIT/CommandLists";
+import {Help} from "./XIT/Help";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -42,7 +43,12 @@ export const XITPreFunctions = {
 	"CHECKLIST": Checklists,
 	"CHECKLISTS": Checklists,
 	"SORT": Sort,
-	"LIST": CommandLists
+	"LIST": CommandLists,
+	"LISTS": CommandLists,
+	"PRUNPLANNER": PrunPlanner,
+	"PLANNER": PrunPlanner,
+	"WIKI": Wiki,
+	"HELP": Help
 }
 
 export const XITBufferTitles = {
@@ -69,7 +75,12 @@ export const XITBufferTitles = {
 	"CHECKLIST": "CHECKLIST",
 	"CHECKLISTS": "CHECKLIST",
 	"SORT": "SORTING OPTIONS",
-	"LIST": "COMMAND LIST"
+	"LIST": "COMMAND LIST",
+	"LISTS": "COMMAND LIST",
+	"PRUNPLANNER": "PRUN PLANNER",
+	"PLANNER": "PRUN PLANNER",
+	"WIKI": "PRUN WIKI",
+	"HELP": "PMMG HELP"
 }
 /**
  * Handle XIT buffers
@@ -134,13 +145,16 @@ export class XITHandler implements Module {
 		const refreshButton = document.createElement("div");
 		if(!tile.firstChild || (tile.firstChild && ((tile.firstChild as HTMLElement).id != "pmmg-no-match")))
 		{
-				refreshButton.appendChild(createTextSpan("⟳"));
-				refreshButton.classList.add("button-upper-right");
-				refreshButton.classList.add(this.tag);
-				refreshButton.style.fontSize = "16px";
-				refreshButton.style.paddingTop = "12px";
-				refreshButton.id = "refresh";
-				(buffer.children[3] || buffer.children[2]).insertBefore(refreshButton, (buffer.children[3] || buffer.children[2]).firstChild);
+				if(buffer.getElementsByClassName("refresh").length == 0)
+				{
+					refreshButton.appendChild(createTextSpan("⟳"));
+					refreshButton.classList.add("button-upper-right");
+					refreshButton.classList.add(this.tag);
+					refreshButton.style.fontSize = "16px";
+					refreshButton.style.paddingTop = "12px";
+					refreshButton.classList.add("refresh");
+					(buffer.children[3] || buffer.children[2]).insertBefore(refreshButton, (buffer.children[3] || buffer.children[2]).firstChild);
+				}
 		}
 		const contentDiv = document.createElement("div");
 			contentDiv.style.height = "100%";

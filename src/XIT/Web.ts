@@ -95,3 +95,26 @@ export function Discord_pre(tile, parameters)
 	tile.appendChild(discord);
 	return;
 }
+
+export function Wiki(tile, parameters)
+{
+	clearChildren(tile);
+	const frame = document.createElement("iframe");
+		frame.src = parameters[1] && parameters[1].toLowerCase() == "resources" ? "https://handbook.apex.prosperousuniverse.com/wiki/community-resources/index.html" : "https://handbook.apex.prosperousuniverse.com/wiki/index.html";
+		frame.style.borderWidth = "0";
+		frame.style.height = "100%";
+		frame.style.width = "100%";
+	tile.appendChild(frame);
+}
+
+export function PrunPlanner(tile, parameters)
+{
+	clearChildren(tile);
+	const frame = document.createElement("iframe");
+		frame.src = parameters[1] ? "https://prunplanner.org/" + parameters[1] : "https://prunplanner.org/";
+		frame.style.borderWidth = "0";
+		frame.style.height = "100%";
+		frame.style.width = "100%";
+	tile.appendChild(frame);
+	return;
+}

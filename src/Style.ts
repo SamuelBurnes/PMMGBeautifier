@@ -412,6 +412,7 @@ tr:hover td.burn-red {
 .button-upper-right{
 	background-color: transparent;
 	color: #bbb;
+	fill: #bbb;
 	cursor: pointer;
 	display: block;
 	font-size: 24px;
@@ -419,6 +420,7 @@ tr:hover td.burn-red {
 }
 .button-upper-right:hover{
 	color: #000 !important;
+	fill: #000;
 	background-color: rgb(247, 166, 0);
 }`;
 

@@ -105,6 +105,7 @@ export class Notifications implements Module {
 const Searchers = [
 	["contract", "contract", "rgb(247, 166, 0)"],
 	["our corporation", "corp", "#8f52cc"],
+	["accepted our invitation", "corp", "#8f52cc"],
 	["produced", "produced", "#3fa2de"],
 	["accepted", "advert", "#449c57"],
 	["expired", "advert", "#449c57"],

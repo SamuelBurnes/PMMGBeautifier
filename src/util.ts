@@ -265,7 +265,10 @@ export function getLocalStorage(storageName, callbackFunction, params)
 {
 	try
 	{
-		browser.storage.local.get(storageName).then(callbackFunction(params));	// For FireFox, throws an error in Chrome
+		browser.storage.local.get(storageName).then(function(result) {
+		
+			callbackFunction(result, params)
+		});	// For FireFox, throws an error in Chrome
 	} catch(err)
 	{
 		chrome.storage.local.get([storageName], function(result)	// For Chrome, doesn't work in FireFox

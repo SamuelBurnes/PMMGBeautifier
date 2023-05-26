@@ -24,7 +24,6 @@ export function Notes(tile, parameters)
 		const textbox = document.createElement("textarea");
 		textboxWrapper.appendChild(textbox);
 		textboxWrapper.classList.add("notes-wrapper");
-		
 		getLocalStorage("PMMG-Notes", dispStoredNote, [noteName, textbox]);
 		
 	}
@@ -111,6 +110,7 @@ function updateThenStoreNote(result, params)
 	{
 		result["PMMG-Notes"] = {};
 	}
+	
 	result["PMMG-Notes"][noteName] = noteText.length == 0 ? undefined : noteText;
 	setSettings(result);
 	return;
@@ -118,10 +118,10 @@ function updateThenStoreNote(result, params)
 
 function dispStoredNote(result, params)
 {
+	console.log(params)
 	if(!params || !params[0] || !params[1]){return;}
 	const noteName = params[0];
 	const textbox = params[1];
-	
 	if(!result["PMMG-Notes"])
 	{
 		result["PMMG-Notes"] = {};
@@ -131,7 +131,6 @@ function dispStoredNote(result, params)
 	{
 		textbox.value = result["PMMG-Notes"][noteName];
 	}
-	
 	textbox.addEventListener("input", function()
 	{
 		getLocalStorage("PMMG-Notes", updateThenStoreNote, [noteName, textbox.value || ""]);
