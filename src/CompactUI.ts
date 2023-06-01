@@ -242,7 +242,9 @@ export function ClearBase(buffer, tag)
     if(elements.length == 0){return;}
 	
 	elements[0].style.display = "none";	// Hide the "area" row
-	const areaBarCopy = elements[0].getElementsByTagName("progress")[0].cloneNode(true) as HTMLElement
+	const areaBar = elements[0].getElementsByTagName("progress")[0];
+	if(!areaBar){return;}
+	const areaBarCopy = areaBar.cloneNode(true) as HTMLElement
 	areaBarCopy.classList.add(tag);
 	const editdiv = elements[1].getElementsByTagName("div")[0] as HTMLElement
 	if((editdiv.firstChild as HTMLElement).classList.contains(tag) && editdiv.firstChild)

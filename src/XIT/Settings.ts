@@ -111,6 +111,24 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	colorDiv.appendChild(colorSelect);
 	tile.appendChild(colorDiv);
 	
+	const finDiv = document.createElement("div");
+	const finLabel = document.createElement('h3');
+	finLabel.appendChild(createTextSpan("Enable Financial Recording"));
+	finLabel.appendChild(createToolTip("Record financial info daily. Open XIT FIN for more info.", "right"));
+	finLabel.classList.add(...Style.SidebarSectionHead);
+	finLabel.style.marginBottom = "4px";
+	finDiv.appendChild(finLabel);
+	
+	const finCheckbox = document.createElement("input");
+	finCheckbox.type = "checkbox";
+	finCheckbox.checked = result["PMMGExtended"]["recording_financials"];
+	finDiv.appendChild(finCheckbox);
+	tile.appendChild(finDiv);
+	finCheckbox.addEventListener("click", function() {
+		result["PMMGExtended"]["recording_financials"] = finCheckbox.checked;
+		setSettings(result);
+	});
+	
 	const minDiv = document.createElement("div");
 	const minLabel = document.createElement('h3');
 	minLabel.appendChild(createTextSpan("Minimize Headers by Default"));
