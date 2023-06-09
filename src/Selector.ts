@@ -15,7 +15,7 @@ export const Selector = {
   WorkforceConsumptionTable: "div[class~='TileFrame__title___xRcZCPx']",
   XITTile: "div[class~='ScrollView__view___ovf59Tk'] > div",
   BufferTitle: "div[class~='TileFrame__title___xRcZCPx']",
-  Notification: "div[class~='AlertListItem__container___m6eH2Jx']",
+  Notification: "div[class~='AlertListItem__content___XYebR1E']",
   ProdQueue: "div[class~='SiteProductionLines__column____s3cTk7']",
   //ProdWindow: "div[class~='Iw1zMtcrB7NFCxAG4xTz8g==']",
   BufferPanel: "div[class~='ScrollView__view___ovf59Tk']",

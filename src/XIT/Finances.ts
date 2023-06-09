@@ -1,4 +1,5 @@
-import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage} from "../util";
+import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption} from "../util";
+import {Style} from "../Style";
 
 export function Fin_pre(tile, parameters, result)
 {
@@ -43,25 +44,79 @@ export function Fin_pre(tile, parameters, result)
 	}
 	
 	// Get stored financial data
-	getLocalStorage("PMMG-Finance", chooseScreen, [tile, parameters]);
+	getLocalStorage("PMMG-Finance", chooseScreen, [tile, parameters, result]);
 	return;
 }
 
-function chooseScreen(result, params)	// Params consists of [tile, parameters]
+function chooseScreen(finResult, params)	// Params consists of [tile, parameters]
 {
-	if(!params[0] || !params[1]){return;}
+	if(!params[0] || !params[1] || !params[2]){return;}
 	const tile = params[0];
 	const parameters = params[1];
+	const result = params[2];
 	
-	console.log(result);
+	console.log(finResult);
 	console.log(parameters);
 	
-	if(Object.keys(result).length == 0)	// No data recorded
+	if(parameters[1] && (parameters[1].toLowerCase() == "settings" || parameters[1].toLowerCase() == "set"))
+	{
+		// Create option for choosing pricing
+		const pricingHeader = document.createElement('h3');
+		pricingHeader.appendChild(document.createTextNode("Pricing Scheme"));
+		pricingHeader.appendChild(createToolTip("Select a pricing scheme to calculate financials.", "right"));
+		pricingHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(pricingHeader);
+		
+		const priceDiv = document.createElement("div");
+		tile.appendChild(priceDiv);
+	
+		const priceLabel = createTextSpan("Pricing Scheme:");
+		priceLabel.style.marginBottom = "4px";
+		priceDiv.appendChild(priceLabel);
+		
+		const priceSelect = document.createElement("select");
+		
+		priceSelect.name = "price-select";
+		priceSelect.id = "price-select";
+		
+		Object.keys(PricingSchemes).forEach(name => {
+			priceSelect.appendChild(createSelectOption(name, name));
+		});
+		
+		if(!result["PMMGExtended"]["pricing_scheme"] || !PricingSchemes[result["PMMGExtended"]["pricing_scheme"]])
+		{
+			(priceSelect.children[0] as HTMLOptionElement).selected = true;
+		}
+		else
+		{
+			(priceSelect.children[PricingSchemes[result["PMMGExtended"]["pricing_scheme"]]] as HTMLOptionElement).selected = true;
+		}
+		
+		priceSelect.classList.add("select");
+		priceSelect.style.marginLeft = "4px";
+		
+		priceSelect.addEventListener("change", function(){
+			result["PMMGExtended"]["pricing_scheme"] = priceSelect.selectedOptions[0].value || undefined;
+			setSettings(result);
+		});
+		
+		priceDiv.appendChild(priceSelect);
+		return;
+	}
+	
+	if(Object.keys(finResult).length == 0)	// No data recorded
 	{
 		const header = document.createElement("h3");
 		header.textContent = "No data has been recorded yet. Wait a few seconds then refresh the page. If this persists, contact PiBoy314.";
 		header.style.textAlign = "center";
 		header.style.width = "100%";
 		tile.appendChild(header);
+		return;
 	}
+}
+
+const PricingSchemes = {
+	"AI1 AVG": 0,
+	"AI1 ASK": 1,
+	"AI1 BID": 2
 }

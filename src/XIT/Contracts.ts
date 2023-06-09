@@ -1,11 +1,13 @@
-import {clearChildren, createLink, createTextSpan, XITWebRequest, createTable, createMaterialElement, createTextDiv} from "../util";
+import {clearChildren, createLink, createTextSpan, createTable, createMaterialElement, createTextDiv} from "../util";
 import {TextColors} from "../Style";
 import {FactionHeaders} from "../GameProperties";
+import {getContracts} from "../BackgroundRunner";
 
-export function Contracts_pre(tile, parameters, result)
+export function Contracts_pre(tile, parameters, result, fullBurn, burnSettings, modules, refresh, contracts)
 {
 	clearChildren(tile);
-	if(!result["PMMGExtended"]["username"])
+	const username = result["PMMGExtended"]["username"];
+	if(!username)
 	{
 		tile.textContent = "Error! Missing Username!";
 		return;
@@ -16,22 +18,25 @@ export function Contracts_pre(tile, parameters, result)
 		return;
 	}
 	
-	XITWebRequest(tile, parameters, Contracts_post, "https://rest.fnar.net/contract/allcontracts/" + result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
-	return;
-}
-
-async function Contracts_post(tile, parameters, jsondata)
-{
-	if(jsondata == undefined || jsondata == null) { return; }
-
-	var contractData;
-	try {
-		contractData = JSON.parse(jsondata);
-	} catch(SyntaxError) {
-		tile.textContent = "Error! Could Not Load Data!";
-		return;
+	if(refresh)
+	{
+		contracts[username] = [];
+		getContracts(contracts, username, result["PMMGExtended"]["apikey"]);
 	}
 	
+	if(!contracts[username] || contracts[username].length == 0)
+	{
+		tile.textContent = "Loading Contract Data...";
+		tile.id = "pmmg-reload";
+		return;
+	}
+	Contracts_post(tile, parameters, contracts[username]);
+	//XITWebRequest(tile, parameters, Contracts_post, "https://rest.fnar.net/contract/allcontracts/" + result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
+	return [fullBurn, burnSettings, modules];
+}
+
+function Contracts_post(tile, parameters, contractData)
+{
 	let validContracts = contractData.filter(c => !invalidContractStatus.includes(c["Status"]));
 	
 	validContracts.map(contract => {
@@ -40,7 +45,6 @@ async function Contracts_post(tile, parameters, jsondata)
 
 		let selfConditions = [] as any;
 		let partnerConditions = [] as any;
-		
 		contract.Conditions.map((condition) => {
 			// Determine if REPUTATION condition type exists to denote Faction contract
 			if (condition["Type"] === "REPUTATION")
@@ -61,9 +65,9 @@ async function Contracts_post(tile, parameters, jsondata)
 		partnerConditions.sort(conditionSort);
 		
 		// Clear out default condition list and replace with named arrays
-		contract.Conditions = {};
-		contract.Conditions["self"] = selfConditions;
-		contract.Conditions["partner"] = partnerConditions;
+		contract.FilteredConditions = {};
+		contract.FilteredConditions["self"] = selfConditions;
+		contract.FilteredConditions["partner"] = partnerConditions;
 	});
 
 	validContracts.sort(ContractSort);
@@ -142,12 +146,12 @@ function createContractRow(contract) {
 		let partnerLink = createLink(contract["PartnerName"], "FA " + faction);
 		partnerColumn.appendChild(partnerLink);
 	}
-	for (let condition of contract.Conditions["partner"])
+	for (let condition of contract.FilteredConditions["partner"])
 		partnerColumn.appendChild(conditionStatus(condition));
 	row.appendChild(partnerColumn);
 	
 	const selfColumn = document.createElement("td");
-	for (let condition of contract.Conditions["self"])
+	for (let condition of contract.FilteredConditions["self"])
 		selfColumn.appendChild(conditionStatus(condition));
 	row.appendChild(selfColumn);
 

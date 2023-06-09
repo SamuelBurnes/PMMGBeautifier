@@ -104,7 +104,7 @@ export function getBurn(burn, username, apikey)
 	xhr.ontimeout = function () {	// On timeout, try again
 		console.log("PMMG: FIO Burn Timeout");
 		burn[username] = undefined;
-		getBurn(burn, username, apikey);
+		//getBurn(burn, username, apikey);
 	};
 	
 	xhr.onreadystatechange = function()
@@ -149,7 +149,7 @@ export function getGroupBurn(burn, groupid, apikey)
 	xhr.ontimeout = function () {
 		console.log("PMMG: FIO Burn Timeout");
 		burn[groupid] = undefined;
-		getGroupBurn(burn, groupid, apikey);
+		//getGroupBurn(burn, groupid, apikey);
 	};
 	
 	xhr.onreadystatechange = function()
@@ -194,7 +194,7 @@ export function getBurnSettings(burnSettings, username, apikey)
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
 		console.log("PMMG: FIO Burn Settings Timeout");
-		getBurnSettings(burnSettings, username, apikey);
+		//getBurnSettings(burnSettings, username, apikey);
 	};
 	
 	xhr.onreadystatechange = function()
@@ -240,7 +240,7 @@ export function getContracts(contracts, username, apikey)
 	xhr.ontimeout = function () {	// On timeout, try again
 		console.log("PMMG: FIO Contract Timeout");
 		contracts[username] = undefined;
-		getContracts(contracts, username, apikey);
+		//getContracts(contracts, username, apikey);
 	};
 	
 	xhr.onreadystatechange = function()
@@ -270,4 +270,74 @@ export function getContracts(contracts, username, apikey)
     xhr.setRequestHeader("Authorization", apikey);
     xhr.send(null);
 	return;
+}
+
+// Get FIO player data
+// "playerData" will contain the settings at the end of the web request
+export function updateFinancials(playerData, contracts, username, apikey)
+{
+	if(!playerData){playerData = {};}
+	if(!apikey || !username){return;}	// If API key or username is missing, abort
+	
+	// Create an XML Http Request
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {	// On timeout, try again
+		console.log("PMMG: FIO Player Data Timeout");
+		playerData[username] = undefined;
+		//updateFinancials(playerData, contracts, username, apikey);
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			try
+			{
+				// Parse the results
+				console.log("PMMG: Retreived Player Data from FIO");
+				var data = JSON.parse(xhr.responseText);
+				Object.keys(data).forEach(key => {	// Copy the data into the player data variable
+					playerData[key] = data[key];
+				});
+				console.log(data);
+				writeFinancials(playerData, contracts, username, true);
+			}
+			catch(SyntaxError)
+			{
+				console.log("PMMG: Bad Data from FIO");
+			}
+		}
+		return;
+    };
+	// Send the request
+	xhr.timeout = 20000;
+	xhr.open("POST", "https://rest.fnar.net" + "/fioweb/grouphub");
+    xhr.setRequestHeader("Authorization", apikey);
+    xhr.send(JSON.stringify([username]));
+	return;
+}
+
+function writeFinancials(playerData, contracts, username, loop)
+{
+	// Wait until contracts are in
+	if(loop)
+	{
+		if(contracts[username].length != 0)
+		{
+			window.setTimeout(() => writeFinancials(playerData, contracts, username, false), 100);
+			return;
+		}
+		else
+		{
+			window.setTimeout(() => writeFinancials(playerData, contracts, username, true), 50);
+			return;
+		}
+	}
+	
+	// Now we have the data, find financial value
+	
+	const finSnapshot = {};
+	finSnapshot["Currencies"] = playerData["PlayerModels"][0]["Currencies"];
+	
+	console.log(finSnapshot);
 }

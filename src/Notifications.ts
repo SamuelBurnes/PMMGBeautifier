@@ -11,14 +11,13 @@ export class Notifications implements Module {
   }
   run() {
     const elements = document.querySelectorAll(Selector.Notification);
-    for (let i = 0; i < elements.length; i++) {
-      const element = elements[i];
-	  if(element.children[1].firstChild && (element.children[1].firstChild as HTMLElement).classList.contains(this.tag))
+    elements.forEach(element => {
+	  if(element.firstChild && (element.firstChild as HTMLElement).classList.contains(this.tag))
 	  {
-		continue;
+		return;
 	  }
-	  const textContent = (element.children[1].children[0] as HTMLElement).textContent;
-	  if(textContent == null){continue;}
+	  const textContent = (element.children[0] as HTMLElement).textContent;
+	  if(textContent == null){return;}
 	  const text = textContent.toLowerCase();
 	  var foundType = false;
 	  Searchers.forEach(search => {
@@ -26,16 +25,17 @@ export class Notifications implements Module {
 		  const match = text.match(new RegExp(search[0]));
 		  if(match != null)
 		  {
+		    foundType = true;
 			const typeSpan = document.createElement("div");
 			typeSpan.textContent = search[1].toUpperCase();
 			typeSpan.classList.add(this.tag);
 			typeSpan.classList.add("notification");
 			typeSpan.style.color = search[2];
-			element.children[1].insertBefore(typeSpan, element.children[1].children[0]);
+			element.insertBefore(typeSpan, element.children[0]);
 			
 			// Shorten notifications
 			var matches;
-			var notText = (element.children[1].children[1] as HTMLElement).textContent;
+			var notText = (element.children[1] as HTMLElement).textContent;
 			
 			if(notText == null){return;}
 			
@@ -52,7 +52,6 @@ export class Notifications implements Module {
 					{
 						notText = notText.replace(new RegExp(matches[1]), Materials[matches[1]][0]);
 					}
-					foundType = true;
 					break;
 				case "trade":
 					matches = notText.match(/your ([A-z -]+) order/);
@@ -60,7 +59,6 @@ export class Notifications implements Module {
 					{
 						notText = notText.replace(new RegExp(matches[1]), Materials[matches[1]][0]);
 					}
-					foundType = true;
 				case "order filled":
 					notText = notText.replace(/ Commodity Exchange/, "");
 					matches = notText.match(/([A-z -]+) order/);
@@ -68,34 +66,29 @@ export class Notifications implements Module {
 					{
 						notText = notText.replace(new RegExp(matches[1]), Materials[matches[1]][0]);
 					}
-					foundType = true;
 					break;
 				case "accepted":
 					notText = notText.replace(/ the/, "");
 					notText = notText.replace(/ local market/, "");
-					foundType = true;
 					break;
 				case "contract":
 					notText = notText.replace(/Your partner /, "");
-					foundType = true;
 					break;
 				case "arrived at":
 					notText = notText.replace(/its destination /, "");
-					foundType = true;
 					break;
 				case "cogc":
 				case "chamber of global commerce":
 					notText = notText.replace(/ a new economic program/, "");
 					notText = notText.replace(/ Advertising Campaign:/, "");
 					
-					foundType = true;
 					break;
 			}
-			(element.children[1].children[1] as HTMLElement).textContent = notText;
+			(element.children[1] as HTMLElement).textContent = notText;
 		  }
 	  });
       
-    }
+    });
 	return;
   }
 }

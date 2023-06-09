@@ -8,7 +8,7 @@ import { PostLM } from "./PostLM";
 import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
-import { getPrices, getBurn, getBurnSettings, getContracts} from "./BackgroundRunner";
+import { getPrices, getBurn, getBurnSettings, getContracts, updateFinancials} from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors, IconStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
@@ -92,6 +92,13 @@ function mainRun(result)
 	
 	var contracts = [];
 	getContracts(contracts, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
+	
+	// Get player model (if financial recording is active)
+	var playerData = {};
+	if(result["PMMGExtended"]["recording_financials"])
+	{
+		//updateFinancials(playerData, contracts, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
+	}
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
 		  new ShippingAds(),
@@ -113,7 +120,7 @@ function mainRun(result)
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
 		  new PendingContracts(result["PMMGExtended"]["username"], contracts),
 		  new CompactUI(result)
-	], result, burn, burnSettings);
+	], result, burn, burnSettings, contracts);
 	
 	// Start the loop
 	(function () {

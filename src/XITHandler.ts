@@ -89,13 +89,15 @@ export class XITHandler implements Module {
   private tag = "pb-xit";
   private burn;
   private burnSettings;
+  private contracts;
   private modules;
   private result;
-  constructor(result, burn, burnSettings, modules)
+  constructor(result, burn, burnSettings, contracts, modules)
   {  
 	this.burn = burn;
 	this.burnSettings = burnSettings;
 	this.modules = modules;
+	this.contracts = contracts
 	this.result = result;
   }
   cleanup() {
@@ -105,6 +107,7 @@ export class XITHandler implements Module {
     const buffers = getBuffers("XIT");
     if (!buffers) return;
 	const burn = this.burn;
+	const contracts = this.contracts;
 	const burnSettings = this.burnSettings;
 	buffers.forEach(buffer => {
 		const tile = (buffer.querySelector(Selector.XITTile)) as HTMLElement;
@@ -134,7 +137,7 @@ export class XITHandler implements Module {
 			parameters[i] = parameters[i].trim()
 		}
 		
-		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, burn, burnSettings, this.modules);return;}
+		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, burn, burnSettings, this.modules, false, this.contracts);return;}
 		
 		tile.classList.add("xit-tile");
 		if(tile.firstChild)
@@ -174,9 +177,9 @@ export class XITHandler implements Module {
 			Array.from(buffer.querySelectorAll(Selector.BufferTitle))[0].textContent = XITBufferTitles[parameters[0].toUpperCase()];	// Title the buffer
 			const modules = this.modules;
 			var result = this.result;
-			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, burn, burnSettings, modules, true);});
+			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, burn, burnSettings, modules, true, contracts);});
 			(tile.firstChild as HTMLElement).id = "pmmg-load-success";
-			preFunc(contentDiv, parameters, this.result, burn, burnSettings, modules);
+			preFunc(contentDiv, parameters, this.result, burn, burnSettings, modules, false, contracts);
 		}
 		return;
 		
