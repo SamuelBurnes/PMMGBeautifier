@@ -1,3 +1,6 @@
+import {setSettings} from "./util";
+import {calculateFinancials} from "./XIT/Finances";
+
 // Get corp prices asynchronously
 // "prices" will contain the prices after the end of the web request
 export function getPrices(prices, webappID)
@@ -74,7 +77,7 @@ export function getCXPrices(cxPrices)
 					return;
 				});
 				cxPrices["Age"] = Date.now();	// Date the data
-				console.log(cxPrices);
+				//console.log(cxPrices);
 			}
 			catch(SyntaxError)
 			{
@@ -227,6 +230,48 @@ export function getBurnSettings(burnSettings, username, apikey)
 	return;
 }
 
+// Get CXOS asynchronously
+// "cxos" will contain the settings at the end of the web request
+export function getCXOS(cxos, username, apikey)
+{
+	if(!apikey || !username){return;}
+	
+	// Create an XML Http Request
+	var xhr = new XMLHttpRequest();
+	xhr.ontimeout = function () {
+		console.log("PMMG: FIO CXOS Timeout");
+		//getBurnSettings(burnSettings, username, apikey);
+	};
+	
+	xhr.onreadystatechange = function()
+    {
+	    if(xhr.readyState == XMLHttpRequest.DONE)
+	    {
+			try
+			{
+				// Parse the results
+				console.log("PMMG: Retreived CXOS from FIO");
+				var cxosData = JSON.parse(xhr.responseText);
+				cxosData.forEach(data => {	// Copy the settings data
+					cxos.push(data);
+				});
+			}
+			catch(SyntaxError)
+			{
+				console.log("PMMG: Bad Data from FIO");
+			}
+		}
+		return;
+    };
+    
+	// Send the request
+	xhr.timeout = 10000;
+	xhr.open("GET", "https://rest.fnar.net" + "/cxos/" + username, true);
+    xhr.setRequestHeader("Authorization", apikey);
+    xhr.send(null);
+	return;
+}
+
 // Get FIO contract data
 // "burnSettings" will contain the settings at the end of the web request
 export function getContracts(contracts, username, apikey)
@@ -274,8 +319,11 @@ export function getContracts(contracts, username, apikey)
 
 // Get FIO player data
 // "playerData" will contain the settings at the end of the web request
-export function updateFinancials(playerData, contracts, username, apikey)
+export function updateFinancials(playerData, contracts, prices, cxos, result, count?)
 {
+	const username = result["PMMGExtended"]["username"];
+	const apikey = result["PMMGExtended"]["apikey"];
+	
 	if(!playerData){playerData = {};}
 	if(!apikey || !username){return;}	// If API key or username is missing, abort
 	
@@ -296,11 +344,23 @@ export function updateFinancials(playerData, contracts, username, apikey)
 				// Parse the results
 				console.log("PMMG: Retreived Player Data from FIO");
 				var data = JSON.parse(xhr.responseText);
+				if(data["CXWarehouses"].length == 0)
+				{
+					if(count > 10)
+					{
+						console.log("PMMG: Error with FIO retrieving warehouse storage!");
+						return;
+					}
+					window.setTimeout(() => updateFinancials(playerData, contracts, prices, cxos, result, count + 1), 1000);
+					return;
+				}
 				Object.keys(data).forEach(key => {	// Copy the data into the player data variable
 					playerData[key] = data[key];
 				});
-				console.log(data);
-				writeFinancials(playerData, contracts, username, true);
+				calculateFinancials(playerData, contracts, prices, cxos, result, true);
+				result["PMMGExtended"]["last_fin_recording"] = Date.now();
+				setSettings(result);
+				
 			}
 			catch(SyntaxError)
 			{
@@ -315,29 +375,4 @@ export function updateFinancials(playerData, contracts, username, apikey)
     xhr.setRequestHeader("Authorization", apikey);
     xhr.send(JSON.stringify([username]));
 	return;
-}
-
-function writeFinancials(playerData, contracts, username, loop)
-{
-	// Wait until contracts are in
-	if(loop)
-	{
-		if(contracts[username].length != 0)
-		{
-			window.setTimeout(() => writeFinancials(playerData, contracts, username, false), 100);
-			return;
-		}
-		else
-		{
-			window.setTimeout(() => writeFinancials(playerData, contracts, username, true), 50);
-			return;
-		}
-	}
-	
-	// Now we have the data, find financial value
-	
-	const finSnapshot = {};
-	finSnapshot["Currencies"] = playerData["PlayerModels"][0]["Currencies"];
-	
-	console.log(finSnapshot);
 }

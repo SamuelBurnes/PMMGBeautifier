@@ -21,10 +21,10 @@ export class ModuleRunner {
   private readonly modules: ModuleEntry[];	// The list of modules run by the extension
   private readonly xit: XITHandler;	// The XIT module, run separately
   private result;	// The stored settings
-  constructor(modules: Module[], result, burn, burnSettings, contracts) {
+  constructor(modules: Module[], result, burn, burnSettings, contracts, browser) {
 	// Construct global variables
     this.modules = modules.map(m => this.moduleToME(m));
-	this.xit = new XITHandler(result, burn, burnSettings, contracts, this.modules);
+	this.xit = new XITHandler(result, burn, burnSettings, contracts, this.modules, browser);
 	this.result = result;
 	
 	this.updateActiveModules(result);

@@ -46,7 +46,7 @@ export const FriendlyNames = {
 	"Sidebar": "Sidebar",
 	"HeaderMinimizer": "Minimize Headers (Master)",
 	"PendingContracts": "Pending Contracts",
-	"CompactUI": "Compact UI (Master)"
+	"CompactUI": "Compact UI"
 }
 
 export const SortingTriangleHTML = `

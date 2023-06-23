@@ -92,13 +92,15 @@ export class XITHandler implements Module {
   private contracts;
   private modules;
   private result;
-  constructor(result, burn, burnSettings, contracts, modules)
+  private browser;
+  constructor(result, burn, burnSettings, contracts, modules, browser)
   {  
 	this.burn = burn;
 	this.burnSettings = burnSettings;
 	this.modules = modules;
 	this.contracts = contracts
 	this.result = result;
+	this.browser = browser;
   }
   cleanup() {
     //genericCleanup(this.tag);	// Don't clean up because causes flashing when doing asynchronous requests
@@ -154,7 +156,8 @@ export class XITHandler implements Module {
 					refreshButton.classList.add("button-upper-right");
 					refreshButton.classList.add(this.tag);
 					refreshButton.style.fontSize = "16px";
-					refreshButton.style.paddingTop = "12px";
+					refreshButton.style.paddingTop = this.browser ? "12px" : "0px";
+					if(!this.browser){refreshButton.style.marginTop = "0px";}
 					refreshButton.classList.add("refresh");
 					(buffer.children[3] || buffer.children[2]).insertBefore(refreshButton, (buffer.children[3] || buffer.children[2]).firstChild);
 				}

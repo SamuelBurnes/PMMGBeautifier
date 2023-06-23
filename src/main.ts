@@ -8,7 +8,7 @@ import { PostLM } from "./PostLM";
 import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
-import { getPrices, getBurn, getBurnSettings, getContracts, updateFinancials} from "./BackgroundRunner";
+import { getPrices, getBurn, getBurnSettings, getContracts, updateFinancials, getCXPrices, getCXOS} from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors, IconStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
@@ -32,12 +32,12 @@ try
 	console.log("Chromium detected");
 	chrome.storage.local.get(["PMMGExtended"], function(result)
 	{
-		mainRun(result);
+		mainRun(result, "chromium");
 	});
 }
 
 // The main function that initializes everything
-function mainRun(result)
+function mainRun(result, browser?)
 {
 	// If no stored data, make it blank so it can be written to
 	if(!result["PMMGExtended"]){result["PMMGExtended"] = {};}
@@ -95,9 +95,13 @@ function mainRun(result)
 	
 	// Get player model (if financial recording is active)
 	var playerData = {};
-	if(result["PMMGExtended"]["recording_financials"])
+	var prices = {};
+	var cxos = [];
+	if(result["PMMGExtended"]["recording_financials"] && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 72000000)) // 86400000
 	{
-		//updateFinancials(playerData, contracts, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
+		getCXPrices(prices);
+		getCXOS(cxos, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
+		updateFinancials(playerData, contracts, prices, cxos, result, 0);
 	}
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
@@ -120,7 +124,7 @@ function mainRun(result)
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
 		  new PendingContracts(result["PMMGExtended"]["username"], contracts),
 		  new CompactUI(result)
-	], result, burn, burnSettings, contracts);
+	], result, burn, burnSettings, contracts, browser);
 	
 	// Start the loop
 	(function () {

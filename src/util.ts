@@ -1,6 +1,6 @@
 import {Selector} from "./Selector";
 import {MaterialNames, PlanetNames, SystemNames} from "./GameProperties";
-import {Style, CategoryColors, WithStyles} from "./Style";
+import {Style, CategoryColors, WithStyles, DefaultColors} from "./Style";
 
 // Download a file containing fileData with fileName
 export function downloadFile(fileData, fileName, isJSON: boolean = true)
@@ -782,4 +782,151 @@ export function showWarningDialog(tile, message: string="Are you sure?", confirm
 		return;
 	});
 	return;
+}
+
+export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, lineColor?, isDates?)
+{
+	const canvas = document.createElement("canvas");
+	canvas.height = ySize;
+	canvas.width = xSize;
+	
+	const context = canvas.getContext("2d");
+	if(!context){return null;}
+	
+	const minX = Math.min(...xData);
+	const maxX = Math.max(...xData);
+	const minY = Math.min(...yData);
+	const maxY = Math.max(...yData);
+	
+	const zeroX = (xLabel ? 20 : 0) + context.measureText((maxY).toLocaleString(undefined, {"maximumFractionDigits": 0})).width;
+	const zeroY = yLabel ? ySize - 23 : ySize;
+	
+	// Draw labels
+	if(xLabel)
+	{
+		const xLabelInfo = context.measureText(xLabel);
+		context.font = "12px Droid Sans";
+		context.fillStyle = "#eee";
+		context.fillText(xLabel, xSize / 2 - 10 - xLabelInfo.width / 2, ySize);
+	}
+	if(yLabel)
+	{
+		context.save();
+		context.font = "12px Droid Sans";
+		context.fillStyle = "#eee";
+		context.translate(10, ySize / 2 + 10);
+		context.rotate(-Math.PI / 2);
+		context.fillText(yLabel, 0, 0);
+		context.restore();
+	}
+	
+	// Draw data
+	const scaleX = (xSize - zeroX) / (maxX - minX);
+	const scaleY = (zeroY) / (maxY - minY);
+	
+	
+	for(var i = 0; i < xData.length - 1; i++)
+	{
+		context.beginPath();
+		context.moveTo((xData[i] - minX) * scaleX + zeroX,  zeroY - (yData[i] - minY) * scaleY);
+		context.lineTo((xData[i + 1] - minX) * scaleX + zeroX, zeroY - (yData[i + 1] - minY) * scaleY);
+		context.strokeStyle = lineColor ? lineColor : "#f7a600";
+		context.stroke();
+	}
+	
+	// Draw axes
+	context.beginPath();
+	context.strokeStyle = "#bbb";
+	context.moveTo(zeroX, zeroY);
+	context.lineTo(xSize, zeroY);
+	context.stroke();
+	
+	context.beginPath();
+	context.moveTo(zeroX, zeroY);
+	context.lineTo(zeroX, 0);
+	context.stroke();
+	
+	// Draw data labels
+	for(i = 0; i < 10; i++)
+	{
+		const text = isDates ? (new Date((maxX - minX) * i / 10 + minX)).toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"}) : ((maxX - minX) * i / 10 + minX).toLocaleString(undefined, {maximumFractionDigits: 2});
+		context.font = "10px Droid Sans";
+		context.fillStyle = "#999";
+		context.fillText(text, (xSize - zeroX) * i / 10 + zeroX, ySize - 12);
+	}
+	
+	for(i = 0; i <= 5; i++)
+	{
+		const text = ((maxY - minY) * i / 5 + minY).toLocaleString(undefined, {"maximumFractionDigits": 0});
+		const textInfo = context.measureText(text);
+		context.font = "10px Droid Sans";
+		context.fillStyle = "#999";
+		context.fillText(text,  zeroX - textInfo.width - 2, -(zeroY - 8) * i / 5 + zeroY);
+	}
+	
+	return canvas;
+}
+
+export function drawPieChart(data, size, text?, colors?)
+{
+	const pieSize = size / 2 - 12;
+	const centerX = size;
+	const centerY = size / 2 + 12;
+	var angle = 0;
+	var sum = 0;
+	data.forEach(point => {
+		sum += point;
+	});
+	const canvas = document.createElement("canvas");
+	canvas.height = size + 24;
+	canvas.width = size * 2;
+	
+	const context = canvas.getContext("2d");
+	if(!context){return null;}
+	
+	for(var i = 0; i < data.length; i++){
+		const pieAngle = data[i] / sum * 2 * Math.PI;
+		context.beginPath();
+		context.arc(centerX, centerY, pieSize, angle, angle + pieAngle);
+		context.stroke();
+		angle += pieAngle;
+		
+		context.lineTo(centerX, centerY);
+		
+		if(colors)
+		{
+			context.fillStyle = colors[i] || "#00ff00";
+		}
+		else
+		{
+			context.fillStyle = i == data.length - 1 && data.length % DefaultColors.length == 1 && data.length > 1 ? DefaultColors[(i + 1) % DefaultColors.length] : DefaultColors[i % DefaultColors.length];
+		}
+		context.fill();
+		
+		
+	}
+	
+	angle = 0; 
+	for(var i = 0; i < data.length; i++)
+	{
+		const pieAngle = data[i] / sum * 2 * Math.PI;
+		const textInfo = context.measureText(text[i]);
+		
+		if(pieAngle < 0.314 && data.length > 5){continue;}
+		
+		var startX = centerX + Math.cos(angle + pieAngle / 2) * size / 2;
+		var startY = centerY + Math.sin(angle + pieAngle / 2) * size / 2 + 4;
+		
+		if(angle + pieAngle / 2 > Math.PI / 2 && angle + pieAngle / 2 < Math.PI * 3 / 2)
+		{
+			startX -= textInfo.width;
+		}
+		
+		context.font = "12px Droid Sans";
+		context.fillStyle = "#eee";
+		context.fillText(text[i], startX, startY);
+		
+		angle += pieAngle;
+	}
+	return canvas;
 }

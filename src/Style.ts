@@ -87,6 +87,15 @@ export const TextColors = {
 	Yellow: "#f7a600"
 }
 
+export const DefaultColors = [
+	"#591e00",
+	"#7b3d00",
+	"#b46d00",
+	"#f7a600",
+	"#ffcf40",
+	"#fbe4af"
+]
+
 // The default category colors used in PrUN
 export const CategoryColors = {
 	"electronic devices": ["linear-gradient(135deg, rgb(86, 20, 147), rgb(111, 45, 172))", "rgb(213, 147, 255)"],
