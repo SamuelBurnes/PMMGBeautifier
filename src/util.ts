@@ -807,7 +807,7 @@ export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, line
 		const xLabelInfo = context.measureText(xLabel);
 		context.font = "12px Droid Sans";
 		context.fillStyle = "#eee";
-		context.fillText(xLabel, xSize / 2 - 10 - xLabelInfo.width / 2, ySize);
+		context.fillText(xLabel, xSize / 2 + zeroX / 2 - xLabelInfo.width / 2, ySize);
 	}
 	if(yLabel)
 	{
@@ -857,7 +857,9 @@ export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, line
 	
 	for(i = 0; i <= 5; i++)
 	{
-		const text = ((maxY - minY) * i / 5 + minY).toLocaleString(undefined, {"maximumFractionDigits": 0});
+		var value = (maxY - minY) * i / 5 + minY
+		value = Math.round(value / Math.pow(10, Math.floor(Math.log10(value)) - 3)) * Math.pow(10, Math.floor(Math.log10(value)) - 3);
+		const text = (value).toLocaleString(undefined, {"maximumFractionDigits": 0});
 		const textInfo = context.measureText(text);
 		context.font = "10px Droid Sans";
 		context.fillStyle = "#999";
@@ -905,8 +907,11 @@ export function drawPieChart(data, size, text?, colors?)
 		
 		
 	}
+	if(!text){return canvas;}
 	
 	angle = 0; 
+	var minX = centerX - pieSize;
+	var maxX = centerX + pieSize;
 	for(var i = 0; i < data.length; i++)
 	{
 		const pieAngle = data[i] / sum * 2 * Math.PI;
@@ -916,6 +921,9 @@ export function drawPieChart(data, size, text?, colors?)
 		
 		var startX = centerX + Math.cos(angle + pieAngle / 2) * size / 2;
 		var startY = centerY + Math.sin(angle + pieAngle / 2) * size / 2 + 4;
+		
+		if(startX - textInfo.width < minX){minX = startX - textInfo.width;}
+		else if(startX + textInfo.width > maxX){maxX = startX + textInfo.width;}
 		
 		if(angle + pieAngle / 2 > Math.PI / 2 && angle + pieAngle / 2 < Math.PI * 3 / 2)
 		{
@@ -928,5 +936,8 @@ export function drawPieChart(data, size, text?, colors?)
 		
 		angle += pieAngle;
 	}
+	
+	canvas.style.marginLeft = (minX > 0 ? -minX + 5 : 5).toString() + "px";
+	canvas.style.marginRight = (maxX - 2 * size + 5).toString() + "px";
 	return canvas;
 }

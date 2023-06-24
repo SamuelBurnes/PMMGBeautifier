@@ -1,4 +1,4 @@
-import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart} from "../util";
+import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile} from "../util";
 import {Style, TextColors} from "../Style";
 
 export function Fin_pre(tile, parameters, result)
@@ -56,8 +56,6 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 	const parameters = params[1];
 	const result = params[2];
 	
-	console.log(finResult);
-	
 	// Create settings screen
 	if(parameters[1] && (parameters[1].toLowerCase() == "settings" || parameters[1].toLowerCase() == "set"))
 	{
@@ -103,6 +101,82 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		priceDiv.appendChild(priceSelect);
 		
+		// Create option to import/export data
+		const importHeader = document.createElement('h3');
+		importHeader.appendChild(document.createTextNode("Import/Export Data"));
+		importHeader.appendChild(createToolTip("Import or export financial data to a json file.", "right"));
+		importHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(importHeader);
+		
+		const importDiv = document.createElement("div");
+		tile.appendChild(importDiv);
+		
+		const importButton = document.createElement("button");
+		importButton.textContent = "Import Finances";
+		importButton.classList.add(...Style.Button);
+		importButton.classList.add(...Style.ButtonPrimary);
+		importButton.style.marginLeft = "4px";
+		importButton.style.marginBottom = "4px";
+		importDiv.appendChild(importButton);
+		
+		const importFile = document.createElement("input");
+		importFile.type = "file";
+		importFile.accept = ".json";
+		importFile.style.display = "none";
+		importDiv.appendChild(importFile);
+		
+		const errorTextBox = createTextSpan("Error Loading File!");
+		errorTextBox.style.display = "none";
+		importDiv.appendChild(errorTextBox);
+			
+		importButton.addEventListener("click", function() {
+			importFile.click()
+			return;
+		});
+		
+		importFile.addEventListener("change", function() {
+			if(!this.files){return;}
+			const file = this.files[0];
+			if(!file){return;}
+			const reader = new FileReader();
+			reader.onload = function(e){
+				if(!e || !e.target){return;}
+				try
+				{
+					const fileOutput = JSON.parse(e.target.result as string);
+					finResult = {};
+					Object.keys(fileOutput).forEach(key => {
+						finResult[key] = fileOutput[key];
+						return;
+					});
+					
+					setSettings({"PMMG-Finance": finResult});
+					errorTextBox.style.display = "none";
+				} catch(ex)
+				{
+					console.log("PMMG: Error encountered processing file!");
+					errorTextBox.style.display = "inline-block";
+				}
+			}
+			reader.readAsText(file);
+		});
+		
+		const exportButton = document.createElement("button");
+		exportButton.textContent = "Export Finances";
+		exportButton.classList.add(...Style.Button);
+		exportButton.classList.add(...Style.ButtonPrimary);
+		exportButton.style.marginLeft = "4px";
+		exportButton.style.marginBottom = "4px";
+		importDiv.appendChild(exportButton);
+		
+		exportButton.addEventListener("click", function(){
+		const output = {};
+		Object.keys(finResult).forEach(key => {
+			output[key] = finResult[key];
+		});
+		
+		downloadFile(output, "pmmg-finances" + Date.now().toString() + ".json");
+	});
 		
 		// Create option for clearing data
 		const clearHeader = document.createElement('h3');
@@ -168,6 +242,75 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 	
 	if(!parameters[1])	// Base finances screen
 	{
+		const quickHeader = document.createElement('h3');
+		quickHeader.appendChild(document.createTextNode("Quick Links"));
+		quickHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(quickHeader);
+		
+		const quickDiv = document.createElement("div");
+		quickDiv.style.marginLeft = "5px";
+		tile.appendChild(quickDiv);
+		
+		const quickButtons = [["SUMMARY", "SUMMARY"], ["CHARTS", "CHART"], ["SETTINGS", "SETTINGS"]];
+		quickButtons.forEach(label => {
+			const button = document.createElement("button");
+			button.classList.add(...Style.Button);
+			button.classList.add(...Style.ButtonPrimary);
+			button.style.marginBottom = "5px";
+			button.textContent = label[0];
+			quickDiv.appendChild(button);
+			button.addEventListener("click", function() {
+				showBuffer("XIT FIN_" + label[1]);
+			});
+		});
+		
+		const chartsHeader = document.createElement('h3');
+		chartsHeader.appendChild(document.createTextNode("Individual Charts"));
+		chartsHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(chartsHeader);
+		
+		const chartsDiv = document.createElement("div");
+		chartsDiv.style.marginLeft = "5px";
+		tile.appendChild(chartsDiv);
+		
+		const chartButtons = [["EQUITY HISTORY", "HISTORY"], ["ASSETS BY TYPE", "ASSETPIE"], ["ASSETS BY LOCATION", "LOCATIONSPIE"]];
+		chartButtons.forEach(label => {
+			const button = document.createElement("button");
+			button.classList.add(...Style.Button);
+			button.classList.add(...Style.ButtonPrimary);
+			button.style.marginBottom = "5px";
+			button.textContent = label[0];
+			chartsDiv.appendChild(button);
+			button.addEventListener("click", function() {
+				showBuffer("XIT FIN_CHART_" + label[1]);
+			});
+		});
+		
+		const infoHeader = document.createElement('h3');
+		infoHeader.appendChild(document.createTextNode("Data Info"));
+		infoHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(infoHeader);
+		
+		const infoDiv = document.createElement("div");
+		tile.appendChild(infoDiv);
+		infoDiv.style.margin = "5px";
+		const dataPoints = createTextSpan((finResult["History"] ? finResult["History"].length : 0).toLocaleString() + " data points recorded");
+		infoDiv.appendChild(dataPoints);
+		dataPoints.style.display = "block";
+		if(finResult["History"])
+		{
+			const oldestDate = new Date(finResult["History"][0][0]);
+			const oldestDateElem = createTextSpan("Oldest data recorded on " + oldestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"}));
+			infoDiv.appendChild(oldestDateElem);
+			oldestDateElem.style.marginTop = "5px";
+			oldestDateElem.style.display = "block";
+			
+			const newestDate = new Date(finResult["History"][finResult["History"].length - 1][0]);
+			const newestDateElem = createTextSpan("Latest data recorded at " + newestDate.toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) + " on " + newestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"}));
+			infoDiv.appendChild(newestDateElem);
+			newestDateElem.style.marginTop = "5px";
+			newestDateElem.style.display = "block";
+		}
 		
 	}
 	else if(parameters[1].toLowerCase() == "summary" || parameters[1].toLowerCase() == "sum")	// Summary financial screen (like FIN)
@@ -229,54 +372,108 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 	}
 	else if(parameters[1].toLowerCase() == "chart" || parameters[1].toLowerCase() == "charts") // Some charts summarizing finances
 	{
+		if(parameters[2])
+		{
+			const graphDiv = document.createElement("div");
+			graphDiv.style.margin = "5px";
+			tile.appendChild(graphDiv);
+			const graph = generateGraph(parameters[2], finResult, locationsArray);
+			if(!graph)
+			{
+				graphDiv.appendChild(createTextSpan("Error! Not a valid graph type!"));
+				return;
+			}
+			graphDiv.appendChild(graph);
+			return;
+		}
 		if(finResult["History"].length == 0){return;}
+		
+		const lineHeader = document.createElement('h3');
+		lineHeader.appendChild(document.createTextNode("Equity History"));
+		lineHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(lineHeader);
 		
 		// Line chart of historical financial data
 		const historyDiv = document.createElement("div");
+		historyDiv.style.margin = "5px";
+		historyDiv.style.marginTop = "10px";
 		tile.appendChild(historyDiv);
 		
-		const dateData = [] as any[];
-		const finData = [] as any[];
 		
-		finResult["History"].forEach(entry => {
-			dateData.push(entry[0]);
-			finData.push(entry[1] + entry[2] + entry[3] - entry[4]);
-		});
 		
-		const linePlot = drawLineChart(dateData, finData, 400, 200, "Date", "Equity", "#f7a600", true);
+		const linePlot = generateGraph("history", finResult, locationsArray);
 		if(!linePlot){return;}
+		linePlot.style.cursor = "pointer";
+		linePlot.addEventListener("click", function() {
+			showBuffer("XIT FIN_CHART_HISTORY");
+		});
 		
 		historyDiv.appendChild(linePlot);
 		
-		
-		// Pie chart of current financial split
-		const pieDiv = document.createElement("div");
-		tile.appendChild(pieDiv);
 		const pieHeader = document.createElement('h3');
 		pieHeader.appendChild(document.createTextNode("Asset Breakdown"));
 		pieHeader.classList.add(...Style.SidebarSectionHead);
-		pieDiv.appendChild(pieHeader);
+		tile.appendChild(pieHeader);
 		
-		const latestReport = finResult["History"][finResult["History"].length - 1];
-		const pieCanvas = drawPieChart([latestReport[1], latestReport[2], latestReport[3]], 180, ["Fixed", "Current", "Liquid"], ["#7b3d00", "#b46d00", "#f7a600"]);
+		const pieDiv = document.createElement("div");
+		pieDiv.style.margin = "5px";
+		tile.appendChild(pieDiv);
+		
+		
+		// Pie chart of current financial split
+		const pieCanvas = generateGraph("assetpie", finResult, locationsArray);
 		if(!pieCanvas){return;}
-		pieCanvas.style.margin = "5px";
+		pieCanvas.style.cursor = "pointer";
+		pieCanvas.style.marginRight = "-25px";
+		pieCanvas.addEventListener("click", function() {
+			showBuffer("XIT FIN_CHART_ASSETPIE");
+		});
 		pieDiv.appendChild(pieCanvas);
 		
-		const locationNames = [] as any[];
-		const locationValue = [] as any[];
-		locationsArray.forEach(location => {
-			locationNames.push(location[0]);
-			locationValue.push(location[1] + location[2] + location[3]);
-		});
-		
-		const locPieCanvas = drawPieChart(locationValue, 180, locationNames);
+		// Pie chart of where fixed/current assets are located
+		const locPieCanvas = generateGraph("locationspie", finResult, locationsArray);
 		if(!locPieCanvas){return;}
-		locPieCanvas.style.margin = "5px";
+		locPieCanvas.style.cursor = "pointer";
+		locPieCanvas.addEventListener("click", function() {
+			showBuffer("XIT FIN_CHART_LOCATIONSPIE");
+		});
 		pieDiv.appendChild(locPieCanvas);
 		
-		// Pie chart of where fixed/current assets are located
+		
 	}
+}
+
+function generateGraph(graphType, finResult, locationsArray)
+{
+	switch(graphType.toLowerCase())
+	{
+		case "history":
+			const dateData = [] as any[];
+			const finData = [] as any[];
+		
+			finResult["History"].forEach(entry => {
+				dateData.push(entry[0]);
+				finData.push(entry[1] + entry[2] + entry[3] - entry[4]);
+			});
+			
+			const linePlot = drawLineChart(dateData, finData, 400, 200, "Date", "Equity", "#f7a600", true);
+			return linePlot;
+		case "assetpie":
+			const latestReport = finResult["History"][finResult["History"].length - 1];
+			const pieCanvas = drawPieChart([latestReport[1], latestReport[2], latestReport[3]], 180, ["Fixed", "Current", "Liquid"]);
+			return pieCanvas;
+		case "locationspie":
+			const locationNames = [] as any[];
+			const locationValue = [] as any[];
+			locationsArray.forEach(location => {
+				locationNames.push(location[0]);
+				locationValue.push(location[1] + location[2] + location[3]);
+			});
+			
+			const locPieCanvas = drawPieChart(locationValue, 180, locationNames);
+			return locPieCanvas;
+	}
+	return null;
 }
 
 function clearData()
@@ -398,6 +595,16 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 				value += (prices[mat["MaterialTicker"]][CX][priceType] || prices[mat["MaterialTicker"]][CX]["Average"]) * mat["Units"];
 			}
 		});
+		
+		if(ship["Fuel"]["CurrentSF"])
+		{
+			value += (prices["SF"][CX][priceType] || prices["SF"][CX]["Average"]) * ship["Fuel"]["CurrentSF"];
+		}
+		if(ship["Fuel"]["CurrentFF"])
+		{
+			value += (prices["FF"][CX][priceType] || prices["FF"][CX]["Average"]) * ship["Fuel"]["CurrentFF"];
+		}
+		
 		if(value == 0){return;}
 		finSnapshot["Inventory"].push([ship["ShipName"] || ship["ShipRegistration"], Math.round(value * 100) / 100]);
 		return;
@@ -412,6 +619,16 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 				value += (prices[mat["MaterialTicker"]][CX][priceType] || prices[mat["MaterialTicker"]][CX]["Average"]) * mat["Units"];
 			}
 		});
+		
+		if(ship["Fuel"]["CurrentSF"])
+		{
+			value += (prices["SF"][CX][priceType] || prices["SF"][CX]["Average"]) * ship["Fuel"]["CurrentSF"];
+		}
+		if(ship["Fuel"]["CurrentFF"])
+		{
+			value += (prices["FF"][CX][priceType] || prices["FF"][CX]["Average"]) * ship["Fuel"]["CurrentFF"];
+		}
+		
 		if(value == 0){return;}
 		finSnapshot["Inventory"].push([ship["ShipName"] || ship["ShipRegistration"], Math.round(value * 100) / 100]);
 		return;

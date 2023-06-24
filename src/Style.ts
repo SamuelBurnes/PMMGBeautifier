@@ -87,13 +87,23 @@ export const TextColors = {
 	Yellow: "#f7a600"
 }
 
-export const DefaultColors = [
+/*export const DefaultColors = [
 	"#591e00",
 	"#7b3d00",
 	"#b46d00",
 	"#f7a600",
 	"#ffcf40",
 	"#fbe4af"
+]*/
+export const DefaultColors = [
+	"#004564",
+	"#005b76",
+	"#007079",
+	"#00846c",
+	"#009552",
+	"#67a22e",
+	"#ada900",
+	"#f7a600"
 ]
 
 // The default category colors used in PrUN
