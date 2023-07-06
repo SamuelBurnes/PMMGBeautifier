@@ -3,7 +3,7 @@ import {TextColors} from "../Style";
 import {FactionHeaders} from "../GameProperties";
 import {getContracts} from "../BackgroundRunner";
 
-export function Contracts_pre(tile, parameters, result, fullBurn, burnSettings, modules, refresh, contracts)
+export function Contracts_pre(tile, parameters, result, webData, modules, refresh)
 {
 	clearChildren(tile);
 	const username = result["PMMGExtended"]["username"];
@@ -20,19 +20,19 @@ export function Contracts_pre(tile, parameters, result, fullBurn, burnSettings, 
 	
 	if(refresh)
 	{
-		contracts[username] = [];
-		getContracts(contracts, username, result["PMMGExtended"]["apikey"]);
+		webData["contracts"][username] = [];
+		getContracts(webData, username, result["PMMGExtended"]["apikey"]);
 	}
 	
-	if(!contracts[username] || contracts[username].length == 0)
+	if(!webData["contracts"][username] || webData["contracts"][username].length == 0)
 	{
 		tile.textContent = "Loading Contract Data...";
 		tile.id = "pmmg-reload";
 		return;
 	}
-	Contracts_post(tile, parameters, contracts[username]);
+	Contracts_post(tile, parameters, webData["contracts"][username]);
 	//XITWebRequest(tile, parameters, Contracts_post, "https://rest.fnar.net/contract/allcontracts/" + result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
-	return [fullBurn, burnSettings, modules];
+	return [modules];
 }
 
 function Contracts_post(tile, parameters, contractData)
@@ -200,11 +200,11 @@ function conditionStatus(condition) {
 	let marker = createTextSpan(condition["Status"] === "FULFILLED" ? "✓" : "X");
 	marker.style.color = condition["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 	marker.style.fontWeight = "bold";
-
-	let text = createTextSpan(` ${friendlyConditionText[condition.Type]}`);
+	let text = friendlyConditionText[condition.Type] ? friendlyConditionText[condition.Type] : condition.Type;
+	let textSpan = createTextSpan(" " + text);
 
 	conditionDiv.appendChild(marker);
-	conditionDiv.appendChild(text);
+	conditionDiv.appendChild(textSpan);
 
 	return conditionDiv;
 }

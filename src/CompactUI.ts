@@ -291,6 +291,7 @@ export function ClearBase(buffer, tag)
                 //bar.innerHTML =  bar.getElementsByTagName("progress")[0].outerHTML + bar.getElementsByTagName("progress")[0].title
                 bar.style.display = "flex"
                 bar.style.flexDirection = "row"
+				bar.style.justifyContent = "left";
 
                 if(required < 1 && capacity < 1 && workforce < 1)
                     HideElement(row, tag);

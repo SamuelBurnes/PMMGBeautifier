@@ -1,7 +1,7 @@
 import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings, getLocalStorage, createToolTip} from "../util";
 import {Style, WithStyles} from "../Style";
 
-export function Settings(tile, parameters, result, fullBurn, burnSettings, modules)
+export function Settings(tile, parameters, result, webData, modules)
 {
 	clearChildren(tile);
 	const warningDiv = document.createElement("div");
@@ -23,7 +23,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const authenticationHeader = document.createElement('h3');
     authenticationHeader.appendChild(document.createTextNode("Authentication Settings"));
-	authenticationHeader.appendChild(createToolTip("Enter your FIO username and API key, as well as a corporate web app ID", "right"));
+	authenticationHeader.appendChild(createToolTip("Enter your FIO username and API key", "right"));
 	authenticationHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(authenticationHeader);
 	const usernameDiv = document.createElement("div");
@@ -54,22 +54,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	apiDiv.appendChild(apiLabel);
 	apiDiv.appendChild(apiInput);
 	tile.appendChild(apiDiv);
-	
-	const webDiv = document.createElement("div");
-	const webLabel = createTextSpan("Web App ID: ");
-	webLabel.style.minWidth = "77px";
-	webLabel.style.display = "inline-block";
-	const webInput = document.createElement("input");
-	webInput.value = result["PMMGExtended"]["webappid"] || "";
-	webInput.addEventListener("input", function(){
-		result["PMMGExtended"]["webappid"] = !webInput.value || webInput.value == "" ? undefined : webInput.value;
-		setSettings(result);
-	});
-	webInput.classList.add("input-text");
-	webDiv.appendChild(webLabel);
-	webDiv.appendChild(webInput);
-	tile.appendChild(webDiv);
-	
+
 	const enhancedColorHeader = document.createElement('h3');
     enhancedColorHeader.appendChild(document.createTextNode("Color Scheme"));
 	enhancedColorHeader.appendChild(createToolTip("Select a color scheme to customize material icons.", "right"));
@@ -121,7 +106,7 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 	
 	const finCheckbox = document.createElement("input");
 	finCheckbox.type = "checkbox";
-	finCheckbox.checked = result["PMMGExtended"]["recording_financials"];
+	finCheckbox.checked = result["PMMGExtended"]["recording_financials"] == false ? false : true;
 	finDiv.appendChild(finCheckbox);
 	tile.appendChild(finDiv);
 	finCheckbox.addEventListener("click", function() {
@@ -297,66 +282,28 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
     importHeader.classList.add(...Style.SidebarSectionHead);
 	tile.appendChild(importHeader);
 	
-	const importDiv = document.createElement("div");
-	
-	const importButton = document.createElement("button");
-	importButton.textContent = "Import Settings";
-	importButton.classList.add(...Style.Button);
-	importButton.classList.add(...Style.ButtonPrimary);
-	importButton.style.marginLeft = "4px";
-	importButton.style.marginBottom = "4px";
-	importDiv.appendChild(importButton);
-	const importFileInput = document.createElement("input");
-	importFileInput.type = "file";
-	importFileInput.accept = ".json";
-	importFileInput.style.display = "none";
-	importDiv.appendChild(importFileInput);
-	importButton.addEventListener("click", function() {
-		importFileInput.click()
-		return;
-	});
-	const errorTextBox = createTextSpan("Error Loading File!");
-	errorTextBox.style.display = "none";
-	importDiv.appendChild(errorTextBox);
-	importFileInput.addEventListener("change", function() {
-		if(!this.files){return;}
-		const file = this.files[0];
-		if(!file){return;}
-		const reader = new FileReader();
-		reader.onload = function(e){
-			if(!e || !e.target){return;}
-			try
-			{
-				const fileOutput = JSON.parse(e.target.result as string);
-				const exclude = ["username", "apikey", "webappid"];	// Don't overwrite username, apikey, and webappid
-				Object.keys(fileOutput).forEach(key => {
-					if(!exclude.includes(key))
-					{
-						result["PMMGExtended"][key] = fileOutput[key];
-					}
-				});
-				setSettings(result);
-				errorTextBox.style.display = "none";
-			} catch(ex)
-			{
-				console.log("PMMG: Error encountered processing file!");
-				errorTextBox.style.display = "inline-block";
-			}
-			
+	// Import/export settings
+	tile.appendChild(createImportExportButton("Settings", function(e, errorTextBox) {
+		if(!e || !e.target){return;}
+		try
+		{
+			const fileOutput = JSON.parse(e.target.result as string);
+			const exclude = ["username", "apikey", "webappid"];	// Don't overwrite username, apikey, and webappid
+			Object.keys(fileOutput).forEach(key => {
+				if(!exclude.includes(key))
+				{
+					result["PMMGExtended"][key] = fileOutput[key];
+				}
+			});
+			setSettings(result);
+			errorTextBox.style.display = "none";
+		} catch(ex)
+		{
+			console.log("PMMG: Error encountered processing file!");
+			errorTextBox.style.display = "inline-block";
 		}
-		reader.readAsText(file);
-		return;
-	});
-	
-	const exportButton = document.createElement("button");
-	exportButton.textContent = "Export Settings";
-	exportButton.classList.add(...Style.Button);
-	exportButton.classList.add(...Style.ButtonPrimary);
-	exportButton.style.marginLeft = "4px";
-	exportButton.style.marginBottom = "4px";
-	importDiv.appendChild(exportButton);
-	
-	exportButton.addEventListener("click", function(){
+		
+	}, function() {
 		const output = {};
 		const exclude = ["username", "apikey", "webappid"];	// Don't export username, apikey, and webappid
 		Object.keys(result["PMMGExtended"]).forEach(key => {
@@ -367,69 +314,128 @@ export function Settings(tile, parameters, result, fullBurn, burnSettings, modul
 		});
 		
 		downloadFile(output, "pmmg-settings" + Date.now().toString() + ".json");
+	}));
+	
+	// Import/export notes
+	tile.appendChild(createImportExportButton("Notes", function(e, errorTextBox) {
+		if(!e || !e.target){return;}
+		try
+		{
+			const fileOutput = JSON.parse(e.target.result as string);
+			setSettings(fileOutput);
+			errorTextBox.style.display = "none";
+		} catch(ex)
+		{
+			console.log("PMMG: Error encountered processing file!");
+			errorTextBox.style.display = "inline-block";
+		}
+		
+	}, function() {
+		getLocalStorage("PMMG-Notes", downloadFile, "pmmg-notes" + Date.now().toString() + ".json");
+	}));
+	
+	// Import/export lists
+	tile.appendChild(createImportExportButton("Lists", function(e, errorTextBox) {
+		if(!e || !e.target){return;}
+		try
+		{
+			const fileOutput = JSON.parse(e.target.result as string);
+			setSettings(fileOutput);
+			errorTextBox.style.display = "none";
+		} catch(ex)
+		{
+			console.log("PMMG: Error encountered processing file!");
+			errorTextBox.style.display = "inline-block";
+		}
+		
+	}, function() {
+		getLocalStorage("PMMG-Lists", downloadFile, "pmmg-lists" + Date.now().toString() + ".json");
+	}));
+	
+	// Import/export finances
+	tile.appendChild(createImportExportButton("Finances", function(e, errorTextBox) {
+		if(!e || !e.target){return;}
+		try
+		{
+			const fileOutput = JSON.parse(e.target.result as string);
+			const finResult = {};
+			Object.keys(fileOutput).forEach(key => {
+				finResult[key] = fileOutput[key];
+				return;
+			});
+			
+			setSettings({"PMMG-Finance": finResult});
+			errorTextBox.style.display = "none";
+		} catch(ex)
+		{
+			console.log("PMMG: Error encountered processing file!");
+			errorTextBox.style.display = "inline-block";
+		}
+		
+	}, function() {
+		getLocalStorage("PMMG-Finance", parseFinThenDownload);
+	}));
+	
+	return [parameters, webData];
+}
+
+function parseFinThenDownload(result)
+{
+	const output = {};
+	Object.keys(result["PMMG-Finance"]).forEach(key => {
+		output[key] = result["PMMG-Finance"][key];
 	});
-	
-	tile.appendChild(importDiv);
-	
-	const importNoteDiv = document.createElement("div");
-	
-	const importNoteButton = document.createElement("button");
-	importNoteButton.textContent = "Import Notes";
-	importNoteButton.classList.add(...Style.Button);
-	importNoteButton.classList.add(...Style.ButtonPrimary);
-	importNoteButton.style.marginLeft = "4px";
-	importNoteButton.style.marginBottom = "4px";
-	importNoteDiv.appendChild(importNoteButton);
-	const importNoteFileInput = document.createElement("input");
-	importNoteFileInput.type = "file";
-	importNoteFileInput.accept = ".json";
-	importNoteFileInput.style.display = "none";
-	importNoteDiv.appendChild(importNoteFileInput);
-	importNoteButton.addEventListener("click", function() {
-		importNoteFileInput.click()
+	downloadFile(output, "pmmg-finance" + Date.now().toString() + ".json");
+	return;
+}
+
+function createImportExportButton(label, importFunction, exportFunction)
+{
+	const buttonDiv = document.createElement("div");
+	const importButton = document.createElement("button");
+	importButton.textContent = "Import " + label;
+	importButton.classList.add(...Style.Button);
+	importButton.classList.add(...Style.ButtonPrimary);
+	importButton.style.marginLeft = "4px";
+	importButton.style.marginBottom = "4px";
+	buttonDiv.appendChild(importButton);
+	const importFileInput = document.createElement("input");
+	importFileInput.type = "file";
+	importFileInput.accept = ".json";
+	importFileInput.style.display = "none";
+	buttonDiv.appendChild(importFileInput);
+	importButton.addEventListener("click", function() {
+		importFileInput.click()
 		return;
 	});
-	const errorNoteTextBox = createTextSpan("Error Loading File!");
-	errorNoteTextBox.style.display = "none";
-	importNoteDiv.appendChild(errorNoteTextBox);
-	importNoteFileInput.addEventListener("change", function() {
+	const errorTextBox = createTextSpan("Error Loading File!");
+	errorTextBox.style.display = "none";
+	buttonDiv.appendChild(errorTextBox);
+	importFileInput.addEventListener("change", function() {
 		if(!this.files){return;}
 		const file = this.files[0];
 		if(!file){return;}
 		const reader = new FileReader();
 		reader.onload = function(e){
-			if(!e || !e.target){return;}
-			try
-			{
-				const fileOutput = JSON.parse(e.target.result as string);
-				setSettings(fileOutput);
-				errorNoteTextBox.style.display = "none";
-			} catch(ex)
-			{
-				console.log("PMMG: Error encountered processing file!");
-				errorNoteTextBox.style.display = "inline-block";
-			}
-			
+			importFunction(e, errorTextBox);
 		}
 		reader.readAsText(file);
 		return;
 	});
 	
-	const exportNoteButton = document.createElement("button");
-	exportNoteButton.textContent = "Export Notes";
-	exportNoteButton.classList.add(...Style.Button);
-	exportNoteButton.classList.add(...Style.ButtonPrimary);
-	exportNoteButton.style.marginLeft = "4px";
-	exportNoteButton.style.marginBottom = "4px";
-	importNoteDiv.appendChild(exportNoteButton);
+	const exportButton = document.createElement("button");
+	exportButton.textContent = "Export " + label;
+	exportButton.classList.add(...Style.Button);
+	exportButton.classList.add(...Style.ButtonPrimary);
+	exportButton.style.marginLeft = "4px";
+	exportButton.style.marginBottom = "4px";
+	buttonDiv.appendChild(exportButton);
 	
-	exportNoteButton.addEventListener("click", function(){
-		getLocalStorage("PMMG-Notes", downloadFile, "pmmg-notes" + Date.now().toString() + ".json");
+	exportButton.addEventListener("click", function(){
+		exportFunction();
 	});
 	
-	tile.appendChild(importNoteDiv);
-	
-	return [parameters, fullBurn, burnSettings];
+	return buttonDiv;
 }
 
 function createInputPair(hotkey, result, fullDiv)

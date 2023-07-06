@@ -118,3 +118,13 @@ export function PrunPlanner(tile, parameters)
 	tile.appendChild(frame);
 	return;
 }
+export function FIO(tile)
+{
+	clearChildren(tile);
+	const frame = document.createElement("iframe");
+		frame.src = "https://fio.fnar.net/";
+		frame.style.borderWidth = "0";
+		frame.style.height = "100%";
+		frame.style.width = "100%";
+	tile.appendChild(frame);
+}

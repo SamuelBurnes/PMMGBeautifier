@@ -4,7 +4,7 @@ import {Selector} from "../Selector";
 import {MaterialNames} from "../GameProperties";
 import {getGroupBurn, getBurn} from "../BackgroundRunner";
 
-export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSettings, modules, refresh)
+export function EnhancedBurn_pre(tile, parameters, result, webData, modules, refresh)
 {
 	clearChildren(tile);
 	if(!result["PMMGExtended"]["apikey"])
@@ -16,8 +16,8 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 	const username = result["PMMGExtended"]["username"];
 	if(refresh)
 	{
-		fullBurn[username] = [];
-		getBurn(fullBurn, username, apikey);
+		webData["burn"][username] = [];
+		getBurn(webData, username, apikey);
 	}
 	var burn;
 	var unloaded = false;
@@ -29,22 +29,22 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 	}
 	else if(parameters.length >= 3 && parameters[1].toLowerCase() == "group")
 	{
-		if(fullBurn[parameters[2]] && fullBurn[parameters[2]].length > 0){burn = fullBurn[parameters[2]];}
+		if(webData["burn"][parameters[2]] && webData["burn"][parameters[2]].length > 0){burn = webData["burn"][parameters[2]];}
 		else
 		{
 			unloaded = true;
 			if(tile.id != "pmmg-reload")
 			{
-				getGroupBurn(fullBurn, parameters[2], apikey);
+				getGroupBurn(webData, parameters[2], apikey);
 			}
 		}
 	}
 	else
 	{
-		if(fullBurn[username] != undefined && fullBurn[username].length > 0){burn = fullBurn[username];planet = parameters[1];}
+		if(webData["burn"][username] != undefined && webData["burn"][username].length > 0){burn = webData["burn"][username];planet = parameters[1];}
 		else{unloaded = true;}
 	}
-	if(burnSettings[0] == "loading" || unloaded)
+	if(webData["burn_settings"][0] == "loading" || unloaded)
 	{
 		tile.textContent = "Loading Burn Data...";
 		tile.id = "pmmg-reload";
@@ -63,7 +63,7 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 		{
 			fullCommand = parameters.join(" ").toUpperCase();
 		}
-		fullBurn[parameters[2]].forEach(planetData => {
+		webData["burn"][parameters[2]].forEach(planetData => {
 			if(parameters[3])
 			{
 				if(!((planetData && planetData["PlanetName"] && fullCommand.match(planetData["PlanetName"].toUpperCase())) || (planetData && planetData["PlanetNaturalId"] && fullCommand.match(planetData["PlanetNaturalId"].toUpperCase()))))
@@ -134,7 +134,7 @@ export function EnhancedBurn_pre(tile, parameters, result, fullBurn, burnSetting
 		{
 		
 		}
-		settings = findCorrespondingPlanet(planet, burnSettings);
+		settings = findCorrespondingPlanet(planet, webData["burn_settings"]);
 		if(planetBurn == undefined){tile.textContent = "Error! No Matching Planet!";return;}
 		
 		

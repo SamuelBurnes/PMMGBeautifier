@@ -4,12 +4,12 @@ import {Materials, CurrencySymbols} from "./GameProperties";
 import {createTextSpan, genericCleanup} from "./util";
 
 export class PostLM implements Module {
-	private prices;
+	private webData;
 	private cleanups: Array<() => void> = [];
 	
-	constructor(prices)
+	constructor(webData)
 	{
-		this.prices = prices;
+		this.webData = webData;
 	}
   private tag = "pb-post-lm-price";
 
@@ -67,7 +67,7 @@ export class PostLM implements Module {
 		  calculatePricePerUnit();
 		  
 	  }
-	  else if(Object.keys(this.prices).length == 0)
+	  else if(!this.webData["custom_prices"] || Object.keys(this.webData["custom_prices"]).length == 0)
 	  {
 		  totalPriceInput.parentNode!.insertBefore(displayElement, totalPriceInput);
 			  const calculatePricePerUnit = () => {
@@ -75,15 +75,17 @@ export class PostLM implements Module {
 			  const total = parseFloat(totalPriceInput.value);
 			  const currency = currencyInput.value;
 			  var currencySymbol;
-			  if(currency != undefined){currencySymbol = CurrencySymbols[currency];}
+			  if(currency){currencySymbol = CurrencySymbols[currency];}
 			  else{currencySymbol = "";}
-			  if(currencySymbol == undefined){currencySymbol = "";}
+			  if(!currencySymbol){currencySymbol = "";}
+			  if(isNaN(total) || isNaN(amount)){return;}
 			  
 			  displayElement.textContent = currencySymbol + (total / amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ea";
+			  return;
 		  };
 		  calculatePricePerUnit();
 	  }
-	  else if(commodity.value != undefined && Materials[commodity.value] != undefined)
+	  else if(commodity.value && Materials[commodity.value])
 	  {
 		totalPriceInput.parentNode!.insertBefore(displayElement, totalPriceInput);
 		const calculatePricePerUnit = () => {
@@ -91,21 +93,20 @@ export class PostLM implements Module {
 		const total = parseFloat(totalPriceInput.value);
 		const currency = currencyInput.value;
 		var currencySymbol;
-		if(currency != undefined){currencySymbol = CurrencySymbols[currency];}
+		if(!currency){currencySymbol = CurrencySymbols[currency] || "";}
 		else{currencySymbol = "";}
-		if(currencySymbol == undefined){currencySymbol = "";}
-		var price = this.prices[commodity.value];
-		if(price == undefined)
+		var price = Materials[commodity.value] ? this.webData["custom_prices"][Materials[commodity.value][0]] : "";
+		if(!price)
 		{
 			price = "";
 		}
-		else if(amount + " " == "NaN ")
+		else if(isNaN(amount))
 		{
 			price = "";
 		}
 		else
 		{
-			price = " | " + (price * amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Total Corp";
+			price = " | " + (price * amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " Total";
 		}
 		displayElement.textContent = currencySymbol + (total / amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " ea" + (price);
 		};

@@ -216,6 +216,7 @@ export const PMMGStyle = `
 	border-width: 0px;
 	color: #cccccc;
 	font-family: "Open Sans",sans-serif;
+	font-size: 12px
 	width: 100%;
 	height: 93%;
 }

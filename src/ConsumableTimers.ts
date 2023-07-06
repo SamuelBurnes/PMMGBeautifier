@@ -6,13 +6,13 @@ import {Selector} from "./Selector";
  * Get inventory and burn data and implement on WF buffers
  */
 export class ConsumableTimers implements Module {
-	private burn;
+	private webData;
 	private username;
 	private thresholds;
 	
-	constructor(username, burn, thresholds)
+	constructor(username, webData, thresholds)
 	{
-		this.burn = burn;
+		this.webData = webData;
 		this.username = username;
 		this.thresholds = thresholds;
 	}
@@ -22,13 +22,13 @@ export class ConsumableTimers implements Module {
 	return;
   }
   run() {
-	if(this.burn[this.username] == undefined || this.burn[this.username].length == 0){return;}
+	if(!this.webData["burn"] || !this.webData["burn"][this.username] || this.webData["burn"][this.username].length == 0){return;}
     const buffers = getBuffers("WF");
 	
     if (!buffers){return};
 	
 	buffers.forEach(buffer => {
-		generateBurns(buffer, this.burn[this.username], this.thresholds);
+		generateBurns(buffer, this.webData["burn"][this.username], this.thresholds);
 	});
 	
 	return;

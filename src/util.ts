@@ -261,7 +261,7 @@ export function parsePlanetName(text)
 
 // Get the data in local storage for a given storageName. Then call the callback function.
 // Also pass the params through to the callback function
-export function getLocalStorage(storageName, callbackFunction, params)
+export function getLocalStorage(storageName, callbackFunction, params?)
 {
 	try
 	{
@@ -315,7 +315,7 @@ export function setSettings(result)
  * @param header - A dictionary with 2 key-value pairs "HeaderName": name of header, "HeaderValue": value of header
  * @param content - The content to send in the HttpRequest
  */
-export function XITWebRequest(tile, parameters, callbackFunction, url, requestType: string = "GET", header, content?)
+export function XITWebRequest(tile, parameters, callbackFunction, url, requestType: string = "GET", header?, content?)
 {
 	var xhr = new XMLHttpRequest();
 	xhr.ontimeout = function () {
@@ -784,7 +784,7 @@ export function showWarningDialog(tile, message: string="Are you sure?", confirm
 	return;
 }
 
-export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, lineColor?, isDates?)
+export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, lineColor?, isDates?, currencySymbol?)
 {
 	const canvas = document.createElement("canvas");
 	canvas.height = ySize;
@@ -798,7 +798,7 @@ export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, line
 	const minY = Math.min(...yData);
 	const maxY = Math.max(...yData);
 	
-	const zeroX = (xLabel ? 20 : 0) + context.measureText((maxY).toLocaleString(undefined, {"maximumFractionDigits": 0})).width;
+	const zeroX = (xLabel ? 25 : 0) + context.measureText((maxY).toLocaleString(undefined, {"maximumFractionDigits": 0})).width;
 	const zeroY = yLabel ? ySize - 23 : ySize;
 	
 	// Draw labels
@@ -859,7 +859,7 @@ export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, line
 	{
 		var value = (maxY - minY) * i / 5 + minY
 		value = Math.round(value / Math.pow(10, Math.floor(Math.log10(value)) - 3)) * Math.pow(10, Math.floor(Math.log10(value)) - 3);
-		const text = (value).toLocaleString(undefined, {"maximumFractionDigits": 0});
+		const text = (currencySymbol ? currencySymbol : "") + (value).toLocaleString(undefined, {"maximumFractionDigits": 0});
 		const textInfo = context.measureText(text);
 		context.font = "10px Droid Sans";
 		context.fillStyle = "#999";
@@ -872,7 +872,7 @@ export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, line
 export function drawPieChart(data, size, text?, colors?)
 {
 	const pieSize = size / 2 - 12;
-	const centerX = size;
+	const centerX = size * 1.5;
 	const centerY = size / 2 + 12;
 	var angle = 0;
 	var sum = 0;
@@ -881,7 +881,7 @@ export function drawPieChart(data, size, text?, colors?)
 	});
 	const canvas = document.createElement("canvas");
 	canvas.height = size + 24;
-	canvas.width = size * 2;
+	canvas.width = size * 3;
 	
 	const context = canvas.getContext("2d");
 	if(!context){return null;}
@@ -901,7 +901,7 @@ export function drawPieChart(data, size, text?, colors?)
 		}
 		else
 		{
-			context.fillStyle = i == data.length - 1 && data.length % DefaultColors.length == 1 && data.length > 1 ? DefaultColors[(i + 1) % DefaultColors.length] : DefaultColors[i % DefaultColors.length];
+			context.fillStyle = i == data.length - 1 && data.length % DefaultColors.length == 1 && data.length > 1 ? DefaultColors[1] : DefaultColors[i % DefaultColors.length];
 		}
 		context.fill();
 		
@@ -915,9 +915,10 @@ export function drawPieChart(data, size, text?, colors?)
 	for(var i = 0; i < data.length; i++)
 	{
 		const pieAngle = data[i] / sum * 2 * Math.PI;
-		const textInfo = context.measureText(text[i]);
+		const percent = " - " + (data[i] / sum * 100).toLocaleString(undefined, {"maximumFractionDigits": 0}) + "%";
+		const textInfo = context.measureText(text[i] + percent);
 		
-		if(pieAngle < 0.314 && data.length > 5){continue;}
+		if(pieAngle < 0.3 && data.length > 5){continue;}
 		
 		var startX = centerX + Math.cos(angle + pieAngle / 2) * size / 2;
 		var startY = centerY + Math.sin(angle + pieAngle / 2) * size / 2 + 4;
@@ -932,7 +933,7 @@ export function drawPieChart(data, size, text?, colors?)
 		
 		context.font = "12px Droid Sans";
 		context.fillStyle = "#eee";
-		context.fillText(text[i], startX, startY);
+		context.fillText(text[i] + percent, startX, startY);
 		
 		angle += pieAngle;
 	}

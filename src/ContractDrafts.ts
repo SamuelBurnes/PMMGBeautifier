@@ -4,11 +4,11 @@ import {Materials} from "./GameProperties";
 import {genericCleanup, getBuffers, createTextSpan} from "./util";
 
 export class ContractDrafts implements Module {
-	private prices;
+	private webData;
 
-	constructor(prices)
+	constructor(webData)
 	{
-		this.prices = prices;
+		this.webData = webData;
 	}
   private tag = "pb-contd";
 
@@ -93,9 +93,9 @@ export class ContractDrafts implements Module {
 			var labelText = perUnit.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " ea";
 			
 			// Do corp pricing
-			if(this.prices[parsedConditions["Material"][1]])
+			if(Materials[parsedConditions["Material"][1]] && this.webData["custom_prices"][Materials[parsedConditions["Material"][1]][0]])
 			{
-				const totalCorp = parseInt(parsedConditions["Material"][0]) * this.prices[parsedConditions["Material"][1]];
+				const totalCorp = parseInt(parsedConditions["Material"][0]) * this.webData["custom_prices"][Materials[parsedConditions["Material"][1]][0]];
 				labelText += " | " + totalCorp.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " Corp"
 			}
 			

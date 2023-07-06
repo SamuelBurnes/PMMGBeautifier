@@ -9,9 +9,8 @@ import {Repairs_pre} from "./XIT/Repairs";
 import {Chat_pre} from "./XIT/Chat";
 import {Fin_pre} from "./XIT/Finances";
 import {EnhancedBurn_pre} from "./XIT/Burn";
-import {SheetTable_pre} from "./XIT/SheetTable";
 import {Contracts_pre} from "./XIT/Contracts";
-import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre, PrunPlanner, Wiki} from "./XIT/Web";
+import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre, PrunPlanner, Wiki, FIO} from "./XIT/Web";
 import {FIOInv_pre} from "./XIT/Inventory";
 import {Notes} from "./XIT/Notes";
 import {Checklists} from "./XIT/Checklists";
@@ -25,7 +24,6 @@ export const XITPreFunctions = {
 	"SHEETS": Sheets_pre,
 	"PROSPERITY": Prosperity_pre,
 	"PRUN": PRuN_pre,
-	"SHEETTABLE": SheetTable_pre,
 	"FIN": Fin_pre,
 	"CHAT": Chat_pre,
 	"BURN": EnhancedBurn_pre,
@@ -48,7 +46,8 @@ export const XITPreFunctions = {
 	"PRUNPLANNER": PrunPlanner,
 	"PLANNER": PrunPlanner,
 	"WIKI": Wiki,
-	"HELP": Help
+	"HELP": Help,
+	"FIO": FIO
 }
 
 export const XITBufferTitles = {
@@ -57,7 +56,6 @@ export const XITBufferTitles = {
 	"SHEETS": "GOOGLE SHEETS",
 	"PROSPERITY": "PROSPERITY",
 	"PRUN": "PRUN-CEPTION",
-	"SHEETTABLE": "GOOGLE SHEETS TABLE",
 	"FIN": "FINANCIAL OVERVIEW",
 	"CHAT": "CHAT",
 	"BURN": "ENHANCED BURN",
@@ -80,25 +78,22 @@ export const XITBufferTitles = {
 	"PRUNPLANNER": "PRUN PLANNER",
 	"PLANNER": "PRUN PLANNER",
 	"WIKI": "PRUN WIKI",
-	"HELP": "PMMG HELP"
+	"HELP": "PMMG HELP",
+	"FIO": "FIO"
 }
 /**
  * Handle XIT buffers
  */
 export class XITHandler implements Module {
   private tag = "pb-xit";
-  private burn;
-  private burnSettings;
-  private contracts;
+  private webData;
   private modules;
   private result;
   private browser;
-  constructor(result, burn, burnSettings, contracts, modules, browser)
+  constructor(result, webData, modules, browser)
   {  
-	this.burn = burn;
-	this.burnSettings = burnSettings;
+	this.webData = webData;
 	this.modules = modules;
-	this.contracts = contracts
 	this.result = result;
 	this.browser = browser;
   }
@@ -108,9 +103,7 @@ export class XITHandler implements Module {
   run() {
     const buffers = getBuffers("XIT");
     if (!buffers) return;
-	const burn = this.burn;
-	const contracts = this.contracts;
-	const burnSettings = this.burnSettings;
+	const webData = this.webData;
 	buffers.forEach(buffer => {
 		const tile = (buffer.querySelector(Selector.XITTile)) as HTMLElement;
 		if(!tile){return;}
@@ -139,7 +132,7 @@ export class XITHandler implements Module {
 			parameters[i] = parameters[i].trim()
 		}
 		
-		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, burn, burnSettings, this.modules, false, this.contracts);return;}
+		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, webData, this.modules, false);return;}
 		
 		tile.classList.add("xit-tile");
 		if(tile.firstChild)
@@ -180,9 +173,9 @@ export class XITHandler implements Module {
 			Array.from(buffer.querySelectorAll(Selector.BufferTitle))[0].textContent = XITBufferTitles[parameters[0].toUpperCase()];	// Title the buffer
 			const modules = this.modules;
 			var result = this.result;
-			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, burn, burnSettings, modules, true, contracts);});
+			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, webData, modules, true);});
 			(tile.firstChild as HTMLElement).id = "pmmg-load-success";
-			preFunc(contentDiv, parameters, this.result, burn, burnSettings, modules, false, contracts);
+			preFunc(contentDiv, parameters, this.result, webData, modules, false);
 		}
 		return;
 		

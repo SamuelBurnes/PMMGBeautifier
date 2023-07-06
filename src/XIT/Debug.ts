@@ -1,14 +1,15 @@
 import {downloadFile, clearChildren, XITWebRequest} from "../util";
 import {Style} from "../Style";
 
-export function Debug(tile, parameters, result, fullBurn, burnSettings)
+export function Debug(tile, parameters, result, webData)
 {
 	clearChildren(tile);
 	const downloadButtons = document.createElement("div");
 	tile.appendChild(downloadButtons);
 	downloadButtons.appendChild(createDownloadButton(result["PMMGExtended"], "Download Full Settings", "pmmg-settings" + Date.now().toString() + ".json"));
-	downloadButtons.appendChild(createDownloadButton(fullBurn[result["PMMGExtended"]["username"]], "Download Burn", "pmmg-burn" + Date.now().toString() + ".json"));
-	downloadButtons.appendChild(createDownloadButton(burnSettings, "Download Burn Settings", "pmmg-burn-settings" + Date.now().toString() + ".json"));
+	downloadButtons.appendChild(createDownloadButton(webData["burn"][result["PMMGExtended"]["username"]], "Download Burn", "pmmg-burn" + Date.now().toString() + ".json"));
+	downloadButtons.appendChild(createDownloadButton(webData["contracts"][result["PMMGExtended"]["username"]], "Download Contracts", "pmmg-contracts" + Date.now().toString() + ".json"));
+	downloadButtons.appendChild(createDownloadButton(webData, "Download All Web Data", "pmmg-web-data" + Date.now().toString() + ".json"));
 	const endpointLabel = document.createElement("div");
 	endpointLabel.textContent = "Get FIO Endpoint (ex: /infrastructure/Proxion)";
 	endpointLabel.style.display = "block";

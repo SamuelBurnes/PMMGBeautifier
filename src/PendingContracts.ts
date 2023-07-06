@@ -6,11 +6,11 @@ import { Selector } from "./Selector";
 export class PendingContracts implements Module {
     private tag = "pb-pending-contracts";
     private username;
-	private contracts;	// Dictionary storing an array of contract data under the key of the user's username
-	constructor(username, contracts)
+	private webData;	// Dictionary storing an array of contract data under the key of the user's username
+	constructor(username, webData)
 	{
 		this.username = username;
-		this.contracts = contracts;
+		this.webData = webData;
 	}
 	
 
@@ -23,8 +23,8 @@ export class PendingContracts implements Module {
 
         const contractLines = Array.from(document.querySelectorAll(Selector.SidebarContract)) as HTMLElement[];	// All the contract lines
         var contractdict = {};
-		if(!this.contracts[this.username]){return;}	// Break if contracts haven't loaded
-	    createContractDict(this.contracts, this.username, contractdict);	// Turn the array into a dictionary with keys being contract IDs
+		if(!this.webData["contracts"] || !this.webData["contracts"][this.username]){return;}	// Break if contracts haven't loaded
+	    createContractDict(this.webData["contracts"], this.username, contractdict);	// Turn the array into a dictionary with keys being contract IDs
 		
         contractLines.forEach(contract => {	// For each contract...
             const contractIDElement = contract.querySelector(Selector.SidebarContractId);	// Find the ID and store it

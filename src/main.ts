@@ -78,43 +78,39 @@ function mainRun(result, browser?)
 		if(doc){doc.appendChild(colors);}
 	}
 	
+	// All asynchronous web data put in as keys into this dictionary
+	const webData = {};
+	
 	// Start the process of getting corp prices via a web app asynchronously
-	var prices = {};
-	getPrices(prices, result["PMMGExtended"]["webappid"]);
+	window.setTimeout(() => getPrices(webData, result["PMMGExtended"]["fin_spreadsheet"], result["PMMGExtended"]["fin_sheet_name"]), 1000);
 	
 	// Start the process of getting FIO burn asynchronously
-	var burn = [];
-	getBurn(burn, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
+	window.setTimeout(() => getBurn(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
 	
 	// Start the process of getting FIO burn settings asynchronously
-	var burnSettings = [];
-	getBurnSettings(burnSettings, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
+	window.setTimeout(() => getBurnSettings(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
 	
-	var contracts = [];
-	getContracts(contracts, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
+	window.setTimeout(() => getContracts(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
 	
 	// Get player model (if financial recording is active)
-	var playerData = {};
-	var prices = {};
-	var cxos = [];
-	if(result["PMMGExtended"]["recording_financials"] && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 72000000)) // 86400000
+	window.setTimeout(() => getCXPrices(webData), 1000);
+	if(result["PMMGExtended"]["recording_financials"] != false && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 72000000)) // 86400000
 	{
-		getCXPrices(prices);
-		getCXOS(cxos, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]);
-		updateFinancials(playerData, contracts, prices, cxos, result, 0);
+		window.setTimeout(() => getCXOS(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
+		window.setTimeout(() => updateFinancials(webData, result), 1000);
 	}
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
 		  new ShippingAds(),
 		  new LocalMarketAds(),
-		  new PostLM(prices),
-		  new ContractDrafts(prices),
+		  new PostLM(webData),
+		  new ContractDrafts(webData),
 		  new OrderETAs(),
 		  new FlightETAs(),
 		  new FleetETAs(),
 		  new QueueLoad(),
-		  new ConsumableTimers(result["PMMGExtended"]["username"], burn, result["PMMGExtended"]["burn_thresholds"]),
-		  new InventoryOrganizer(result["PMMGExtended"]["username"], burn, result),
+		  new ConsumableTimers(result["PMMGExtended"]["username"], webData, result["PMMGExtended"]["burn_thresholds"]),
+		  new InventoryOrganizer(result["PMMGExtended"]["username"], webData, result),
 		  new Notifications(),
 		  new ImageCreator(),
 		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
@@ -122,9 +118,9 @@ function mainRun(result, browser?)
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
-		  new PendingContracts(result["PMMGExtended"]["username"], contracts),
+		  new PendingContracts(result["PMMGExtended"]["username"], webData),
 		  new CompactUI(result)
-	], result, burn, burnSettings, contracts, browser);
+	], result, webData, browser);
 	
 	// Start the loop
 	(function () {

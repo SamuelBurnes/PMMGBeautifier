@@ -1,17 +1,20 @@
 import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile} from "../util";
 import {Style, TextColors} from "../Style";
+import {CurrencySymbols} from "../GameProperties";
 
-export function Fin_pre(tile, parameters, result)
+export function Fin_pre(tile, parameters, result, webData, modules, refresh)
 {
 	clearChildren(tile);
-	if(!result["PMMGExtended"]["recording_financials"])	// If not recording financial info, show screen with checkbox to enable
+	if(result["PMMGExtended"]["recording_financials"] == false)	// If not recording financial info, show screen with checkbox to enable
 	{
+		// Create a header explaining the situation
 		const header = document.createElement("h3");
 		header.textContent = "You are not recording daily financial data, would you like to enable recording?";
 		header.style.textAlign = "center";
 		header.style.width = "100%";
 		tile.appendChild(header);
 		
+		// Div holding the checkbox
 		const checkboxDiv = document.createElement("div");
 		checkboxDiv.style.alignItems = "center"
 		checkboxDiv.style.display = "flex";
@@ -35,6 +38,7 @@ export function Fin_pre(tile, parameters, result)
 		tile.appendChild(explainDiv);
 		explainDiv.appendChild(createTextSpan("PMMG can record your finances (using FIO data) to provide a more accurate estimate than the in-game FIN screen. The data is pulled at most every 24 hours and is stored locally like your other settings. You can access all the information from the XIT FIN buffer."));
 		
+		// Flip the settings when checkbox is checked
 		checkbox.addEventListener("click", function(){
 			result["PMMGExtended"]["recording_financials"] = checkbox.checked;
 			setSettings(result);
@@ -44,17 +48,50 @@ export function Fin_pre(tile, parameters, result)
 	}
 	
 	// Get stored financial data
-	getLocalStorage("PMMG-Finance", chooseScreen, [tile, parameters, result]);
-	return;
+	getLocalStorage("PMMG-Finance", chooseScreen, [tile, parameters, result, webData]);
+	return [modules, refresh];
 }
 
-function chooseScreen(finResult, params)	// Params consists of [tile, parameters]
+// Draw the correct screen based on the parameters (should split out into multiple functions probably)
+function chooseScreen(finResult, params)	// Params consists of [tile, parameters, result, webData]
 {
 	finResult = finResult["PMMG-Finance"];
-	if(!params[0] || !params[1] || !params[2]){return;}
+	if(!params[0] || !params[1] || !params[2] || !params[3]){return;}
 	const tile = params[0];
 	const parameters = params[1];
 	const result = params[2];
+	const webData = params[3];
+	const burn = webData["burn"];
+	
+	// Determine the array of CX prices to use
+	var CX = "AI1";
+	var priceType = "Average";
+	if(result["PMMGExtended"]["pricing_scheme"])
+	{
+		const interpreted = interpretCX(result["PMMGExtended"]["pricing_scheme"], result);
+		CX = interpreted[0];
+		priceType = interpreted[1];
+	}
+	const cxPrices = webData["cx_prices"][CX][priceType];	// Dictionary containing prices keyed to material tickers
+	
+	var currency = "";	// Determine currency symbol
+	switch(CX)
+	{
+		case "AI1":
+			currency = CurrencySymbols.AIC;
+			break;
+		case "CI1":
+		case "CI2":
+			currency = CurrencySymbols.CIS;
+			break;
+		case "NC1":
+		case "NC2":
+			currency = CurrencySymbols.NCC;
+			break;
+		case "IC1":
+			currency = CurrencySymbols.ICA;
+			break;
+	}
 	
 	// Create settings screen
 	if(parameters[1] && (parameters[1].toLowerCase() == "settings" || parameters[1].toLowerCase() == "set"))
@@ -78,28 +115,149 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		priceSelect.name = "price-select";
 		priceSelect.id = "price-select";
 		
+		// Add each CX option
 		Object.keys(PricingSchemes).forEach(name => {
 			priceSelect.appendChild(createSelectOption(name, name));
 		});
 		
-		if(!result["PMMGExtended"]["pricing_scheme"] || !PricingSchemes[result["PMMGExtended"]["pricing_scheme"]])
+		// Add custom options
+		Object.keys(CustomSchemes).forEach(name => {
+			priceSelect.appendChild(createSelectOption(name, name));
+		});
+		
+		// Set value to what is in settings
+		if(!result["PMMGExtended"]["pricing_scheme"] || (!PricingSchemes[result["PMMGExtended"]["pricing_scheme"]] && !CustomSchemes[result["PMMGExtended"]["pricing_scheme"]]))
 		{
 			(priceSelect.children[0] as HTMLOptionElement).selected = true;
 		}
-		else
+		else if(PricingSchemes[result["PMMGExtended"]["pricing_scheme"]])
 		{
 			(priceSelect.children[PricingSchemes[result["PMMGExtended"]["pricing_scheme"]]] as HTMLOptionElement).selected = true;
+		}
+		else
+		{
+			(priceSelect.children[CustomSchemes[result["PMMGExtended"]["pricing_scheme"]]] as HTMLOptionElement).selected = true;
 		}
 		
 		priceSelect.classList.add("select");
 		priceSelect.style.marginLeft = "4px";
 		
+		// Create a div for Custom (Spreadsheet) option. Only visible if custom spreadsheet option is selected
+		const spreadsheetDiv = document.createElement("div");
+		if(result["PMMGExtended"]["pricing_scheme"] != "Custom (Spreadsheet)")
+		{
+			spreadsheetDiv.style.display = "none";
+		}
+		
+		// Detect if changed to custom spreadsheet. Show or hide div accordingly
 		priceSelect.addEventListener("change", function(){
-			result["PMMGExtended"]["pricing_scheme"] = priceSelect.selectedOptions[0].value || undefined;
+			result["PMMGExtended"]["pricing_scheme"] = priceSelect.selectedOptions[0].value;
 			setSettings(result);
+			switch(priceSelect.selectedOptions[0].value)
+			{
+				case "Custom (Spreadsheet)":
+					spreadsheetDiv.style.display = "block";
+					break;
+				default:
+					spreadsheetDiv.style.display = "none";
+			}
 		});
 		
 		priceDiv.appendChild(priceSelect);
+		
+		tile.appendChild(spreadsheetDiv);
+		
+		// Create options for importing from spreadsheet
+		
+		// Set back up prices in case spreadsheet does not have a price for material
+		const backupDiv = document.createElement("div");
+		backupDiv.style.marginTop = "8px";
+		const backupPriceLabel = createTextSpan("Back Up Pricing Scheme:");
+		backupPriceLabel.style.marginBottom = "4px";
+		backupDiv.appendChild(backupPriceLabel);
+		spreadsheetDiv.appendChild(backupDiv);
+		
+		const backupPriceSelect = document.createElement("select");
+		backupDiv.appendChild(backupPriceSelect);
+		
+		backupPriceSelect.name = "backup-price-select";
+		backupPriceSelect.id = "backup-price-select";
+		
+		// Only add options for CXs
+		Object.keys(PricingSchemes).forEach(name => {
+			backupPriceSelect.appendChild(createSelectOption(name, name));
+		});
+		
+		// Set according to previous settings
+		if(!result["PMMGExtended"]["backup_pricing_scheme"] || !PricingSchemes[result["PMMGExtended"]["backup_pricing_scheme"]])
+		{
+			(backupPriceSelect.children[0] as HTMLOptionElement).selected = true;
+		}
+		else
+		{
+			(backupPriceSelect.children[PricingSchemes[result["PMMGExtended"]["backup_pricing_scheme"]]] as HTMLOptionElement).selected = true;
+		}
+		
+		backupPriceSelect.classList.add("select");
+		backupPriceSelect.style.marginLeft = "4px";
+		// Listen for change to pricing scheme, update settings accordingly
+		backupPriceSelect.addEventListener("change", function(){
+			result["PMMGExtended"]["backup_pricing_scheme"] = backupPriceSelect.selectedOptions[0].value;
+			setSettings(result);
+		});
+		
+		// Spreadsheet URL entry
+		const urlDiv = document.createElement("div");
+		spreadsheetDiv.appendChild(urlDiv);
+		
+		const urlLabel = createTextSpan("Spreadsheet URL:");
+		//urlLabel.style.marginBottom = "4px";
+		urlDiv.appendChild(urlLabel);
+		
+		const urlInput = document.createElement("input");
+		urlInput.classList.add("input-text");
+		urlDiv.appendChild(urlInput);
+		urlInput.style.marginLeft = "4px";
+		if(result["PMMGExtended"]["fin_spreadsheet"])
+		{
+			urlInput.value = result["PMMGExtended"]["fin_spreadsheet"];
+		}
+		urlInput.addEventListener("input", function() {
+			result["PMMGExtended"]["fin_spreadsheet"] = urlInput.value == "" ? undefined : urlInput.value;
+			setSettings(result);
+		});
+		
+		// Sheet name entry
+		const sheetDiv = document.createElement("div");
+		spreadsheetDiv.appendChild(sheetDiv);
+		const sheetLabel = createTextSpan("Sheet Name:");
+		sheetLabel.style.marginBottom = "4px";
+		sheetDiv.appendChild(sheetLabel);
+		
+		const sheetInput = document.createElement("input");
+		sheetDiv.appendChild(sheetInput);
+		sheetInput.classList.add("input-text");
+		sheetInput.style.marginLeft = "4px";
+		if(result["PMMGExtended"]["fin_sheet_name"])
+		{
+			sheetInput.value = result["PMMGExtended"]["fin_sheet_name"];
+		}
+		sheetInput.addEventListener("input", function() {
+			result["PMMGExtended"]["fin_sheet_name"] = sheetInput.value == "" ? undefined : sheetInput.value;
+			setSettings(result);
+		});
+		
+		// Table summarizing prices
+		const resultDiv = document.createElement("div");
+		spreadsheetDiv.appendChild(resultDiv);
+		if(result["PMMGExtended"]["fin_spreadsheet"] && result["PMMGExtended"]["fin_sheet_name"])
+		{
+			const sheetID = result["PMMGExtended"]["fin_spreadsheet"].match(/\/d\/([^\/]+)/);
+			if(sheetID && sheetID[1])
+			{
+				drawGSTable(resultDiv, webData["custom_prices"]);
+			}
+		}
 		
 		// Create option to import/export data
 		const importHeader = document.createElement('h3');
@@ -129,11 +287,13 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		errorTextBox.style.display = "none";
 		importDiv.appendChild(errorTextBox);
 			
+		// When import button is clicked, click invisible file object
 		importButton.addEventListener("click", function() {
 			importFile.click()
 			return;
 		});
 		
+		// When imported file is detected, parse and import the data
 		importFile.addEventListener("change", function() {
 			if(!this.files){return;}
 			const file = this.files[0];
@@ -169,13 +329,14 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		exportButton.style.marginBottom = "4px";
 		importDiv.appendChild(exportButton);
 		
+		// When export button is pressed, download data
 		exportButton.addEventListener("click", function(){
 		const output = {};
 		Object.keys(finResult).forEach(key => {
 			output[key] = finResult[key];
 		});
 		
-		downloadFile(output, "pmmg-finances" + Date.now().toString() + ".json");
+		downloadFile(output, "pmmg-finance" + Date.now().toString() + ".json");
 	});
 		
 		// Create option for clearing data
@@ -194,7 +355,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		tile.appendChild(clearButton);
 		
 		clearButton.addEventListener("click", function() {
-			showWarningDialog(tile, "You are about to clear all current and historical financial data. Do you want to continue?", "Confirm", clearData);
+			showWarningDialog(tile, "You are about to clear all current and historical financial data. Do you want to continue?", "Confirm", clearData, result);
 		});
 		return;
 	}
@@ -234,7 +395,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		}
 	});
 	
-	const locationsArray = [] as any[];
+	const locationsArray = [] as any[];	// Rework into common array different screens use
 	Object.keys(locations).forEach(inv => {
 		locationsArray.push([inv, locations[inv][0], locations[inv][1], locations[inv][2]]);
 	});
@@ -251,7 +412,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		quickDiv.style.marginLeft = "5px";
 		tile.appendChild(quickDiv);
 		
-		const quickButtons = [["SUMMARY", "SUMMARY"], ["CHARTS", "CHART"], ["SETTINGS", "SETTINGS"]];
+		const quickButtons = [["SUMMARY", "SUMMARY"], ["PRODUCTION", "PRODUCTION"], ["CHARTS", "CHART"], ["SETTINGS", "SETTINGS"]];
 		quickButtons.forEach(label => {
 			const button = document.createElement("button");
 			button.classList.add(...Style.Button);
@@ -324,15 +485,15 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		tileHeader.classList.add("fin-title");
 		tile.appendChild(tileHeader);
 		
-		tile.appendChild(createFinancialTextBox(Math.round(lastReading[1]).toLocaleString(), "Fixed Assets", TextColors.Standard));
-		tile.appendChild(createFinancialTextBox(Math.round(lastReading[2]).toLocaleString(), "Current Assets", TextColors.Standard));
-		tile.appendChild(createFinancialTextBox(Math.round(lastReading[3]).toLocaleString(), "Liquid Assets", TextColors.Standard));
-		tile.appendChild(createFinancialTextBox(Math.round(lastEquity).toLocaleString(), "Equity", TextColors.Standard));
-		tile.appendChild(createFinancialTextBox(Math.round(lastReading[4]).toLocaleString(), "Liabilities", TextColors.Standard));
+		tile.appendChild(createFinancialTextBox(currency + Math.round(lastReading[1]).toLocaleString(), "Fixed Assets", TextColors.Standard));
+		tile.appendChild(createFinancialTextBox(currency + Math.round(lastReading[2]).toLocaleString(), "Current Assets", TextColors.Standard));
+		tile.appendChild(createFinancialTextBox(currency + Math.round(lastReading[3]).toLocaleString(), "Liquid Assets", TextColors.Standard));
+		tile.appendChild(createFinancialTextBox(currency + Math.round(lastEquity).toLocaleString(), "Equity", TextColors.Standard));
+		tile.appendChild(createFinancialTextBox(currency + Math.round(lastReading[4]).toLocaleString(), "Liabilities", TextColors.Standard));
 		
 		for(var i = finResult["History"].length - 1; i >= 0; i--)
 		{
-			if(lastReading[0] - finResult["History"][i] > 86400000*7)
+			if(lastReading[0] - finResult["History"][i][0] > 86400000*7)
 			{
 				break;
 			}
@@ -342,7 +503,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		const prevEquity = finResult["History"][i][1] + finResult["History"][i][2] + finResult["History"][i][3] - finResult["History"][i][4];
 		const profit = Math.round(lastEquity - prevEquity);
 		const color = profit > 0 ? TextColors.Success : TextColors.Failure;
-		tile.appendChild(createFinancialTextBox(profit.toLocaleString(), "Profit", color));
+		tile.appendChild(createFinancialTextBox(currency + profit.toLocaleString(), "Profit", color));
 		
 		const breakdownHeader = document.createElement("h2");
 		breakdownHeader.title = "Financial Breakdown";
@@ -366,7 +527,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			{
 				const tableElem = document.createElement("td");
 				row.appendChild(tableElem);
-				tableElem.appendChild(createTextSpan(point.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})));
+				tableElem.appendChild(createTextSpan(point.toLocaleString(undefined, {maximumFractionDigits: 0})));
 			}
 		});
 	}
@@ -377,7 +538,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			const graphDiv = document.createElement("div");
 			graphDiv.style.margin = "5px";
 			tile.appendChild(graphDiv);
-			const graph = generateGraph(parameters[2], finResult, locationsArray);
+			const graph = generateGraph(parameters[2], finResult, locationsArray, currency);
 			if(!graph)
 			{
 				graphDiv.appendChild(createTextSpan("Error! Not a valid graph type!"));
@@ -401,7 +562,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		
 		
-		const linePlot = generateGraph("history", finResult, locationsArray);
+		const linePlot = generateGraph("history", finResult, locationsArray, currency);
 		if(!linePlot){return;}
 		linePlot.style.cursor = "pointer";
 		linePlot.addEventListener("click", function() {
@@ -421,7 +582,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		
 		// Pie chart of current financial split
-		const pieCanvas = generateGraph("assetpie", finResult, locationsArray);
+		const pieCanvas = generateGraph("assetpie", finResult, locationsArray, currency);
 		if(!pieCanvas){return;}
 		pieCanvas.style.cursor = "pointer";
 		pieCanvas.style.marginRight = "-25px";
@@ -431,7 +592,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		pieDiv.appendChild(pieCanvas);
 		
 		// Pie chart of where fixed/current assets are located
-		const locPieCanvas = generateGraph("locationspie", finResult, locationsArray);
+		const locPieCanvas = generateGraph("locationspie", finResult, locationsArray, currency);
 		if(!locPieCanvas){return;}
 		locPieCanvas.style.cursor = "pointer";
 		locPieCanvas.addEventListener("click", function() {
@@ -441,9 +602,117 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		
 	}
+	else if(parameters[1].toLowerCase() == "production" || parameters[1].toLowerCase() == "prox") // Revenue/profit derived from burn data
+	{
+		if(!result["PMMGExtended"]["username"] || !burn[result["PMMGExtended"]["username"]] || burn[result["PMMGExtended"]["username"]].length == 0){
+			tile.id = "pmmg-reload";
+			return;
+		}
+		else
+		{
+			tile.textContent = "";
+			tile.id = "pmmg-load-success";
+		}
+	
+		const playerBurn = burn[result["PMMGExtended"]["username"]];
+		const burnFinances = [] as any[][];
+		var totalProduced = 0;
+		var totalConsumed = 0;
+		const isCustom = result["PMMGExtended"]["pricing_scheme"] == "Custom (Spreadsheet)";
+		playerBurn.forEach(planet => {
+			const planetFinances = [] as any[];
+			planetFinances.push(planet["PlanetName"]);
+			var consumed = 0;
+			var produced = 0;
+			
+			planet["OrderConsumption"].forEach(mat => {
+				consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["DailyAmount"];
+			});
+			
+			planet["WorkforceConsumption"].forEach(mat => {
+				consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["DailyAmount"];
+			});
+			
+			planet["OrderProduction"].forEach(mat => {
+				produced += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["DailyAmount"];
+			});
+			planetFinances.push(produced);
+			planetFinances.push(consumed);
+			totalProduced += produced;
+			totalConsumed += consumed;
+			
+			burnFinances.push(planetFinances);
+		});
+		
+		const tileHeader = document.createElement("h2");
+		tileHeader.title = "Production Overview";
+		tileHeader.textContent = "Production Overview";
+		tileHeader.classList.add("fin-title");
+		tile.appendChild(tileHeader);
+		
+		tile.appendChild(createFinancialTextBox(currency + totalProduced.toLocaleString(undefined, {"maximumFractionDigits": 0}), "Daily Produced", TextColors.Standard));
+		tile.appendChild(createFinancialTextBox(currency + totalConsumed.toLocaleString(undefined, {"maximumFractionDigits": 0}), "Daily Consumed", TextColors.Standard));
+		tile.appendChild(createFinancialTextBox(currency + (totalProduced - totalConsumed).toLocaleString(undefined, {"maximumFractionDigits": 0}), "Daily Profit", (totalProduced - totalConsumed) > 0 ? TextColors.Success : TextColors.Failure));
+		
+		const planetHeader = document.createElement("h2");
+		planetHeader.title = "Planet Breakdown";
+		planetHeader.textContent = "Planet Breakdown";
+		planetHeader.classList.add("fin-title");
+		tile.appendChild(planetHeader);
+		
+		const tbody = createTable(tile, ["Name", "Produced", "Consumed", "Profit"]);
+		
+		burnFinances.sort(burnProductionSort);
+		
+		burnFinances.forEach(inv => {
+			if(inv[1] == 0 && inv[2] == 0){return;}
+			const row = document.createElement("tr");
+			tbody.appendChild(row);
+			
+			const firstTableElem = document.createElement("td");
+			row.appendChild(firstTableElem);
+			firstTableElem.appendChild(createTextSpan(inv[0]));
+			
+			const producedElem = document.createElement("td");
+			row.appendChild(producedElem);
+			producedElem.appendChild(createTextSpan(inv[1].toLocaleString(undefined, {maximumFractionDigits: 0})));
+			
+			const consumedElem = document.createElement("td");
+			row.appendChild(consumedElem);
+			consumedElem.appendChild(createTextSpan(inv[2].toLocaleString(undefined, {maximumFractionDigits: 0})));
+			
+			const profitElem = document.createElement("td");
+			row.appendChild(profitElem);
+			profitElem.appendChild(createTextSpan((inv[1] - inv[2]).toLocaleString(undefined, {maximumFractionDigits: 0})));
+			profitElem.style.color = inv[1] - inv[2] > 0 ? TextColors.Success : TextColors.Failure;
+		});
+	}
 }
 
-function generateGraph(graphType, finResult, locationsArray)
+function drawGSTable(resultDiv, prices)
+{
+	if(!prices)
+	{
+		resultDiv.appendChild(createTextSpan("Error! No Prices Found!"));
+	}
+	
+	const tbody = createTable(resultDiv, ["Ticker", "Price"]);
+	Object.keys(prices).forEach(mat => {
+		const row = document.createElement("tr");
+		const matElem = document.createElement("td");
+		row.appendChild(matElem);
+		matElem.appendChild(createTextSpan(mat));
+		
+		const priceElem = document.createElement("td");
+		row.appendChild(priceElem);
+		priceElem.appendChild(createTextSpan(prices[mat].toLocaleString(undefined, {"maximumFractionDigits": 2, "minimumFractionDigits": 2})));
+		
+		tbody.appendChild(row);
+	});
+	
+}
+
+function generateGraph(graphType, finResult, locationsArray, currency)
 {
 	switch(graphType.toLowerCase())
 	{
@@ -456,7 +725,7 @@ function generateGraph(graphType, finResult, locationsArray)
 				finData.push(entry[1] + entry[2] + entry[3] - entry[4]);
 			});
 			
-			const linePlot = drawLineChart(dateData, finData, 400, 200, "Date", "Equity", "#f7a600", true);
+			const linePlot = drawLineChart(dateData, finData, 400, 200, "Date", "Equity", "#f7a600", true, currency);
 			return linePlot;
 		case "assetpie":
 			const latestReport = finResult["History"][finResult["History"].length - 1];
@@ -476,8 +745,9 @@ function generateGraph(graphType, finResult, locationsArray)
 	return null;
 }
 
-function clearData()
+function clearData(result)
 {
+	if(result["PMMGExtended"]){result["PMMGExtended"]["last_fin_recording"] = undefined; setSettings(result);}
 	try
 	{
 		browser.storage.local.remove("PMMG-Finance");
@@ -487,6 +757,11 @@ function clearData()
 		chrome.storage.local.remove("PMMG-Finance");
 	}
 	return;
+}
+
+function getPrice(cxPrices, customPrices, isCustom, ticker)
+{
+	return isCustom && customPrices && customPrices[ticker] ? customPrices[ticker] : (cxPrices[ticker] ? cxPrices[ticker] : 0);
 }
 
 const PricingSchemes = {
@@ -510,75 +785,69 @@ const PricingSchemes = {
 	"NC2 BID": 17
 }
 
+const CustomSchemes = {
+	"Custom (Spreadsheet)": 18
+}
+
 // Actually recording and processing the financials once they are received through BackgroundRunner.
-export function calculateFinancials(playerData, contracts, prices, cxos, result, loop)
-{
+export function calculateFinancials(webData, result, loop)
+{//playerData, contracts, prices, cxos
 	const username = result["PMMGExtended"]["username"];
 	// Wait until contracts and prices are in
 	if(loop)
 	{
-		if(contracts[username].length != 0 && prices["Age"] && cxos.length != 0)
+		if(webData["contracts"] && webData["cx_prices"] && webData["cxos"])
 		{
-			window.setTimeout(() => calculateFinancials(playerData, contracts, prices, cxos, result, false), 100);
+			window.setTimeout(() => calculateFinancials(webData, result, false), 100);
 			return;
 		}
 		else
 		{
-			window.setTimeout(() => calculateFinancials(playerData, contracts, prices, cxos, result, true), 50);
+			window.setTimeout(() => calculateFinancials(webData, result, true), 50);
 			return;
 		}
 	}
+	
+	result["PMMGExtended"]["last_fin_recording"] = Date.now();
+	setSettings(result);
 	
 	var CX = "AI1";
 	var priceType = "Average";
 	if(result["PMMGExtended"]["pricing_scheme"])
 	{
-		const info = result["PMMGExtended"]["pricing_scheme"].split(" ");
-		CX = info[0];
-		switch(info[1])
-		{
-			case "AVG":
-				priceType = "Average";
-				break;
-			case "ASK":
-				priceType = "AskPrice";
-				break;
-			case "BID":
-				priceType = "BidPrice";
-				break;
-		}
+		const interpreted = interpretCX(result["PMMGExtended"]["pricing_scheme"], result);
+		CX = interpreted[0];
+		priceType = interpreted[1];
 	}
+	
+	const cxPrices = webData["cx_prices"][CX][priceType];
+	const isCustom = webData["pricing_scheme"] == "Custom (Spreadsheet)"
+	
 	// Now we have the data, find financial value
 	const finSnapshot = {};
 	
 	// Get currencies
 	finSnapshot["Currencies"] = [];
-	playerData["PlayerModels"][0]["Currencies"].forEach(currency => {
+	webData["fioweb_data"]["PlayerModels"][0]["Currencies"].forEach(currency => {
 		finSnapshot["Currencies"].push([currency["CurrencyName"], Math.round(currency["Amount"] * 100) / 100]);
 	});
 	
 	// Put together inventory value
 	finSnapshot["Inventory"] = [];
 	finSnapshot["Buildings"] = [];
-	playerData["PlayerModels"][0]["Locations"].forEach(location => {
+	webData["fioweb_data"]["PlayerModels"][0]["Locations"].forEach(location => {
 		var value = 0;
 		if(location["BaseStorage"])
 		{
 			location["BaseStorage"]["Items"].forEach(mat => {
-				if(prices[mat["MaterialTicker"]])
-				{
-					value += (prices[mat["MaterialTicker"]][CX][priceType] || prices[mat["MaterialTicker"]][CX]["Average"]) * mat["Units"];
-				}
+				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
 			});
 		}
 		
 		if(location["WarehouseStorage"])
 		{
 			location["WarehouseStorage"]["Items"].forEach(mat => {
-				if(prices[mat["MaterialTicker"]])
-				{
-					value += (prices[mat["MaterialTicker"]][CX][priceType] || prices[mat["MaterialTicker"]][CX]["Average"]) * mat["Units"];
-				}
+				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
 			});
 		}
 		if(value == 0){return;}
@@ -586,23 +855,20 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 		return;
 	});
 	
-	playerData["PlayerShipsInFlight"].forEach(ship => {
+	webData["fioweb_data"]["PlayerShipsInFlight"].forEach(ship => {
 		var value = 0;
 		if(!ship["Cargo"]["Items"]){return;}
 		ship["Cargo"]["Items"].forEach(mat => {
-			if(prices[mat["MaterialTicker"]])
-			{
-				value += (prices[mat["MaterialTicker"]][CX][priceType] || prices[mat["MaterialTicker"]][CX]["Average"]) * mat["Units"];
-			}
+			value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
 		});
 		
 		if(ship["Fuel"]["CurrentSF"])
 		{
-			value += (prices["SF"][CX][priceType] || prices["SF"][CX]["Average"]) * ship["Fuel"]["CurrentSF"];
+			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "SF") * ship["Fuel"]["CurrentSF"];
 		}
 		if(ship["Fuel"]["CurrentFF"])
 		{
-			value += (prices["FF"][CX][priceType] || prices["FF"][CX]["Average"]) * ship["Fuel"]["CurrentFF"];
+			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "FF") * ship["Fuel"]["CurrentFF"];
 		}
 		
 		if(value == 0){return;}
@@ -610,23 +876,20 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 		return;
 	});
 	
-	playerData["PlayerStationaryShips"].forEach(ship => {
+	webData["fioweb_data"]["PlayerStationaryShips"].forEach(ship => {
 		var value = 0;
 		if(!ship["Cargo"]["Items"]){return;}
 		ship["Cargo"]["Items"].forEach(mat => {
-			if(prices[mat["MaterialTicker"]])
-			{
-				value += (prices[mat["MaterialTicker"]][CX][priceType] || prices[mat["MaterialTicker"]][CX]["Average"]) * mat["Units"];
-			}
+			value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
 		});
 		
 		if(ship["Fuel"]["CurrentSF"])
 		{
-			value += (prices["SF"][CX][priceType] || prices["SF"][CX]["Average"]) * ship["Fuel"]["CurrentSF"];
+			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "SF") * ship["Fuel"]["CurrentSF"];
 		}
 		if(ship["Fuel"]["CurrentFF"])
 		{
-			value += (prices["FF"][CX][priceType] || prices["FF"][CX]["Average"]) * ship["Fuel"]["CurrentFF"];
+			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "FF") * ship["Fuel"]["CurrentFF"];
 		}
 		
 		if(value == 0){return;}
@@ -635,14 +898,11 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 	});
 	
 	// Put together building value
-	playerData["PlayerModels"][0]["Locations"].forEach(location => {
+	webData["fioweb_data"]["PlayerModels"][0]["Locations"].forEach(location => {
 		var value = 0;
 		location["Buildings"].forEach(building => {
 			building["ReclaimableMaterials"].forEach(mat => {
-				if(prices[mat["MaterialTicker"]])
-				{
-					value += (prices[mat["MaterialTicker"]][CX][priceType] || prices[mat["MaterialTicker"]][CX]["Average"]) * mat["Units"];
-				}
+				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
 			});
 		});
 		if(value == 0){return;}
@@ -650,7 +910,7 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 	});
 	
 	// Handle contracts
-	let validContracts = contracts[username].filter(c => !invalidContractStatus.includes(c["Status"]));
+	let validContracts = webData["contracts"][username].filter(c => !invalidContractStatus.includes(c["Status"]));
 	
 	var contractValue = 0;
 	var contractLiability = 0;
@@ -662,11 +922,11 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 			{
 				if(condition["Party"] == party)
 				{
-					contractLiability += (prices[condition["MaterialTicker"]][CX][priceType] || prices[condition["MaterialTicker"]][CX]["Average"]) * condition["MaterialAmount"];
+					contractLiability += getPrice(cxPrices, webData["custom_prices"], isCustom, condition["MaterialTicker"]) * condition["MaterialAmount"];
 				}
 				else
 				{
-					contractValue += (prices[condition["MaterialTicker"]][CX][priceType] || prices[condition["MaterialTicker"]][CX]["Average"]) * condition["MaterialAmount"];
+					contractValue += getPrice(cxPrices, webData["custom_prices"], isCustom, condition["MaterialTicker"]) * condition["MaterialAmount"];
 				}
 			}
 			else if(condition["Type"] == "PAYMENT")
@@ -689,12 +949,12 @@ export function calculateFinancials(playerData, contracts, prices, cxos, result,
 	// Handle CXOS
 	var cxBuyValue = 0;
 	var cxSellValue = 0;
-	cxos.forEach(order => {
+	webData["cxos"].forEach(order => {
 		if(order["Status"] == "FILLED"){return;}
 		
 		if(order["OrderType"] == "SELLING")
 		{
-			cxSellValue += (prices[order["MaterialTicker"]][CX][priceType] || prices[order["MaterialTicker"]][CX]["Average"]) * order["Amount"];
+			cxSellValue += getPrice(cxPrices, webData["custom_prices"], isCustom, order["MaterialTicker"]) * order["Amount"];
 		}
 		else
 		{
@@ -753,4 +1013,44 @@ const invalidContractStatus = [
 function financialSort(a, b)
 {
 	return a[3] < b[3] ? 1 : -1;
+}
+
+function burnProductionSort(a, b)
+{
+	return a[1] - a[2] < b[1] - b[2] ? 1 : -1;
+}
+
+function interpretCX(CXString, result)
+{
+	var CX = "AI1";
+	var priceType = "Average";
+	switch(CXString)
+	{
+		case "Custom (Manual)":
+			break;
+		case "Custom (Spreadsheet)":
+			if(result["PMMGExtended"]["backup_pricing_scheme"])
+			{
+				const data = interpretCX(result["PMMGExtended"]["backup_pricing_scheme"], result);
+				CX = data[0];
+				priceType = data[1];
+			}
+			break;
+		default:
+			const info = CXString.split(" ");
+			CX = info[0];
+			switch(info[1])
+			{
+				case "AVG":
+					priceType = "Average";
+					break;
+				case "ASK":
+					priceType = "AskPrice";
+					break;
+				case "BID":
+					priceType = "BidPrice";
+					break;
+			}
+	}
+	return [CX, priceType];
 }
