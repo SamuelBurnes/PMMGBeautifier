@@ -190,6 +190,9 @@ export const PMMGStyle = `
 .check-time {
 	color: rgb(153, 153, 153)
 }
+.check-item {
+	border-bottom: solid 1px #555;
+}
 .checked-text {
 	text-decoration: line-through;
 	color: rgb(153, 153, 153)
@@ -216,7 +219,7 @@ export const PMMGStyle = `
 	border-width: 0px;
 	color: #cccccc;
 	font-family: "Open Sans",sans-serif;
-	font-size: 12px
+	font-size: 12px;
 	width: 100%;
 	height: 93%;
 }

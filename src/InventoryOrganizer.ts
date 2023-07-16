@@ -49,7 +49,7 @@ export class InventoryOrganizer implements Module {
 			const planetNameElem = buffer.querySelector(Selector.InventoryName);	// Get the human-friendly name of the planet (element)
 			const planetName = planetNameElem ? parsePlanetName(planetNameElem.textContent) : "";	// Get the text out of it
 			
-			const burn = findCorrespondingPlanet(planetName, this.webData["burn"][this.username]);	// Find the burn for the specific planet, or undefined if it doesn't exist
+			const burn = this.webData["burn"] ? findCorrespondingPlanet(planetName, this.webData["burn"][this.username]) : undefined;	// Find the burn for the specific planet, or undefined if it doesn't exist
 			const inventory = buffer.querySelector(Selector.Inventory);	// The inventory element containing all the materials
 			if(!inventory || !inventory.parentElement){return;}
 			

@@ -942,3 +942,80 @@ export function drawPieChart(data, size, text?, colors?)
 	canvas.style.marginRight = (maxX - 2 * size + 5).toString() + "px";
 	return canvas;
 }
+
+export class Popup
+{
+	private tile;	// The tile the popup is over
+	private overlapDiv;	// The popup element
+	private form;	// The form element to which all rows are added
+	
+	constructor(tile, name)
+	{
+		this.tile = tile;
+		
+		this.overlapDiv = document.createElement("div");
+		this.overlapDiv.classList.add(...Style.OverlappingDiv);
+		const greyStripes = document.createElement("div");
+		greyStripes.classList.add(...Style.GreyStripes);
+		this.overlapDiv.appendChild(greyStripes);
+		tile.insertBefore(this.overlapDiv, tile.firstChild);
+		
+		greyStripes.appendChild(makePopupSpacer(tile, this.overlapDiv));
+		
+		const popupInterfaceWrapper = document.createElement("div");
+		popupInterfaceWrapper.classList.add(...Style.CenterInterface);
+		greyStripes.appendChild(popupInterfaceWrapper);
+		const popupInterface = document.createElement("div");
+		//popupInterface.classList.add("NLOrH7hF5fbKIesqW3uSkA==");
+		popupInterfaceWrapper.appendChild(popupInterface);
+		
+		const header = document.createElement("h3");
+		header.appendChild(document.createTextNode(name));
+		header.classList.add(...Style.SidebarSectionHead);
+		popupInterface.appendChild(header);
+		header.style.margin = "0.5em 0 0.5em";
+
+		this.form = document.createElement("div");
+		popupInterface.appendChild(this.form);
+		
+		greyStripes.appendChild(makePopupSpacer(tile, this.overlapDiv));
+	}
+}
+
+class PopupRow
+{
+	public rowType;
+	public row;
+	private rowInput;
+	private rowInputCallback;
+	
+	// rowType: Either "text" or "button" depending if it is a row with text input or a button
+	// label: Label of the row
+	// inputText: If "text" type, the text in the input field. If "button" type, text on the button
+	// rowInputCallback: Function called when input is clicked/changed
+	constructor(rowType, label, inputText, callback)
+	{
+		this.rowType = rowType;
+		this.rowInputCallback = callback;
+		
+		/*if(rowType == "text")
+		{
+			this.rowInput = document.createElement("input");
+			
+			this.row = document.createElement("div");
+			this.row.classList.add(...Style.FormRow);
+			const inputLabel = document.createElement("label");
+			inputLabel.textContent = label;
+			if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
+			inputLabel.classList.add(...Style.FormLabel);
+			inputRow.appendChild(inputLabel);
+			const inputInputDiv = document.createElement("div");
+			inputInputDiv.classList.add(...Style.FormInput);
+			inputRow.appendChild(inputInputDiv);
+			const inputInput = document.createElement("input");
+			inputInput.style.width = "80%";
+			inputInputDiv.appendChild(inputInput);
+			inputInput.value = text;
+		}*/
+	}
+}

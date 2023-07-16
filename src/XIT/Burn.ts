@@ -16,6 +16,7 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 	const username = result["PMMGExtended"]["username"];
 	if(refresh)
 	{
+		if(!webData["burn"]){webData["burn"] = {};}
 		webData["burn"][username] = [];
 		getBurn(webData, username, apikey);
 	}
@@ -29,7 +30,7 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 	}
 	else if(parameters.length >= 3 && parameters[1].toLowerCase() == "group")
 	{
-		if(webData["burn"][parameters[2]] && webData["burn"][parameters[2]].length > 0){burn = webData["burn"][parameters[2]];}
+		if(webData["burn"] && webData["burn"][parameters[2]] && webData["burn"][parameters[2]].length > 0){burn = webData["burn"][parameters[2]];}
 		else
 		{
 			unloaded = true;
@@ -41,7 +42,7 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 	}
 	else
 	{
-		if(webData["burn"][username] != undefined && webData["burn"][username].length > 0){burn = webData["burn"][username];planet = parameters[1];}
+		if(webData["burn"] && webData["burn"][username] && webData["burn"][username].length > 0){burn = webData["burn"][username];planet = parameters[1];}
 		else{unloaded = true;}
 	}
 	if(webData["burn_settings"][0] == "loading" || unloaded)
@@ -54,7 +55,7 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 	// Burn data is non-empty
 	tile.id = "pmmg-load-success";
 	var settings;
-	if(parameters[1].toLowerCase() == "group")
+	if(parameters[1].toLowerCase() == "group" && webData["burn"])
 	{
 		var inv = {};
 		var cons = {};

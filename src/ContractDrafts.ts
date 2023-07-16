@@ -93,7 +93,7 @@ export class ContractDrafts implements Module {
 			var labelText = perUnit.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " ea";
 			
 			// Do corp pricing
-			if(Materials[parsedConditions["Material"][1]] && this.webData["custom_prices"][Materials[parsedConditions["Material"][1]][0]])
+			if(Materials[parsedConditions["Material"][1]] && this.webData["custom_prices"] && this.webData["custom_prices"][Materials[parsedConditions["Material"][1]][0]])
 			{
 				const totalCorp = parseInt(parsedConditions["Material"][0]) * this.webData["custom_prices"][Materials[parsedConditions["Material"][1]][0]];
 				labelText += " | " + totalCorp.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " Corp"

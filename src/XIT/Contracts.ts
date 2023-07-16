@@ -20,11 +20,12 @@ export function Contracts_pre(tile, parameters, result, webData, modules, refres
 	
 	if(refresh)
 	{
+		if(!webData["contracts"]){webData["contracts"] = []};
 		webData["contracts"][username] = [];
 		getContracts(webData, username, result["PMMGExtended"]["apikey"]);
 	}
 	
-	if(!webData["contracts"][username] || webData["contracts"][username].length == 0)
+	if(!webData["contracts"] || !webData["contracts"][username] || webData["contracts"][username].length == 0)
 	{
 		tile.textContent = "Loading Contract Data...";
 		tile.id = "pmmg-reload";
