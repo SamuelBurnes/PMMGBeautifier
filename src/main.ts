@@ -104,7 +104,7 @@ function mainRun(result, browser?)
 		  new ShippingAds(),
 		  new LocalMarketAds(),
 		  new PostLM(webData),
-		  new ContractDrafts(webData),
+		  //new ContractDrafts(webData),
 		  new OrderETAs(),
 		  new FlightETAs(),
 		  new FleetETAs(),

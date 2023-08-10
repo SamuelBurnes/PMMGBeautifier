@@ -185,7 +185,7 @@ function createEditInterface(tile, result, parameters, settings: any[] = [])
 	addInterfaceWrapper.classList.add(...Style.CenterInterface);
 	greyStripes.appendChild(addInterfaceWrapper);
 	const addInterface = document.createElement("div");
-	addInterface.classList.add("NLOrH7hF5fbKIesqW3uSkA==");
+	addInterface.classList.add("DraftConditionEditor__form___fF72bJM");
 	addInterfaceWrapper.appendChild(addInterface);
 	const addHeader = document.createElement('h3');
 	addHeader.appendChild(document.createTextNode("Command List Editor"));

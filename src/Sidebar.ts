@@ -6,7 +6,7 @@ import {genericCleanup, showBuffer, createTextSpan} from "./util";
 export class Sidebar implements Module {
   private tag = "pb-sidebar";
   private buttons;
-  private defaultButtons = ["BS", "CONT", "COM", "CORP", "CXL", "FIN", "FLT", "INV", "MAP", "PROD", "CMDS"];
+  private defaultButtons = ["BS", "CONT", "COM", "CORP", "CXL", "FIN", "FLT", "INV", "MAP", "PROD", "LEAD", "CMDS"];
   constructor(buttons) {
     this.buttons = buttons;
   }
@@ -19,7 +19,7 @@ export class Sidebar implements Module {
   {
 	const sidebar = document.getElementById(Selector.LeftSidebar);
 	
-	if(!this.buttons){this.buttons = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];}
+	if(!this.buttons){this.buttons = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["LEAD", "LEAD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];}
 	if(!sidebar){return;}
 	
 	this.defaultButtons.forEach(defaultButton => {

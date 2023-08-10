@@ -1,7 +1,7 @@
-import {clearChildren, getLocalStorage, createTextSpan, createLink, setSettings, createTable, Popup} from "../util";
+import {clearChildren, getLocalStorage, createTextSpan, createLink, setSettings, createTable, Popup, showWarningDialog, findCorrespondingPlanet, CategorySort} from "../util";
 import {Style, TextColors} from "../Style";
 
-export function Checklists(tile, parameters)
+export function Checklists(tile, parameters, pmmgResult, webData)
 {
 	clearChildren(tile);
 	if(parameters.length == 1)
@@ -13,7 +13,7 @@ export function Checklists(tile, parameters)
 	{
 		// Display the specified check
 		const checkName = (parameters.slice(1)).join("_");
-		getLocalStorage("PMMG-Checklists", displayChecklist, [tile, checkName]);
+		getLocalStorage("PMMG-Checklists", displayChecklist, [tile, checkName, pmmgResult, webData]);
 		
 	}
 	return;
@@ -92,11 +92,14 @@ function generateCheckTable(result, tile)	// Create a list of all checklists
 
 function displayChecklist(result, params)	// Create an individual checklist
 {
-	if(!params || !params[0] || !params[1]){return;}
+	if(!params || !params[0] || !params[1] || !params[2] || !params[3]){return;}
 	const tile = params[0];
 	const name = params[1];
+	const webData = params[3];
+	const pmmgResult = params[2];
 	
 	if(!result["PMMG-Checklists"]){result["PMMG-Checklists"] = {};}
+	console.log(result["PMMG-Checklists"]);
 	
 	// Create the title at the top of the checklist
 	const nameDiv = document.createElement("div");
@@ -161,20 +164,256 @@ function displayChecklist(result, params)	// Create an individual checklist
 	optionsDiv.appendChild(deleteAll);
 	deleteAll.style.marginLeft = "2px";
 	deleteAll.style.marginBottom = "2px";
-	deleteAll.textContent = "DELETE ALL COMPLETED";
+	deleteAll.textContent = "DELETE COMPLETED";
+	
+	deleteAll.addEventListener("click", function() {
+		showWarningDialog(tile, "Are you sure you want to delete all completed checklist items?", "Confirm", function() {
+			const removeIndexes = [] as number[];
+			for(var i = 0; i < checkItems.length; i++)
+			{
+				if(checkItems[i].condition.completed)
+				{
+					const toRemove = checkItems.splice(i, 1)[0];
+					conditionsDiv.removeChild(toRemove.item);
+					
+					removeIndexes.push(i);
+					
+					i--;
+				}
+			}
+			
+			getLocalStorage("PMMG-Checklists", updateThenRemove, [name, removeIndexes]);
+		});
+	});
 	
 	const addButton = document.createElement("button");
 	addButton.classList.add(...Style.Button);
 	addButton.classList.add(...Style.ButtonPrimary);
 	tile.appendChild(addButton);
 	addButton.style.marginLeft = "5px";
-	addButton.textContent = "ADD";
+	addButton.textContent = "ADD ITEM";
 	
 	addButton.addEventListener("click", function() {
+		const info = {"type": "Text", "completed": false};	// The information defining the checklist item
 		const popup = new Popup(tile, "Checklist Item Editor");
+		
+		// Type row (present on all)
+		popup.addPopupRow("dropdown", "Type", ["Text", "Resupply", "Repairs", "Construct", "Transport", 0], "The type of checklist item being added.", updateInfo, [popup, info, pmmgResult, webData]);
+		
+		// Date row (present on all)
+		popup.addPopupRow("date", "Due Date", undefined, undefined, updateInfo, [popup, info, pmmgResult, webData]);
+		
+		// Text row (Only present on text type)
+		popup.addPopupRow("text", "Text", undefined, undefined, updateInfo, [popup, info, pmmgResult, webData]);
+		popup.rows[2].rowInput.focus();
+		
+		// Confirm/add row (present on all)
+		popup.addPopupRow("button", "CMD", "SAVE", "Save and add the checklist item.", addChecklistItem, [popup, info, name, tile, pmmgResult, webData]);
 	});
 	
 	return [result];
+}
+
+// Updates the interface on the add/edit screen to reflect the values of the type dropdown
+function updateInfo(junk, params)
+{
+	if(!params[0] || !params[1] || !params[2] || !params[3]){return;}
+	
+	const popup = params[0];
+	const info = params[1];
+	const pmmgResult = params[2];
+	const webData = params[3];
+	
+	const typeValue = popup.rows[0].rowInput.selectedOptions[0].value;
+	
+	// Update the interface as needed
+	if(info["type"] != typeValue)
+	{
+		// Delete all rows (except universal ones at the top)
+		const numRows = popup.rows.length;
+		for(var i = 2; i < numRows - 1; i++)
+		{
+			popup.removePopupRow(2);
+		}
+		if(typeValue == "Text")	// If it was just changed back to text...
+		{
+			// Add in the text row
+			popup.addPopupRow("text", "Text", info["name"], undefined, updateInfo, [popup, info, pmmgResult, webData]);
+		}
+		else if(typeValue == "Resupply")
+		{
+			// Add in planet row
+			const planetBurns = [] as any[];
+			const username = pmmgResult["PMMGExtended"]["username"];
+			if(webData["burn"] && username && webData["burn"][username])
+			{
+				webData["burn"][username].forEach(burnInfo => {
+					planetBurns.push(burnInfo["PlanetName"]);
+				});
+			}
+			planetBurns.push(0);
+			popup.addPopupRow("dropdown", "Planet", planetBurns, "The planet to resupply. Ex: JS-952c, OT-580b, Gibson", updateInfo, [popup, info, pmmgResult, webData]);
+			popup.addPopupRow("number", "Days", "0", "The number of days of supplies", updateInfo, [popup, info, pmmgResult, webData]);
+		}
+		
+		popup.moveRowToBottom(2);
+	}
+	
+	// Update the values
+	switch(typeValue)
+	{
+		case "Text":
+			const textRow = popup.getRowByName("Text");
+			if(textRow)
+			{
+				info["name"] = textRow.rowInput.value;
+			}
+			break;
+		case "Resupply":
+			var planetRow = popup.getRowByName("Planet");
+			var daysRow = popup.getRowByName("Days");
+			if(planetRow && daysRow)
+			{
+				info["planet"] = planetRow.rowInput.selectedOptions[0].value;
+				info["days"] = daysRow.rowInput.value;
+			}
+			break;
+	}
+	
+	info["type"] = typeValue;
+	info["duedate"] = popup.rows[1].rowInput.value == "" ? undefined : (new Date(popup.rows[1].rowInput.value)).getTime();
+	
+	console.log(info);
+	return junk;
+}
+
+// Saves the info from the add interface to a new checklist item and stores it
+function addChecklistItem(params)
+{
+	if(!params[0] || !params[1] || !params[2] || !params[3] || !params[4] || !params[5]){return;}
+	
+	const popup = params[0];
+	const info = params[1];
+	const name = params[2];
+	const tile = params[3];
+	const pmmgResult = params[4];
+	const webData = params[5];
+	
+	// Destroy the popup
+	popup.destroy();
+	
+	// Store the info
+	getLocalStorage("PMMG-Checklists", updateThenStore, [info, name, tile, pmmgResult, webData]);
+}
+
+// Once the current stored checklists have been retrieved, add the new one and set it.
+function updateThenStore(result, params)
+{
+	if(!params[0] || !params[1] || !params[2] || !params[3] || !params[4]){return;}
+	if(!result["PMMG-Checklists"]){result["PMMG-Checklists"] = {};}
+	
+	const info = params[0];
+	const name = params[1];
+	const tile = params[2];
+	const pmmgResult = params[3];
+	const webData = params[4];
+	
+	if(!result["PMMG-Checklists"][name]){result["PMMG-Checklists"][name] = [];}
+	
+	// Reconstruct the info dictionary to only contain relevant info
+	const newInfo = {};
+	newInfo["duedate"] = info["duedate"];
+	newInfo["completed"] = info["completed"];
+	newInfo["type"] = info["type"];
+	
+	switch(info["type"])
+	{
+		case "Text":
+			newInfo["name"] = info["name"];
+			result["PMMG-Checklists"][name].push(newInfo);
+			break;
+		case "Resupply":
+			newInfo["planet"] = info["planet"];
+			newInfo["days"] = info["days"];
+			
+			newInfo["name"] = "Supply [[p:" + info["planet"] + "]] with " + newInfo["days"] + " " + (newInfo["days"] == "1" ? "day" : "days") + " of consumables.";
+			
+			var username = pmmgResult["PMMGExtended"]["username"];
+			
+			if(username && newInfo["planet"] && webData["burn"] && webData["burn"][username])
+			{
+				const burn = findCorrespondingPlanet(newInfo["planet"], webData["burn"][username]);
+				
+				const matDict = {};
+				burn["WorkforceConsumption"].forEach(mat => {
+					if(!matDict[mat["MaterialTicker"]]){matDict[mat["MaterialTicker"]] = 0;}
+					
+					matDict[mat["MaterialTicker"]] += mat["DailyAmount"];
+				});
+				
+				burn["OrderConsumption"].forEach(mat => {
+					if(!matDict[mat["MaterialTicker"]]){matDict[mat["MaterialTicker"]] = 0;}
+					
+					matDict[mat["MaterialTicker"]] += mat["DailyAmount"];
+				});
+				
+				burn["OrderProduction"].forEach(mat => {
+					if(!matDict[mat["MaterialTicker"]]){matDict[mat["MaterialTicker"]] = 0;}
+					
+					matDict[mat["MaterialTicker"]] -= mat["DailyAmount"];
+				});
+				
+				const matArray = [] as any[];
+				Object.keys(matDict).forEach(mat => {
+					if(matDict[mat] > 0)
+					{
+						matArray.push([mat, (matDict[mat] * parseFloat(newInfo["days"])).toLocaleString(undefined, {maximumFractionDigits: 0})]);
+					}
+				});
+				
+				matArray.sort(CategorySort);
+				
+				// Push the parent item to the checklist
+				result["PMMG-Checklists"][name].push(newInfo);
+				
+				matArray.forEach(mat => {
+					const matInfo = {"completed": false, "ischild": true, "type": "resupplyChild"}
+					matInfo["name"] = mat[1] + " [[m:" + mat[0] + "]]";
+					
+					result["PMMG-Checklists"][name].push(matInfo);
+				});
+
+			}
+			break;
+	}
+	
+	
+	
+	setSettings(result);
+	
+	clearChildren(tile);
+	getLocalStorage("PMMG-Checklists", displayChecklist, [tile, name, pmmgResult, webData]);
+}
+
+// Remove a check item
+function updateThenRemove(result, params)
+{
+	if(!result["PMMG-Checklists"]){result["PMMG-Checklists"] = {};}
+	if(!params[0] || !params[1]){return;}
+	
+	const name = params[0];
+	const removalIndexes = params[1];
+	
+	removalIndexes.forEach(index => {
+		if(result["PMMG-Checklists"][name] && result["PMMG-Checklists"][name].length > index)
+		{
+			result["PMMG-Checklists"][name].splice(index, 1);
+			
+			
+		}
+	});
+	
+	setSettings(result);
 }
 
 // Store checklist state in settings (pass into getLocalStorage function)

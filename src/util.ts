@@ -25,11 +25,12 @@ export function createNode(htmlString) {
 }
 
 // Create an option element for a select list
-export function createSelectOption(optionLabel, optionValue) 
+export function createSelectOption(optionLabel, optionValue, rightAlign?) 
 {
 	const option = document.createElement("option");
 	option.value = optionValue;
 	option.textContent = optionLabel;
+	if(rightAlign){option.style.direction = "rtl";}
 	return option;
 }
 
@@ -728,8 +729,10 @@ export function createContractDict(contracts, username, contractdict)
 // Create a warning dialog with a confirmation button before running the callback function with the passed parameters
 export function showWarningDialog(tile, message: string="Are you sure?", confirmButtonText: string="Confirm", callbackFunction, parameters?)
 {
+	const displayTile = tile.parentElement.parentElement.parentElement;
+	
 	const overlay = document.createElement("div");	// Main striped overlay
-	tile.appendChild(overlay);
+	displayTile.appendChild(overlay);
 	overlay.classList.add(...Style.ActionOverlay);
 	
 	const centerInterface = document.createElement("div");	// Center yellow block
@@ -764,13 +767,13 @@ export function showWarningDialog(tile, message: string="Are you sure?", confirm
 	
 	cancelButton.addEventListener("click", function()	// Just remove the overlay to cancel
 	{
-		tile.removeChild(overlay);
+		displayTile.removeChild(overlay);
 		return;
 	});
 	
 	confirmButton.addEventListener("click", function()	// Remove the overlay and call the callback function
 	{
-		tile.removeChild(overlay);
+		displayTile.removeChild(overlay);
 		if(parameters)
 		{
 			callbackFunction(parameters);
@@ -945,12 +948,14 @@ export function drawPieChart(data, size, text?, colors?)
 
 export class Popup
 {
-	private tile;	// The tile the popup is over
 	private overlapDiv;	// The popup element
 	private form;	// The form element to which all rows are added
+	private tile;
+	public rows: PopupRow[];	// All the popup rows
 	
 	constructor(tile, name)
 	{
+		this.rows = [] as PopupRow[];
 		this.tile = tile;
 		
 		this.overlapDiv = document.createElement("div");
@@ -966,7 +971,7 @@ export class Popup
 		popupInterfaceWrapper.classList.add(...Style.CenterInterface);
 		greyStripes.appendChild(popupInterfaceWrapper);
 		const popupInterface = document.createElement("div");
-		//popupInterface.classList.add("NLOrH7hF5fbKIesqW3uSkA==");
+		popupInterface.classList.add("DraftConditionEditor__form___fF72bJM");
 		popupInterfaceWrapper.appendChild(popupInterface);
 		
 		const header = document.createElement("h3");
@@ -980,42 +985,175 @@ export class Popup
 		
 		greyStripes.appendChild(makePopupSpacer(tile, this.overlapDiv));
 	}
+	
+	addPopupRow(rowType, label, inputText, tooltip, callback, params?)
+	{
+		const newRow = new PopupRow(rowType, label, inputText, tooltip, callback, params);
+		this.rows.push(newRow);
+		this.form.appendChild(newRow.row);
+	}
+	
+	removePopupRow(rowIndex)
+	{
+		const toDelete = this.rows.splice(rowIndex, 1)[0];
+		this.form.removeChild(toDelete.row);
+	}
+	
+	getRowByName(name)
+	{	
+		var selectedRow;
+		
+		this.rows.forEach(row => {
+			if(row.rowLabel == name)
+			{
+				selectedRow = row;
+				return;
+			}
+		});
+		
+		return selectedRow;
+	}
+	
+	destroy()
+	{
+		this.tile.removeChild(this.overlapDiv);
+	}
+	
+	moveRowToBottom(rowIndex)
+	{
+		const movingRow = this.rows[rowIndex];
+		this.removePopupRow(rowIndex);
+		this.rows.push(movingRow);
+		this.form.appendChild(movingRow.row);
+	}
 }
 
 class PopupRow
 {
 	public rowType;
+	public rowLabel;
 	public row;
-	private rowInput;
-	private rowInputCallback;
+	public rowInput;
 	
-	// rowType: Either "text" or "button" depending if it is a row with text input or a button
+	// rowType: Either "text" or "button" or "dropdown" or "checkbox"
 	// label: Label of the row
-	// inputText: If "text" type, the text in the input field. If "button" type, text on the button
+	// inputText: If "text" type, the text in the input field. If "button" type, text on the button. If "dropdown" type an array of values with the last one being the index of the currently selected value. If "checkbox" boolean value of checkbox
+	// tooltip: Text to appear on the tooltip, undefined or null for no tool tip
 	// rowInputCallback: Function called when input is clicked/changed
-	constructor(rowType, label, inputText, callback)
+	// params: Callback Function parameters
+	constructor(rowType, label, inputText, tooltip, callback, params?)
 	{
 		this.rowType = rowType;
-		this.rowInputCallback = callback;
+		this.rowLabel = label;
 		
-		/*if(rowType == "text")
+		if(rowType == "text" || rowType == "date" || rowType == "number")
 		{
-			this.rowInput = document.createElement("input");
-			
 			this.row = document.createElement("div");
 			this.row.classList.add(...Style.FormRow);
-			const inputLabel = document.createElement("label");
-			inputLabel.textContent = label;
-			if(tooltip != ""){inputLabel.appendChild(createToolTip(tooltip, "right"));}
-			inputLabel.classList.add(...Style.FormLabel);
-			inputRow.appendChild(inputLabel);
+			const rowLabel = document.createElement("label");
+			rowLabel.textContent = label;
+			if(tooltip){rowLabel.appendChild(createToolTip(tooltip, "right"));}
+			rowLabel.classList.add(...Style.FormLabel);
+			this.row.appendChild(rowLabel);
 			const inputInputDiv = document.createElement("div");
 			inputInputDiv.classList.add(...Style.FormInput);
-			inputRow.appendChild(inputInputDiv);
-			const inputInput = document.createElement("input");
-			inputInput.style.width = "80%";
-			inputInputDiv.appendChild(inputInput);
-			inputInput.value = text;
-		}*/
+			this.row.appendChild(inputInputDiv);
+			this.rowInput = document.createElement("input");
+			
+			inputInputDiv.appendChild(this.rowInput);
+			
+			if(inputText)
+			{
+				this.rowInput.value = inputText;
+			}
+			
+			if(rowType == "date")
+			{
+				this.rowInput.type = "datetime-local";
+			}
+			else if(rowType == "number")
+			{
+				this.rowInput.type = "number";
+			}
+			
+			this.rowInput.style.width = "80%";
+			
+			if(callback)
+			{
+				const rowInput = this.rowInput;
+				this.rowInput.addEventListener("input", function() {
+					callback(rowInput.value, params);
+				});
+			}
+		}
+		else if(rowType == "dropdown")
+		{
+			this.row = document.createElement("div");
+			this.row.classList.add(...Style.FormRow);
+			const rowLabel = document.createElement("label");
+			rowLabel.textContent = label;
+			if(tooltip){rowLabel.appendChild(createToolTip(tooltip, "right"));}
+			rowLabel.classList.add(...Style.FormLabel);
+			this.row.appendChild(rowLabel);
+			const inputDiv = document.createElement("div");
+			inputDiv.classList.add(...Style.FormInput);
+			this.row.appendChild(inputDiv);
+			this.rowInput = document.createElement("select");
+			this.rowInput.classList.add("select");
+			this.rowInput.style.width = "80%";
+			this.rowInput.style.textAlignLast = "right";
+			
+			this.rowInput.name = "popup-dropdown" + Math.floor(Math.random() * 10000).toString();
+			this.rowInput.id = "popup-dropdown" + Math.floor(Math.random() * 10000).toString();
+			
+			const selectedIndex = inputText[inputText.length - 1];
+			inputText = inputText.slice(0, -1);
+			
+			inputText.forEach(text => {
+				this.rowInput.appendChild(createSelectOption(text, text));
+			});
+			
+			if(this.rowInput.children[selectedIndex])
+			{
+				(this.rowInput.children[selectedIndex] as HTMLOptionElement).selected = true;
+				this.rowInput.selectedIndex = selectedIndex;
+			}
+			
+			inputDiv.appendChild(this.rowInput);
+			
+			
+			if(callback)
+			{
+				const rowInput = this.rowInput;
+				this.rowInput.addEventListener("change", function() {
+					callback(rowInput.selectedOptions[0].value, params);
+				});
+			}
+		}
+		else if(rowType == "button")
+		{
+			this.row = document.createElement("div");
+			this.row.classList.add(...Style.FormSaveRow);
+			
+			const rowLabel = document.createElement("label");
+			rowLabel.textContent = label;
+			rowLabel.classList.add(...Style.FormSaveLabel);
+			this.row.appendChild(rowLabel);
+			const inputDiv = document.createElement("div");
+			inputDiv.classList.add(...Style.FormSaveInput);
+			this.row.appendChild(inputDiv);
+			this.rowInput = document.createElement("button");
+			this.rowInput.textContent = inputText;
+			this.rowInput.classList.add(...Style.Button);
+			this.rowInput.classList.add(...Style.ButtonPrimary);
+			inputDiv.appendChild(this.rowInput);
+			
+			if(callback)
+			{
+				this.rowInput.addEventListener("click", function() {
+					callback(params);
+				});
+			}
+		}
 	}
 }
