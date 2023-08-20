@@ -8,25 +8,42 @@ import { PostLM } from "./PostLM";
 import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
-import { getPrices, getBurn, getBurnSettings, getContracts, updateFinancials, getCXPrices, getCXOS} from "./BackgroundRunner";
+import { getPrices, getCXPrices} from "./BackgroundRunner";
 import { PMMGStyle, EnhancedColors, IconStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
 import { CalculatorButton } from "./CalculatorButton";
-import { ContractDrafts } from "./ContractDrafts";
+//import { ContractDrafts } from "./ContractDrafts";
 import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
 import { HeaderMinimizer } from "./HeaderMinimizer";
 import { PendingContracts } from "./PendingContracts";
 import { CompactUI } from "./CompactUI";
+import { calculateFinancials } from "./XIT/Finances";
 
-try
+// Inject page_script.js directly into the webpage.
+var browser = typeof browser === "undefined" ? chrome : browser;
+var browserType = browser === chrome ? "chromium" : "firefox";
+
+function AddScriptToDOM(script_name)
+{
+    var s = document.createElement('script');
+    s.src = browser.runtime.getURL(script_name);
+    s.onload = function() {
+        s.remove();
+    };
+    (document.head || document.documentElement).appendChild(s);
+}
+
+AddScriptToDOM("page_script.js");
+
+if(browserType == "firefox")
 {
 	// Try and get stored settings using FireFox syntax
 	browser.storage.local.get("PMMGExtended").then(mainRun, onError);
 	console.log("FireFox detected");
-} catch(err)
+} else
 {
 	// Method throws an error if not on FF, so then try and get stored settings using Chromium syntax
 	console.log("Chromium detected");
@@ -78,27 +95,24 @@ function mainRun(result, browser?)
 		if(doc){doc.appendChild(colors);}
 	}
 	
+	// Introduce an object that will hold and be periodically updated with latest info harvested from server traffic
+	const userInfo = {};
+	
 	// All asynchronous web data put in as keys into this dictionary
 	const webData = {};
 	
 	// Start the process of getting corp prices via a web app asynchronously
 	window.setTimeout(() => getPrices(webData, result["PMMGExtended"]["fin_spreadsheet"], result["PMMGExtended"]["fin_sheet_name"]), 1000);
 	
-	// Start the process of getting FIO burn asynchronously
-	window.setTimeout(() => getBurn(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
+	// Get CX Prices
+	window.setTimeout(() => getCXPrices(userInfo), 1000);
 	
-	// Start the process of getting FIO burn settings asynchronously
-	window.setTimeout(() => getBurnSettings(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
-	
-	window.setTimeout(() => getContracts(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
-	
-	// Get player model (if financial recording is active)
-	window.setTimeout(() => getCXPrices(webData), 1000);
-	if(result["PMMGExtended"]["recording_financials"] != false && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 72000000)) // 86400000
+	// Do FIN recording
+	if(result["PMMGExtended"]["recording_financials"] != false && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 72000000)) // 72000000
 	{
-		window.setTimeout(() => getCXOS(webData, result["PMMGExtended"]["username"], result["PMMGExtended"]["apikey"]), 1000);
-		window.setTimeout(() => updateFinancials(webData, result), 1000);
+		window.setTimeout(() => calculateFinancials(webData, userInfo, result, true), 1000);
 	}
+	
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
 		  new ShippingAds(),
@@ -109,8 +123,8 @@ function mainRun(result, browser?)
 		  new FlightETAs(),
 		  new FleetETAs(),
 		  new QueueLoad(),
-		  new ConsumableTimers(result["PMMGExtended"]["username"], webData, result["PMMGExtended"]["burn_thresholds"]),
-		  new InventoryOrganizer(result["PMMGExtended"]["username"], webData, result),
+		  new ConsumableTimers(result["PMMGExtended"]["burn_thresholds"], userInfo),
+		  new InventoryOrganizer(userInfo, result),
 		  new Notifications(),
 		  new ImageCreator(),
 		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
@@ -118,13 +132,14 @@ function mainRun(result, browser?)
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
-		  new PendingContracts(result["PMMGExtended"]["username"], webData),
+		  new PendingContracts(userInfo),
 		  new CompactUI(result)
-	], result, webData, browser);
+	], result, webData, userInfo, browser);
 	
 	// Start the loop
 	(function () {
-	  runner.loop()
+	  runner.loop();
+	  runner.loopUserInfo();
 	})();
 }
 

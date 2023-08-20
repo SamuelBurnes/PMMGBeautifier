@@ -1,7 +1,7 @@
 import {clearChildren, getLocalStorage, createTextSpan, createLink, setSettings, createTable, Popup, showWarningDialog, findCorrespondingPlanet, CategorySort} from "../util";
 import {Style, TextColors} from "../Style";
 
-export function Checklists(tile, parameters, pmmgResult, webData)
+export function Checklists(tile, parameters, pmmgResult, userInfo, webData)
 {
 	clearChildren(tile);
 	if(parameters.length == 1)
@@ -16,7 +16,7 @@ export function Checklists(tile, parameters, pmmgResult, webData)
 		getLocalStorage("PMMG-Checklists", displayChecklist, [tile, checkName, pmmgResult, webData]);
 		
 	}
-	return;
+	return userInfo;
 }
 
 function generateCheckTable(result, tile)	// Create a list of all checklists

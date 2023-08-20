@@ -1,20 +1,18 @@
 import {Module} from "./ModuleRunner";
-import {parseBaseName, findBurnAmount, findCorrespondingPlanet, findInventoryAmount, createTextSpan, getBuffers} from "./util";
+import {parseBaseName, findCorrespondingPlanet, createTextSpan, getBuffers, calculateBurn} from "./util";
 import {Selector} from "./Selector";
 
 /**
  * Get inventory and burn data and implement on WF buffers
  */
 export class ConsumableTimers implements Module {
-	private webData;
-	private username;
 	private thresholds;
+	private userInfo;
 	
-	constructor(username, webData, thresholds)
+	constructor(thresholds, userInfo)
 	{
-		this.webData = webData;
-		this.username = username;
 		this.thresholds = thresholds;
+		this.userInfo = userInfo;
 	}
 	
   cleanup() {
@@ -22,13 +20,12 @@ export class ConsumableTimers implements Module {
 	return;
   }
   run() {
-	if(!this.webData["burn"] || !this.webData["burn"][this.username] || this.webData["burn"][this.username].length == 0){return;}
     const buffers = getBuffers("WF");
 	
     if (!buffers){return};
 	
 	buffers.forEach(buffer => {
-		generateBurns(buffer, this.webData["burn"][this.username], this.thresholds);
+		generateBurns(buffer, this.thresholds, this.userInfo);
 	});
 	
 	return;
@@ -36,8 +33,13 @@ export class ConsumableTimers implements Module {
   
   
 }
-export function generateBurns(buffer, burn, thresholds)
+export function generateBurns(buffer, thresholds, userInfo)
 {
+	if(!userInfo["PMMG-User-Info"]){return;}
+	const production = userInfo["PMMG-User-Info"]["production"];
+	const workforce = userInfo["PMMG-User-Info"]["workforce"];
+	const inventories = userInfo["PMMG-User-Info"]["storage"];
+	
 	if(buffer.classList.contains("pb-loaded")){return;}
 	const nameElem = buffer.querySelector(Selector.WorkforceConsumptionTable);
 	if(!nameElem || !nameElem.textContent) return;
@@ -52,8 +54,12 @@ export function generateBurns(buffer, burn, thresholds)
 		burnHeader.textContent = "Burn";
 	});
 	
-	const planetBurn = findCorrespondingPlanet(name, burn);
-	if(planetBurn == undefined){return;}
+	const planetProduction = findCorrespondingPlanet(name, production);
+	const planetWorkforce = findCorrespondingPlanet(name, workforce);
+	const planetInv = findCorrespondingPlanet(name, inventories, true);
+	
+	const planetBurn = calculateBurn(planetProduction, planetWorkforce, planetInv);
+	
 	
 	const elements = Array.from(buffer.querySelectorAll("table > tbody > tr") as HTMLElement[]);
 	elements.forEach(targetRow => {
@@ -61,12 +67,16 @@ export function generateBurns(buffer, burn, thresholds)
 	  const outputData = targetRow.children[4] as HTMLElement;
 	  const totalData = targetRow.children[3] as HTMLElement;
 	  if (outputData.textContent != "") {
-		var inventoryAmount = findInventoryAmount(targetRow.children[0].textContent, planetBurn);
-		var burnAmount = findBurnAmount(targetRow.children[0].textContent, planetBurn);
-		var daysLeft;
+		const ticker = targetRow.children[0].textContent;
+		if(!ticker)
+		{
+			return;
+		}
+		
+		const burnAmount = planetBurn[ticker] ? planetBurn[ticker]["DailyAmount"] : 0;
+		var daysLeft = planetBurn[ticker] ? planetBurn[ticker]["DaysLeft"] : 0;
 		if(burnAmount != 0)
 		{
-			daysLeft = Math.floor(inventoryAmount / burnAmount);
 			if(daysLeft <= thresholds[0])
 			{
 				if(!outputData.classList.contains("burn-red"))
@@ -76,6 +86,14 @@ export function generateBurns(buffer, burn, thresholds)
 			{
 				if(!outputData.classList.contains("burn-yellow"))
 					outputData.classList.add("burn-yellow");
+			}
+			else if(daysLeft >= 500)
+			{
+				if(!outputData.classList.contains("burn-green"))
+				{
+					outputData.classList.add("burn-green");
+					daysLeft = "∞";
+				}
 			}
 			else
 			{
@@ -103,7 +121,7 @@ export function generateBurns(buffer, burn, thresholds)
 		
 		firstChild = totalData.firstChild;
 		if(firstChild != null){totalData.removeChild(firstChild);}
-		totalData.appendChild(createTextSpan(burnAmount == 0 ? "" : burnAmount.toFixed(2)));
+		totalData.appendChild(createTextSpan(burnAmount == 0 ? "" : (-burnAmount).toFixed(2)));
 	  }
 	});
 	buffer.classList.add("pb-loaded");

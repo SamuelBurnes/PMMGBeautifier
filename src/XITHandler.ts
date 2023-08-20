@@ -12,8 +12,8 @@ import {EnhancedBurn_pre} from "./XIT/Burn";
 import {Contracts_pre} from "./XIT/Contracts";
 import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre, PrunPlanner, Wiki, FIO} from "./XIT/Web";
 import {FIOInv_pre} from "./XIT/Inventory";
-import {Notes} from "./XIT/Notes_New";
-import {Checklists} from "./XIT/Checklists_New";
+import {Notes} from "./XIT/Notes";
+import {Checklists} from "./XIT/Checklists";
 import {Sort} from "./XIT/Sort";
 import {CommandLists} from "./XIT/CommandLists";
 import {Help} from "./XIT/Help";
@@ -90,8 +90,11 @@ export class XITHandler implements Module {
   private modules;
   private result;
   private browser;
-  constructor(result, webData, modules, browser)
+  private userInfo;
+  
+  constructor(result, userInfo, webData, modules, browser)
   {  
+	this.userInfo = userInfo;
 	this.webData = webData;
 	this.modules = modules;
 	this.result = result;
@@ -104,6 +107,7 @@ export class XITHandler implements Module {
     const buffers = getBuffers("XIT");
     if (!buffers) return;
 	const webData = this.webData;
+	const userInfo = this.userInfo;
 	buffers.forEach(buffer => {
 		const tile = (buffer.querySelector(Selector.XITTile)) as HTMLElement;
 		if(!tile){return;}
@@ -132,7 +136,7 @@ export class XITHandler implements Module {
 			parameters[i] = parameters[i].trim()
 		}
 		
-		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, webData, this.modules, false);return;}
+		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.result, userInfo, webData, this.modules, false);return;}
 		
 		tile.classList.add("xit-tile");
 		if(tile.firstChild)
@@ -149,8 +153,8 @@ export class XITHandler implements Module {
 					refreshButton.classList.add("button-upper-right");
 					refreshButton.classList.add(this.tag);
 					refreshButton.style.fontSize = "16px";
-					refreshButton.style.paddingTop = this.browser ? "12px" : "0px";
-					if(!this.browser){refreshButton.style.marginTop = "0px";}
+					refreshButton.style.paddingTop = this.browser == "chromium" ? "12px" : "0px";
+					if(this.browser == "firefox"){refreshButton.style.marginTop = "0px";}
 					refreshButton.classList.add("refresh");
 					(buffer.children[3] || buffer.children[2]).insertBefore(refreshButton, (buffer.children[3] || buffer.children[2]).firstChild);
 				}
@@ -173,9 +177,9 @@ export class XITHandler implements Module {
 			Array.from(buffer.querySelectorAll(Selector.BufferTitle))[0].textContent = XITBufferTitles[parameters[0].toUpperCase()];	// Title the buffer
 			const modules = this.modules;
 			var result = this.result;
-			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, webData, modules, true);});
+			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, result, userInfo, webData, modules, true);});
 			(tile.firstChild as HTMLElement).id = "pmmg-load-success";
-			preFunc(contentDiv, parameters, this.result, webData, modules, false);
+			preFunc(contentDiv, parameters, this.result, userInfo, webData, modules, false);
 		}
 		return;
 		

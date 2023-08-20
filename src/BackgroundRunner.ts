@@ -1,4 +1,4 @@
-import {calculateFinancials} from "./XIT/Finances";
+import {setSettings} from "./util";
 
 // Get corp prices asynchronously
 // "prices" will contain the prices after the end of the web request
@@ -60,7 +60,7 @@ export function getPrices(webData, sheetURL, sheetName)
 
 // Get CX prices asynchronously
 // "cxPrices" will contain the prices at the end of the web request
-export function getCXPrices(webData)
+export function getCXPrices(userInfo)
 {
 	// Create a new XML Http Request
 	var xhr = new XMLHttpRequest();
@@ -80,19 +80,20 @@ export function getCXPrices(webData)
 				const wantedResults = ["AskPrice", "BidPrice", "Average", "AskAvail", "BidAvail"];	// The data points for each CX to pull
 				const CXs = ["AI1", "CI1", "CI2", "IC1", "NC1", "NC2"];	// All the CXs
 				
-				webData["cx_prices"] = {};
+				userInfo["PMMG-User-Info"]["cx_prices"] = {};
 				
 				CXs.forEach(CX => {
-					webData["cx_prices"][CX] = {};
+					userInfo["PMMG-User-Info"]["cx_prices"][CX] = {};
 					wantedResults.forEach(wanted => {
-						webData["cx_prices"][CX][wanted] = {};
+						userInfo["PMMG-User-Info"]["cx_prices"][CX][wanted] = {};
 						priceData.forEach(mat => {
-							webData["cx_prices"][CX][wanted][mat["Ticker"]] = mat[CX + "-" + wanted];
+							userInfo["PMMG-User-Info"]["cx_prices"][CX][wanted][mat["Ticker"]] = mat[CX + "-" + wanted];
 						});
 					});
 				});
 				
-				webData["cx_prices"]["Age"] = Date.now();	// Date the data
+				userInfo["PMMG-User-Info"]["cx_prices"]["Age"] = Date.now();	// Date the data
+				setSettings(userInfo);
 			}
 			catch(SyntaxError)
 			{
@@ -205,9 +206,9 @@ export function getGroupBurn(webData, groupid, apikey)
 // "burnSettings" will contain the settings at the end of the web request
 export function getBurnSettings(webData, username, apikey)
 {
-	if(!apikey || !username){return;}
 	webData["burn_settings"] = [];
 	webData["burn_settings"].push("loading");	// Push a temporary value to the array to allow for easier parsing
+	if(!apikey || !username){return;}
 	
 	// Create an XML Http Request
 	var xhr = new XMLHttpRequest();
@@ -332,52 +333,5 @@ export function getContracts(webData, username, apikey)
 	xhr.open("GET", "https://rest.fnar.net" + "/contract/allcontracts");
     xhr.setRequestHeader("Authorization", apikey);
     xhr.send(null);
-	return;
-}
-
-// Get FIO player data
-// "playerData" will contain the settings at the end of the web request
-export function updateFinancials(webData, result)
-{
-	const username = result["PMMGExtended"]["username"];
-	const apikey = result["PMMGExtended"]["apikey"];
-	
-	if(!webData["fioweb_data"]){webData["fioweb_data"] = {};}
-	if(!apikey || !username){return;}	// If API key or username is missing, abort
-	
-	// Create an XML Http Request
-	var xhr = new XMLHttpRequest();
-	xhr.ontimeout = function () {	// On timeout, try again
-		console.log("PMMG: FIO Player Data Timeout");
-		//updateFinancials(playerData, contracts, username, apikey);
-	};
-	
-	xhr.onreadystatechange = function()
-    {
-	    if(xhr.readyState == XMLHttpRequest.DONE)
-	    {
-			try
-			{
-				// Parse the results
-				console.log("PMMG: Retreived Player Data from FIO");
-				var data = JSON.parse(xhr.responseText);
-				Object.keys(data).forEach(key => {	// Copy the data into the player data variable
-					webData["fioweb_data"][key] = data[key];
-				});
-				calculateFinancials(webData, result, true);
-				
-			}
-			catch(SyntaxError)
-			{
-				console.log("PMMG: Bad Data from FIO");
-			}
-		}
-		return;
-    };
-	// Send the request
-	xhr.timeout = 20000;
-	xhr.open("POST", "https://rest.fnar.net" + "/fioweb/grouphub");
-    xhr.setRequestHeader("Authorization", apikey);
-    xhr.send(JSON.stringify([username]));
 	return;
 }

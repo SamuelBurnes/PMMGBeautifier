@@ -1,44 +1,23 @@
 import {clearChildren, createLink, createTextSpan, createTable, createMaterialElement, createTextDiv} from "../util";
 import {TextColors} from "../Style";
 import {FactionHeaders} from "../GameProperties";
-import {getContracts} from "../BackgroundRunner";
 
-export function Contracts_pre(tile, parameters, result, webData, modules, refresh)
+export function Contracts_pre(tile, parameters, pmmgResult, result)	// "result" is "userInfo"
 {
 	clearChildren(tile);
-	const username = result["PMMGExtended"]["username"];
-	if(!username)
-	{
-		tile.textContent = "Error! Missing Username!";
-		return;
-	}
-	if(!result["PMMGExtended"]["apikey"])
-	{
-		tile.textContent = "Error! Missing API Key!";
-		return;
-	}
 	
-	if(refresh)
-	{
-		if(!webData["contracts"]){webData["contracts"] = []};
-		webData["contracts"][username] = [];
-		getContracts(webData, username, result["PMMGExtended"]["apikey"]);
-	}
-	
-	if(!webData["contracts"] || !webData["contracts"][username] || webData["contracts"][username].length == 0)
+	if(!result["PMMG-User-Info"] || !result["PMMG-User-Info"]["contracts"])
 	{
 		tile.textContent = "Loading Contract Data...";
 		tile.id = "pmmg-reload";
 		return;
 	}
-	Contracts_post(tile, parameters, webData["contracts"][username]);
-	//XITWebRequest(tile, parameters, Contracts_post, "https://rest.fnar.net/contract/allcontracts/" + result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
-	return [modules];
-}
-
-function Contracts_post(tile, parameters, contractData)
-{
-	let validContracts = contractData.filter(c => !invalidContractStatus.includes(c["Status"]));
+	
+	const contractData = result["PMMG-User-Info"]["contracts"];
+	
+	
+	let validContracts = contractData.filter(c => !invalidContractStatus.includes(c["status"]));
+	
 	
 	validContracts.map(contract => {
 		contract["IsFaction"] = false;
@@ -46,16 +25,16 @@ function Contracts_post(tile, parameters, contractData)
 
 		let selfConditions = [] as any;
 		let partnerConditions = [] as any;
-		contract.Conditions.map((condition) => {
+		contract.conditions.map((condition) => {
 			// Determine if REPUTATION condition type exists to denote Faction contract
-			if (condition["Type"] === "REPUTATION")
+			if (condition["type"] === "REPUTATION")
 				contract["IsFaction"] = true;
 
-			if (condition["MaterialTicker"] !== null && materialFulfilmentType.includes(condition["Type"]))
+			if (condition["quantity"] !== null && materialFulfilmentType.includes(condition["type"]))
 				contract["materialConditions"].push(condition);
 
 			// Categorize conditions by who fulfills it
-			if (condition["Party"] === contract["Party"])
+			if (condition["party"] === contract["party"])
 				selfConditions.push(condition);
 			else
 				partnerConditions.push(condition);
@@ -84,7 +63,7 @@ function Contracts_post(tile, parameters, contractData)
 		});
 	}
 	
-	return parameters;
+	return [parameters, pmmgResult];
 }
 
 const invalidContractStatus = [
@@ -98,7 +77,7 @@ const invalidContractStatus = [
 function createContractRow(contract) {
 	var row = document.createElement("tr");
 
-	let contractLink = createLink(contract["Name"] || contract["ContractLocalId"], "CONT " + contract["ContractLocalId"])
+	let contractLink = createLink(contract["name"] || contract["localId"], "CONT " + contract["localId"])
 	const contractIdColumn = document.createElement("td");
 	contractIdColumn.appendChild(contract["IsFaction"] ? factionContract(contractLink) : contractLink);
 	row.appendChild(contractIdColumn);
@@ -114,7 +93,7 @@ function createContractRow(contract) {
 	materialColumn.appendChild(materialDiv);
 	if (contract["materialConditions"].length > 0) {
 		contract["materialConditions"].forEach(materialCondition => { 
-			const materialElement = createMaterialElement(materialCondition["MaterialTicker"], "prun-remove-js", materialCondition["MaterialAmount"], false, true);
+			const materialElement = createMaterialElement(materialCondition.quantity.material.ticker, "prun-remove-js", materialCondition.quantity.amount, false, true);
 			
 			if(materialElement) { 
 				materialElement.style.marginBottom = "4px";
@@ -130,7 +109,7 @@ function createContractRow(contract) {
 	if(contract["IsFaction"])
 	{
 		Object.keys(FactionHeaders).forEach(factionName => {
-			if(contract["PartnerName"].includes(factionName))
+			if(contract.partner.name.includes(factionName))
 			{
 				faction = FactionHeaders[factionName];
 			}
@@ -139,12 +118,12 @@ function createContractRow(contract) {
 	}
 	if(!faction)
 	{
-		let partnerLink = createLink(contract["PartnerName"], "CO " + contract["PartnerCompanyCode"]);
+		let partnerLink = createLink(contract.partner.name, "CO " + contract.partner.code);
 		partnerColumn.appendChild(partnerLink);
 	}
 	else
 	{
-		let partnerLink = createLink(contract["PartnerName"], "FA " + faction);
+		let partnerLink = createLink(contract.partner.name, "FA " + faction);
 		partnerColumn.appendChild(partnerLink);
 	}
 	for (let condition of contract.FilteredConditions["partner"])
@@ -170,12 +149,12 @@ function createNoContractsRow(colspan) {
 
 function conditionSort(a, b)
 {
-	return a["ConditionIndex"] > b["ConditionIndex"] ? 1 : -1;
+	return a["index"] > b["index"] ? 1 : -1;
 }
 
 function ContractSort(a, b)
 {
-	return a["DueDateEpochMs"] > b["DueDateEpochMs"] ? 1 : -1;
+	return (a["date"] ? a["date"]["timestamp"] : 0) > (b["date"] ? b["date"]["timestamp"] : 0) ? 1 : -1;
 }
 
 function factionContract(link) {
@@ -198,10 +177,10 @@ function factionContract(link) {
 function conditionStatus(condition) {
 	let conditionDiv = createTextDiv("");
 
-	let marker = createTextSpan(condition["Status"] === "FULFILLED" ? "✓" : "X");
-	marker.style.color = condition["Status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+	let marker = createTextSpan(condition["status"] === "FULFILLED" ? "✓" : "X");
+	marker.style.color = condition["status"] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
 	marker.style.fontWeight = "bold";
-	let text = friendlyConditionText[condition.Type] ? friendlyConditionText[condition.Type] : condition.Type;
+	let text = friendlyConditionText[condition.type] ? friendlyConditionText[condition.type] : condition.type;
 	let textSpan = createTextSpan(" " + text);
 
 	conditionDiv.appendChild(marker);

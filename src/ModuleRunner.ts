@@ -1,5 +1,5 @@
 import {XITHandler} from "./XITHandler";
-import { showBuffer, setSettings } from "./util";
+import { showBuffer, setSettings, getLocalStorage } from "./util";
 import { FriendlyNames } from "./GameProperties";
 
 export interface Module {
@@ -20,12 +20,14 @@ interface ModuleEntry {
 export class ModuleRunner {
   private readonly modules: ModuleEntry[];	// The list of modules run by the extension
   private readonly xit: XITHandler;	// The XIT module, run separately
+  private userInfo;
   private result;	// The stored settings
-  constructor(modules: Module[], result, webData, browser) {
+  constructor(modules: Module[], result, webData, userInfo, browser) {
 	// Construct global variables
     this.modules = modules.map(m => this.moduleToME(m));
-	this.xit = new XITHandler(result, webData, this.modules, browser);
+	this.xit = new XITHandler(result, userInfo, webData, this.modules, browser);
 	this.result = result;
+	this.userInfo = userInfo;
 	
 	this.updateActiveModules(result);
   }
@@ -87,4 +89,14 @@ export class ModuleRunner {
     // @TODO: Vary the interval based on module performance
     window.setTimeout(() => this.loop(), 250);
   }
+  
+  loopUserInfo() {
+	getLocalStorage("PMMG-User-Info", updateUserInfo, this.userInfo);
+	window.setTimeout(() => this.loopUserInfo(), 1000);
+  }
+}
+
+function updateUserInfo(result, userInfo)
+{
+	userInfo["PMMG-User-Info"] = result["PMMG-User-Info"];
 }

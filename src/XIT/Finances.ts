@@ -1,8 +1,8 @@
-import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile} from "../util";
+import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile, findCorrespondingPlanet, createSmallButton} from "../util";
 import {Style, TextColors} from "../Style";
 import {CurrencySymbols} from "../GameProperties";
 
-export function Fin_pre(tile, parameters, result, webData, modules, refresh)
+export function Fin_pre(tile, parameters, result, userInfo, webData)
 {
 	clearChildren(tile);
 	if(result["PMMGExtended"]["recording_financials"] == false)	// If not recording financial info, show screen with checkbox to enable
@@ -48,8 +48,8 @@ export function Fin_pre(tile, parameters, result, webData, modules, refresh)
 	}
 	
 	// Get stored financial data
-	getLocalStorage("PMMG-Finance", chooseScreen, [tile, parameters, result, webData]);
-	return [modules, refresh];
+	getLocalStorage("PMMG-Finance", chooseScreen, [tile, parameters, result, webData, userInfo]);
+	return;
 }
 
 // Draw the correct screen based on the parameters (should split out into multiple functions probably)
@@ -61,7 +61,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 	const parameters = params[1];
 	const result = params[2];
 	const webData = params[3];
-	const burn = webData["burn"];
+	const userInfo = params[4];
 	
 	// Determine the array of CX prices to use
 	var CX = "AI1";
@@ -72,7 +72,9 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		CX = interpreted[0];
 		priceType = interpreted[1];
 	}
-	const cxPrices = webData["cx_prices"][CX][priceType];	// Dictionary containing prices keyed to material tickers
+	
+	if(!userInfo["PMMG-User-Info"]["cx_prices"]){return;}
+	const cxPrices = userInfo["PMMG-User-Info"]["cx_prices"][CX][priceType];	// Dictionary containing prices keyed to material tickers
 	
 	var currency = "";	// Determine currency symbol
 	switch(CX)
@@ -339,9 +341,65 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		downloadFile(output, "pmmg-finance" + Date.now().toString() + ".json");
 	});
 		
+		// Create option to manually trigger collection
+		const collectHeader = document.createElement('h3');
+		collectHeader.appendChild(document.createTextNode("Collect Data"));
+		collectHeader.appendChild(createToolTip("Manually collects a data point.", "right"));
+		collectHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(collectHeader);
+		
+		const addButton = document.createElement("button");
+		addButton.textContent = "Record Data";
+		addButton.classList.add(...Style.Button);
+		addButton.classList.add(...Style.ButtonPrimary);
+		addButton.style.marginLeft = "4px";
+		addButton.style.marginBottom = "4px";
+		tile.appendChild(addButton);
+		
+		addButton.addEventListener("click", function() {
+			calculateFinancials(webData, userInfo, result, true);
+			Fin_pre(tile, parameters, result, userInfo, webData);
+		});
+		
+		// Create option to purge individual data points
+		const purgeHeader = document.createElement('h3');
+		purgeHeader.appendChild(document.createTextNode("Purge Specific Data Points"));
+		purgeHeader.appendChild(createToolTip("Purge individual data points from storage.", "right"));
+		purgeHeader.classList.add(...Style.SidebarSectionHead);
+		tile.appendChild(purgeHeader);
+		
+		const tbody = createTable(tile, ["Date", "Equity", "Delete"]);
+		
+		for(var i = 0; i < finResult["History"].length; i++)
+		{
+			const row = document.createElement("tr");
+			tbody.appendChild(row);
+			
+			const dateColumn = document.createElement("td");
+			dateColumn.appendChild(createTextSpan((new Date(finResult["History"][i][0])).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) + " on " + (new Date(finResult["History"][i][0])).toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"})));
+			row.appendChild(dateColumn);
+			
+			const equityColumn = document.createElement("td");
+			const equity = finResult["History"][i][1] + finResult["History"][i][2] + finResult["History"][i][3] - finResult["History"][i][4];
+			equityColumn.appendChild(createTextSpan(equity.toLocaleString(undefined, {maximumFractionDigits: 0})));
+			row.appendChild(equityColumn);
+			
+			const deleteColumn = document.createElement("td");
+			deleteColumn.appendChild(createSmallButton("delete", function(index){
+				showWarningDialog(tile, "Are you sure you want to delete this datapoint?", "Confirm", function() {
+					// That's a lot of nested stuff...
+					
+					finResult["History"].splice(index, 1);
+					setSettings({"PMMG-Finance": finResult});
+					Fin_pre(tile, parameters, result, userInfo, webData);
+				});
+			}, [i]));
+			row.appendChild(deleteColumn);
+		}
+		
 		// Create option for clearing data
 		const clearHeader = document.createElement('h3');
-		clearHeader.appendChild(document.createTextNode("Clear Data"));
+		clearHeader.appendChild(document.createTextNode("Clear All Data"));
 		clearHeader.appendChild(createToolTip("Clear all current and historical financial data.", "right"));
 		clearHeader.classList.add(...Style.SidebarSectionHead);
 		tile.appendChild(clearHeader);
@@ -604,7 +662,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 	}
 	else if(parameters[1].toLowerCase() == "production" || parameters[1].toLowerCase() == "prox") // Revenue/profit derived from burn data
 	{
-		if(!result["PMMGExtended"]["username"] || !burn[result["PMMGExtended"]["username"]] || burn[result["PMMGExtended"]["username"]].length == 0){
+		if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["workforce"]){
 			tile.id = "pmmg-reload";
 			return;
 		}
@@ -613,29 +671,73 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			tile.textContent = "";
 			tile.id = "pmmg-load-success";
 		}
-	
-		const playerBurn = burn[result["PMMGExtended"]["username"]];
+		
+		// Calculate the player burn from userInfo
+		const planets = [] as string[];
+		userInfo["PMMG-User-Info"]["workforce"].forEach(workforce => {
+			if(workforce.PlanetName && !planets.includes(workforce.PlanetName)){planets.push(workforce.PlanetName);}
+		});
+		userInfo["PMMG-User-Info"]["production"].forEach(production => {
+			if(production.PlanetName && !planets.includes(production.PlanetName)){planets.push(production.PlanetName);}
+		});
+		
 		const burnFinances = [] as any[][];
 		var totalProduced = 0;
 		var totalConsumed = 0;
 		const isCustom = result["PMMGExtended"]["pricing_scheme"] == "Custom (Spreadsheet)";
-		playerBurn.forEach(planet => {
+		planets.forEach(planet => {
+		
+			const planetProduction = findCorrespondingPlanet(planet, userInfo["PMMG-User-Info"]["production"]);
+			const planetWorkforce = findCorrespondingPlanet(planet, userInfo["PMMG-User-Info"]["workforce"]);
+			
 			const planetFinances = [] as any[];
-			planetFinances.push(planet["PlanetName"]);
-			var consumed = 0;
+			planetFinances.push(planet);
 			var produced = 0;
+			var consumed = 0;
 			
-			planet["OrderConsumption"].forEach(mat => {
-				consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["DailyAmount"];
-			});
+			if(planetWorkforce)
+			{
+				planetWorkforce.workforce.forEach(tier => {
+					tier.needs.forEach(need => {
+						consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, need.material.ticker) * need.unitsPerInterval;
+					});
+				});
 			
-			planet["WorkforceConsumption"].forEach(mat => {
-				consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["DailyAmount"];
-			});
+			}
 			
-			planet["OrderProduction"].forEach(mat => {
-				produced += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["DailyAmount"];
-			});
+			var isRecurring = false;
+			
+			if(planetProduction && planetProduction.lines)
+			{
+			
+				planetProduction.lines.forEach(line => {
+					line.orders.forEach(order => {if(order.recurring){isRecurring = true;}});
+				});
+				
+				planetProduction.lines.forEach(line => {
+					var totalDuration = 0;
+					line.orders.forEach(order => {
+						if(!order.started && (!isRecurring || order.recurring))
+						{
+							totalDuration += order.duration;
+						}
+					});
+				
+					line.orders.forEach(order => {
+						if(!order.started && (!isRecurring || order.recurring))
+						{
+							order.inputs.forEach(mat => {
+								consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.MaterialTicker) * mat.Amount * 86400000 * line.capacity / totalDuration;
+							});
+							
+							order.outputs.forEach(mat => {
+								produced += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.MaterialTicker) * mat.Amount * 86400000 * line.capacity / totalDuration;
+							});
+						}
+					});
+				});
+			}
+			
 			planetFinances.push(produced);
 			planetFinances.push(consumed);
 			totalProduced += produced;
@@ -790,20 +892,19 @@ const CustomSchemes = {
 }
 
 // Actually recording and processing the financials once they are received through BackgroundRunner.
-export function calculateFinancials(webData, result, loop)
+export function calculateFinancials(webData, userInfo, result, loop)
 {//playerData, contracts, prices, cxos
-	const username = result["PMMGExtended"]["username"];
 	// Wait until contracts and prices are in
 	if(loop)
 	{
-		if(webData["contracts"] && webData["cx_prices"] && webData["cxos"])
+		if(userInfo["PMMG-User-Info"] && userInfo["PMMG-User-Info"]["cx_prices"])
 		{
-			window.setTimeout(() => calculateFinancials(webData, result, false), 100);
+			window.setTimeout(() => calculateFinancials(webData, userInfo, result, false), 100);
 			return;
 		}
 		else
 		{
-			window.setTimeout(() => calculateFinancials(webData, result, true), 50);
+			window.setTimeout(() => calculateFinancials(webData, userInfo, result, true), 50);
 			return;
 		}
 	}
@@ -820,156 +921,166 @@ export function calculateFinancials(webData, result, loop)
 		priceType = interpreted[1];
 	}
 	
-	const cxPrices = webData["cx_prices"][CX][priceType];
-	const isCustom = webData["pricing_scheme"] == "Custom (Spreadsheet)"
+	const cxPrices = userInfo["PMMG-User-Info"]["cx_prices"][CX][priceType];
+	const isCustom = result["PMMGExtended"]["pricing_scheme"] == "Custom (Spreadsheet)"
 	
 	// Now we have the data, find financial value
 	const finSnapshot = {};
 	
 	// Get currencies
 	finSnapshot["Currencies"] = [];
-	webData["fioweb_data"]["PlayerModels"][0]["Currencies"].forEach(currency => {
-		finSnapshot["Currencies"].push([currency["CurrencyName"], Math.round(currency["Amount"] * 100) / 100]);
-	});
+	
+	if(userInfo["PMMG-User-Info"]["currency"])
+	{
+		userInfo["PMMG-User-Info"]["currency"].forEach(currency => {
+			finSnapshot["Currencies"].push([currency["currency"], Math.round(currency["amount"] * 100) / 100]);
+		});
+	}
 	
 	// Put together inventory value
 	finSnapshot["Inventory"] = [];
 	finSnapshot["Buildings"] = [];
-	webData["fioweb_data"]["PlayerModels"][0]["Locations"].forEach(location => {
-		var value = 0;
-		if(location["BaseStorage"])
-		{
-			location["BaseStorage"]["Items"].forEach(mat => {
-				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
+	
+	if(userInfo["PMMG-User-Info"]["storage"])
+	{
+		userInfo["PMMG-User-Info"]["storage"].forEach(location => {
+			var value = 0;
+			
+			location["items"].forEach(mat => {
+				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.MaterialTicker) * mat.Amount;
 			});
-		}
-		
-		if(location["WarehouseStorage"])
-		{
-			location["WarehouseStorage"]["Items"].forEach(mat => {
-				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
+			
+			var name;
+			if(location.type == "STORE" || location.type == "WAREHOUSE_STORE")
+			{
+				name = location.PlanetName;
+			}
+			else
+			{
+				name = location.name;
+			}
+			
+			if(value == 0){return;}
+			
+			var isMatch = false;	// Consolidate multiple storages down into one (warehouses + bases or cargo + stl + ftl tanks)
+			finSnapshot["Inventory"].forEach(inv => {
+				if(inv[0] == name)
+				{
+					isMatch = true;
+					inv[1] += Math.round(value * 100) / 100;
+				}
 			});
-		}
-		if(value == 0){return;}
-		finSnapshot["Inventory"].push([location["LocationName"], Math.round(value * 100) / 100]);
-		return;
-	});
-	
-	webData["fioweb_data"]["PlayerShipsInFlight"].forEach(ship => {
-		var value = 0;
-		if(!ship["Cargo"]["Items"]){return;}
-		ship["Cargo"]["Items"].forEach(mat => {
-			value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
+			if(!isMatch)
+			{
+				finSnapshot["Inventory"].push([name, Math.round(value * 100) / 100]);
+			}
+			return;
 		});
-		
-		if(ship["Fuel"]["CurrentSF"])
-		{
-			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "SF") * ship["Fuel"]["CurrentSF"];
-		}
-		if(ship["Fuel"]["CurrentFF"])
-		{
-			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "FF") * ship["Fuel"]["CurrentFF"];
-		}
-		
-		if(value == 0){return;}
-		finSnapshot["Inventory"].push([ship["ShipName"] || ship["ShipRegistration"], Math.round(value * 100) / 100]);
-		return;
-	});
-	
-	webData["fioweb_data"]["PlayerStationaryShips"].forEach(ship => {
-		var value = 0;
-		if(!ship["Cargo"]["Items"]){return;}
-		ship["Cargo"]["Items"].forEach(mat => {
-			value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
-		});
-		
-		if(ship["Fuel"]["CurrentSF"])
-		{
-			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "SF") * ship["Fuel"]["CurrentSF"];
-		}
-		if(ship["Fuel"]["CurrentFF"])
-		{
-			value += getPrice(cxPrices, webData["custom_prices"], isCustom, "FF") * ship["Fuel"]["CurrentFF"];
-		}
-		
-		if(value == 0){return;}
-		finSnapshot["Inventory"].push([ship["ShipName"] || ship["ShipRegistration"], Math.round(value * 100) / 100]);
-		return;
-	});
-	
+	}
 	// Put together building value
-	webData["fioweb_data"]["PlayerModels"][0]["Locations"].forEach(location => {
-		var value = 0;
-		location["Buildings"].forEach(building => {
-			building["ReclaimableMaterials"].forEach(mat => {
-				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat["MaterialTicker"]) * mat["Units"];
+	if(userInfo["PMMG-User-Info"]["sites"])
+	{
+		userInfo["PMMG-User-Info"]["sites"].forEach(location => {
+			if(location.type != "BASE"){return;}
+			var value = 0;
+			location["buildings"].forEach(building => {
+				building["reclaimableMaterials"].forEach(mat => {
+					value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.material.ticker) * mat.amount;
+				});
 			});
+			if(value == 0){return;}
+			finSnapshot["Buildings"].push([location.PlanetName, Math.round(value * 100) / 100]);
 		});
-		if(value == 0){return;}
-		finSnapshot["Buildings"].push([location["LocationName"], Math.round(value * 100) / 100]);
-	});
+	}
 	
 	// Handle contracts
-	let validContracts = webData["contracts"][username].filter(c => !invalidContractStatus.includes(c["Status"]));
-	
 	var contractValue = 0;
 	var contractLiability = 0;
-	validContracts.forEach(contract => {
-		const party = contract["Party"];
-		contract["Conditions"].forEach(condition => {
-			if(condition["Status"] == "FULFILLED"){return;}
-			if(condition["Type"] == "DELIVERY" || condition["Type"] == "PROVISION")
-			{
-				if(condition["Party"] == party)
+	if(userInfo["PMMG-User-Info"]["contracts"])
+	{
+		let validContracts = userInfo["PMMG-User-Info"]["contracts"].filter(c => !invalidContractStatus.includes(c["status"]));
+		
+		validContracts.forEach(contract => {
+			const party = contract["party"];
+			contract["conditions"].forEach(condition => {
+				if(condition["status"] == "FULFILLED"){return;}
+				if(condition["type"] == "DELIVERY" || condition["type"] == "PROVISION")
 				{
-					contractLiability += getPrice(cxPrices, webData["custom_prices"], isCustom, condition["MaterialTicker"]) * condition["MaterialAmount"];
+					if(condition["party"] == party)
+					{
+						contractLiability += getPrice(cxPrices, webData["custom_prices"], isCustom, condition.quantity.material.ticker) * condition.quantity.amount;
+					}
+					else
+					{
+						contractValue += getPrice(cxPrices, webData["custom_prices"], isCustom, condition.quantity.material.ticker) * condition.quantity.amount;
+					}
 				}
-				else
+				else if(condition["Type"] == "PAYMENT")
 				{
-					contractValue += getPrice(cxPrices, webData["custom_prices"], isCustom, condition["MaterialTicker"]) * condition["MaterialAmount"];
+					if(condition["Party"] == party)
+					{
+						contractLiability += condition.amount.amount;
+					}
+					else
+					{
+						contractValue += condition.amount.amount;
+					}
 				}
-			}
-			else if(condition["Type"] == "PAYMENT")
-			{
-				if(condition["Party"] == party)
-				{
-					contractLiability += condition["Amount"];
-				}
-				else
-				{
-					contractValue += condition["Amount"];
-				}
-			}
+			});
 		});
-	});
-	finSnapshot["ContractValue"] = Math.round(contractValue * 100) / 100;
-	finSnapshot["ContractLiability"] = Math.round(contractLiability * 100) / 100;
-	
+		finSnapshot["ContractValue"] = Math.round(contractValue * 100) / 100;
+		finSnapshot["ContractLiability"] = Math.round(contractLiability * 100) / 100;
+	}
 	
 	// Handle CXOS
 	var cxBuyValue = 0;
 	var cxSellValue = 0;
-	webData["cxos"].forEach(order => {
-		if(order["Status"] == "FILLED"){return;}
+	if(userInfo["PMMG-User-Info"]["cxos"])
+	{
 		
-		if(order["OrderType"] == "SELLING")
-		{
-			cxSellValue += getPrice(cxPrices, webData["custom_prices"], isCustom, order["MaterialTicker"]) * order["Amount"];
-		}
-		else
-		{
-			cxBuyValue += order["Limit"] * order["Amount"];
-		}
-	});
+		userInfo["PMMG-User-Info"]["cxos"].forEach(order => {
+			if(order["status"] == "FILLED"){return;}
+			
+			if(order["type"] == "SELLING")
+			{
+				cxSellValue += getPrice(cxPrices, webData["custom_prices"], isCustom, order.material.ticker) * order.amount;
+			}
+			else
+			{
+				cxBuyValue += order.limit.amount * order.amount;
+			}
+		});
+	}
+	
+	// Handle FXOS
+	var fxBuyValue = 0;
+	var fxSellValue = 0;
+	if(userInfo["PMMG-User-Info"]["fxos"])
+	{
+		userInfo["PMMG-User-Info"]["fxos"].forEach(order => {
+			if(order["status"] == "FILLED"){return;}
+			
+			if(order["type"] == "SELLING")
+			{
+				fxSellValue += order.initialAmount.amount;
+			}
+			else
+			{
+				fxBuyValue += order.limit.rate * order.initialAmount.amount;
+			}
+		});
+	}
 	
 	finSnapshot["CXBuy"] = Math.round(cxBuyValue * 100) / 100;
 	finSnapshot["CXSell"] = Math.round(cxSellValue * 100) / 100;
+	finSnapshot["FXBuy"] = Math.round(fxBuyValue * 100) / 100;
+	finSnapshot["FXSell"] = Math.round(fxSellValue * 100) / 100;
 	
 	var liquid = 0;
 	finSnapshot["Currencies"].forEach(currency => {
 		liquid += currency[1];
 	});
-	liquid += cxBuyValue;
+	liquid += cxBuyValue + fxBuyValue + fxSellValue;
 	
 	var fixed = 0;
 	finSnapshot["Buildings"].forEach(inv => {
@@ -982,7 +1093,7 @@ export function calculateFinancials(webData, result, loop)
 	});
 	
 	var liabilities = contractLiability;
-	
+	console.log(finSnapshot);
 	// History stored as [time, fixed, current, liquid, liabilities]
 	finSnapshot["History"] = [Date.now(), Math.round(fixed * 100) / 100, Math.round(current * 100) / 100, Math.round(liquid * 100) / 100, Math.round(liabilities * 100) / 100];
 	getLocalStorage("PMMG-Finance", writeFinancials, finSnapshot);

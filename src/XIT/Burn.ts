@@ -1,51 +1,24 @@
-import {clearChildren, createTextSpan, setSettings, CategorySort, findCorrespondingPlanet, createMaterialElement} from "../util";
+import {clearChildren, createTextSpan, setSettings, CategorySort, findCorrespondingPlanet, createMaterialElement, calculateBurn} from "../util";
 import {Style} from "../Style";
 import {Selector} from "../Selector";
 import {MaterialNames} from "../GameProperties";
-import {getGroupBurn, getBurn} from "../BackgroundRunner";
+//import {getGroupBurn, getBurn} from "../BackgroundRunner";
 
-export function EnhancedBurn_pre(tile, parameters, result, webData, modules, refresh)
+export function EnhancedBurn_pre(tile, parameters, result, userInfo, webData, modules)
 {
 	clearChildren(tile);
-	if(!result["PMMGExtended"]["apikey"])
-	{
-		tile.textContent = "Error! No API Key!";
-		return;
-	}
-	const apikey = result["PMMGExtended"]["apikey"];
-	const username = result["PMMGExtended"]["username"];
-	if(refresh)
-	{
-		if(!webData["burn"]){webData["burn"] = {};}
-		webData["burn"][username] = [];
-		getBurn(webData, username, apikey);
-	}
-	var burn;
-	var unloaded = false;
 	var planet;
-	if(parameters.length < 2)
+	if(parameters[1])
 	{
-		tile.textContent = "Error! Not Enough Parameters!";
-		return;
-	}
-	else if(parameters.length >= 3 && parameters[1].toLowerCase() == "group")
-	{
-		if(webData["burn"] && webData["burn"][parameters[2]] && webData["burn"][parameters[2]].length > 0){burn = webData["burn"][parameters[2]];}
-		else
-		{
-			unloaded = true;
-			if(tile.id != "pmmg-reload")
-			{
-				getGroupBurn(webData, parameters[2], apikey);
-			}
-		}
+		planet = parameters[1];
 	}
 	else
 	{
-		if(webData["burn"] && webData["burn"][username] && webData["burn"][username].length > 0){burn = webData["burn"][username];planet = parameters[1];}
-		else{unloaded = true;}
+		tile.textContent = "Error! Enter a planet name after XIT BURN (XIT BURN_UV-351a)";
+		return;
 	}
-	if(webData["burn_settings"][0] == "loading" || unloaded)
+	
+	if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["workforce"])
 	{
 		tile.textContent = "Loading Burn Data...";
 		tile.id = "pmmg-reload";
@@ -54,9 +27,13 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 	
 	// Burn data is non-empty
 	tile.id = "pmmg-load-success";
+	
+	var planetBurn;
 	var settings;
 	if(parameters[1].toLowerCase() == "group" && webData["burn"])
 	{
+		// Add group burn back in later.
+		return;
 		var inv = {};
 		var cons = {};
 		var fullCommand = "";
@@ -125,59 +102,19 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 		});
 	} else
 	{
-		const planetBurn = findCorrespondingPlanet(planet, burn);	// The planet data to work with
-		var lastUpdated;
-		try
-		{
-			lastUpdated = new Date(planetBurn["LastUpdate"] + "Z");
-		}
-		catch
-		{
+		const planetProduction = findCorrespondingPlanet(planet, userInfo["PMMG-User-Info"]["production"]);
+		const planetWorkforce = findCorrespondingPlanet(planet, userInfo["PMMG-User-Info"]["workforce"]);
+		const planetInv = findCorrespondingPlanet(planet, userInfo["PMMG-User-Info"]["storage"], true);
+	
+		planetBurn = calculateBurn(planetProduction, planetWorkforce, planetInv);	// The planet burn data
 		
-		}
-		settings = findCorrespondingPlanet(planet, webData["burn_settings"]);
-		if(planetBurn == undefined){tile.textContent = "Error! No Matching Planet!";return;}
-		
-		
-		var cons = {};
-		var inv = {};
-		for(let material of planetBurn["WorkforceConsumption"])
-		{
-			if(cons[material["MaterialTicker"]] == undefined)
-			{
-				cons[material["MaterialTicker"]] = -material["DailyAmount"];
-				continue;
-			}
-			cons[material["MaterialTicker"]] -= material["DailyAmount"]; 
-		}
-		for(let material of planetBurn["OrderConsumption"])
-		{
-			if(cons[material["MaterialTicker"]] == undefined)
-			{
-				cons[material["MaterialTicker"]] = -material["DailyAmount"];
-				continue;
-			}
-			cons[material["MaterialTicker"]] -= material["DailyAmount"]; 
-		}
-		for(let material of planetBurn["OrderProduction"])
-		{
-			if(cons[material["MaterialTicker"]] == undefined)
-			{
-				cons[material["MaterialTicker"]] = material["DailyAmount"];
-				continue;
-			}
-			cons[material["MaterialTicker"]] += material["DailyAmount"]; 
-		}
-		for(let material of planetBurn["Inventory"])
-		{
-			if(inv[material["MaterialTicker"]] == undefined)
-			{
-				inv[material["MaterialTicker"]] = material["MaterialAmount"];
-				continue;
-			}
-			inv[material["MaterialTicker"]] += material["MaterialAmount"]; 
-		}
+		// Reimplement burn settings later.
+		//settings = findCorrespondingPlanet(planet, webData["burn_settings"]);
+		if(!planetBurn || Object.keys(planetBurn).length == 0){tile.textContent = "Error! No Matching Planet!";return;}
 	}
+	
+	if(!planetBurn){return;}
+	
 	const screenNameElem = document.querySelector(Selector.ScreenName);
 	const screenName = screenNameElem ? screenNameElem.textContent : "";
 	if(!result["PMMGExtended"]["burn_display_settings"]){result["PMMGExtended"]["burn_display_settings"] = [];}
@@ -248,14 +185,6 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 		setSettings(result);
 	}));
 	
-	if(lastUpdated){
-		const lastUpdatedSpan = createTextSpan("Last Updated: " + lastUpdated.toLocaleDateString(undefined, {day: "numeric", month: "numeric"}) + " " + lastUpdated.toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}));
-		lastUpdatedSpan.style.marginLeft = "auto";
-		lastUpdatedSpan.style.marginRight = "10px";
-		lastUpdatedSpan.style.color = "rgb(153, 153, 153)";
-		bufferHeader.appendChild(lastUpdatedSpan);
-	}
-	
 	const head = document.createElement("thead");
 	const headRow = document.createElement("tr");
 	head.appendChild(headRow);
@@ -272,7 +201,7 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 	const body = document.createElement("tbody");
 	table.appendChild(body);
 	
-	var burnMaterials = Object.keys(cons);
+	var burnMaterials = Object.keys(planetBurn);
 	burnMaterials.sort(CategorySort);
 	for(let material of burnMaterials)
 	{
@@ -302,18 +231,18 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 		row.appendChild(nameColumn);
 		
 		const consColumn = document.createElement("td");
-		consColumn.appendChild(createTextSpan(cons[material].toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Day"));
+		consColumn.appendChild(createTextSpan(planetBurn[material]["DailyAmount"].toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Day"));
 		row.appendChild(consColumn);
 		
 		const invColumn = document.createElement("td");
-		const invAmount = inv[material] == undefined ? 0 : inv[material];
+		const invAmount = planetBurn[material]["Inventory"] == undefined ? 0 : planetBurn[material]["Inventory"];
 		invColumn.appendChild(createTextSpan(invAmount.toLocaleString(undefined)));
 		row.appendChild(invColumn);
 		
-		const burn = invAmount == 0 ? 0 : -invAmount / cons[material];
+		const burn = planetBurn[material]["DaysLeft"];
 		const burnColumn = document.createElement("td");
-		burnColumn.appendChild(createTextSpan(((burn < 500 && cons[material] < 0) ? Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
-		if(cons[material] >= 0)
+		burnColumn.appendChild(createTextSpan(((burn != "∞" && burn < 500 && planetBurn[material]["DailyAmount"] < 0) ? Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
+		if(planetBurn[material]["DailyAmount"] >= 0)
 		{
 			burnColumn.classList.add("burn-green");
 			burnColumn.classList.add("burn-infinite");
@@ -332,7 +261,7 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 		}
 		
 		const needColumn = document.createElement("td");
-		const needAmt = burn > (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] || cons[material] > 0 ? 0 : (burn - (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1]) * cons[material];
+		const needAmt = burn > (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] || planetBurn[material]["DailyAmount"] > 0 ? 0 : (burn - (result["PMMGExtended"]["burn_thresholds"] || [3, 7])[1]) * planetBurn[material]["DailyAmount"];
 		needColumn.appendChild(createTextSpan(needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
 		
 		row.appendChild(needColumn);
@@ -341,7 +270,7 @@ export function EnhancedBurn_pre(tile, parameters, result, webData, modules, ref
 	}
 	UpdateBurn(table, dispSettings);
 	tile.appendChild(table);
-	return modules;
+	return [modules, userInfo];
 }
 
 function FindBurnSettings(array, matchString)

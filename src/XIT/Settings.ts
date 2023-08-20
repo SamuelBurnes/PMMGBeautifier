@@ -1,7 +1,7 @@
 import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings, getLocalStorage, createToolTip} from "../util";
 import {Style, WithStyles} from "../Style";
 
-export function Settings(tile, parameters, result, webData, modules)
+export function Settings(tile, parameters, result, userInfo, webData, modules)
 {
 	clearChildren(tile);
 	const warningDiv = document.createElement("div");
@@ -376,7 +376,7 @@ export function Settings(tile, parameters, result, webData, modules)
 		getLocalStorage("PMMG-Finance", parseFinThenDownload);
 	}));
 	
-	return [parameters, webData];
+	return [parameters, webData, userInfo];
 }
 
 function parseFinThenDownload(result)

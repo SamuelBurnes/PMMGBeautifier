@@ -170,20 +170,20 @@ export function CategorySort(a, b)
 }
 
 // Find the data corresponding to a planet in an array of FIO inventory/burn data
-export function findCorrespondingPlanet(planet, data)
+export function findCorrespondingPlanet(planet, data, needBase?)
 {
 	if(!data || !planet){return undefined;}
 	for(var i = 0; i < data.length; i++)
 	{
-		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase())	// If the natural ID matches: XX-000x
+		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase() && (!needBase || data[i]["type"] == "STORE"))	// If the natural ID matches: XX-000x
 		{
 			return data[i];
 		}
-		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase())	// If the planet name matches
+		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase() && (!needBase || data[i]["type"] == "STORE"))	// If the planet name matches
 		{
 			return data[i];
 		}
-		else if(planet && data[i]["PlanetNaturalId"] && PlanetNames[planet] && PlanetNames[planet].toLowerCase() == data[i]["PlanetNaturalId"].toLowerCase())	// When planet name isn't in the payload, convert it to natural ID
+		else if(planet && data[i]["PlanetNaturalId"] && PlanetNames[planet] && PlanetNames[planet].toLowerCase() == data[i]["PlanetNaturalId"].toLowerCase() && (!needBase || data[i]["type"] == "STORE"))	// When planet name isn't in the payload, convert it to natural ID
 		{
 			return data[i];
 		}
@@ -718,12 +718,108 @@ export function createSmallButton(label, clickFunction, parameters)
 }
 
 
-export function createContractDict(contracts, username, contractdict)
+export function createContractDict(contracts, contractdict)
 {
-	for (let i = 0; i < contracts[username].length; i++) {
-		const element = contracts[username][i];
-		contractdict[element['ContractLocalId']] = element
+	for (let i = 0; i < contracts.length; i++) {
+		const element = contracts[i];
+		contractdict[element['localId']] = element
 	}
+}
+
+// Calculate burn
+export function calculateBurn(production, workforce, inventory)
+{
+	const burnDict = {};
+	
+	if(production && production.lines)
+	{
+		production.lines.forEach(line => {
+			const numLines = line.capacity;
+			var hasRecurring = false;
+			var totalDuration = 0;
+			line.orders.forEach(order => {
+				if(!order.started)	// Only account for orders in the queue.
+				{
+					hasRecurring = hasRecurring || order.recurring;
+				}
+			});
+			line.orders.forEach(order => {
+				if(!order.started && (!hasRecurring || order.recurring))	// Only account for orders in the queue.
+				{
+					totalDuration += order.duration;
+				}
+			});
+			totalDuration /= 86400000;	// Convert to days
+			
+			line.orders.forEach(order => {
+				if(!order.started && (!hasRecurring || order.recurring))
+				{
+					order.outputs.forEach(mat => {
+						if(burnDict[mat["MaterialTicker"]])
+						{
+							burnDict[mat["MaterialTicker"]]["DailyAmount"] += mat["Amount"] * numLines / totalDuration;
+						}
+						else
+						{
+							burnDict[mat["MaterialTicker"]] = {"DailyAmount": mat["Amount"] * numLines / totalDuration, "Inventory": 0, "DaysLeft": 0, "Type": "output"};
+						}
+					});
+					order.inputs.forEach(mat => {
+						if(burnDict[mat["MaterialTicker"]])
+						{
+							burnDict[mat["MaterialTicker"]]["DailyAmount"] -= mat["Amount"] * numLines / totalDuration;
+							if(burnDict[mat["MaterialTicker"]]["Type"] == "output")
+							{
+								burnDict[mat["MaterialTicker"]]["Type"] = "input"
+							}
+						}
+						else
+						{
+							burnDict[mat["MaterialTicker"]] = {"DailyAmount": -mat["Amount"] * numLines / totalDuration, "Inventory": 0, "DaysLeft": 0, "Type": "input"};
+						}
+					});
+					
+				}
+			});
+		});
+	}
+	
+	if(workforce && workforce.workforce)
+	{
+		workforce.workforce.forEach(tier => {	// Loop over all 5 tiers of workers
+			if(tier.population > 1)	// Don't count the one bugged population
+			{
+				tier.needs.forEach(need => {
+					const ticker = need.material.ticker;
+					if(burnDict[ticker])
+					{
+						burnDict[ticker]["DailyAmount"] -= need.unitsPerInterval;
+						burnDict[ticker]["Type"] = "workforce";
+					}
+					else
+					{
+						burnDict[ticker] = {"DailyAmount": -need.unitsPerInterval, "Inventory": 0, "DaysLeft": 0, "Type": "workforce"};
+					}
+				});
+			}
+		});
+	}
+	
+	if(inventory && inventory.items)
+	{
+		inventory.items.forEach(item => {
+			if(burnDict[item.MaterialTicker])	// Only care about items that are burned, not other inventory items
+			{
+				burnDict[item.MaterialTicker]["Inventory"] = item.Amount;
+				if(item.Amount != 0)
+				{
+					burnDict[item.MaterialTicker]["DaysLeft"] = burnDict[item.MaterialTicker]["DailyAmount"] > 0 ? 1000 : Math.floor(-item.Amount / burnDict[item.MaterialTicker]["DailyAmount"]);
+				}
+			}
+		});
+	}
+	
+	return burnDict;
 }
 
 // Create a warning dialog with a confirmation button before running the callback function with the passed parameters

@@ -1,7 +1,7 @@
 import {downloadFile, clearChildren, XITWebRequest} from "../util";
 import {Style} from "../Style";
 
-export function Debug(tile, parameters, result, webData)
+export function Debug(tile, parameters, result, userInfo, webData)
 {
 	clearChildren(tile);
 	const downloadButtons = document.createElement("div");
@@ -10,6 +10,7 @@ export function Debug(tile, parameters, result, webData)
 	downloadButtons.appendChild(createDownloadButton(webData["burn"][result["PMMGExtended"]["username"]], "Download Burn", "pmmg-burn" + Date.now().toString() + ".json"));
 	downloadButtons.appendChild(createDownloadButton(webData["contracts"][result["PMMGExtended"]["username"]], "Download Contracts", "pmmg-contracts" + Date.now().toString() + ".json"));
 	downloadButtons.appendChild(createDownloadButton(webData, "Download All Web Data", "pmmg-web-data" + Date.now().toString() + ".json"));
+	downloadButtons.appendChild(createDownloadButton(userInfo, "Download All Collected Data", "pmmg-user-info" + Date.now().toString() + ".json"));
 	const endpointLabel = document.createElement("div");
 	endpointLabel.textContent = "Get FIO Endpoint (ex: /infrastructure/Proxion)";
 	endpointLabel.style.display = "block";
@@ -31,7 +32,7 @@ export function Debug(tile, parameters, result, webData)
 	    XITWebRequest(tile, parameters, Debug_post, url, "GET", ["Authorization", result["PMMGExtended"]["apikey"]], null);
 	});
 	downloadButtons.appendChild(endpointButton);
-	return parameters;
+	return [parameters, userInfo];
 }
 export function Debug_post(tile, parameters, jsondata)
 {

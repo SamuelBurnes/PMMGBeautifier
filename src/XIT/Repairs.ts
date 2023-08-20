@@ -1,40 +1,16 @@
-import {createTextSpan, clearChildren, XITWebRequest, setSettings} from "../util";
+import {createTextSpan, clearChildren, setSettings} from "../util";
 
-export function Repairs_pre(tile, parameters, result)
+export function Repairs_pre(tile, parameters, result, userInfo)
 {
 	clearChildren(tile);
-	if(!result["PMMGExtended"]["username"])
+	if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["sites"])
 	{
-		tile.textContent = "Error! Missing Username";
+		tile.textContent = "Loading Repair Data...";
+		tile.id = "pmmg-reload";
 		return;
 	}
-	if(!result["PMMGExtended"]["apikey"])
-	{
-		tile.textContent = "Error! Missing API Key";
-		return;
-	}
-	if(!parameters[parameters.length - 1]["PMMGExtended"]){parameters.push(result);}
-	XITWebRequest(tile, parameters, Repairs_post, "https://rest.fnar.net/sites/"+ result["PMMGExtended"]["username"], "GET", ["Authorization", result["PMMGExtended"]["apikey"]], undefined);
 	
-	return;
-}
-
-function Repairs_post(tile, parameters, jsondata)
-{
-	const result = parameters[parameters.length - 1];
-	
-	if(jsondata == undefined || jsondata == null){return;}
-	var repairData;
-	try
-	{
-		repairData = JSON.parse(jsondata);
-	}
-	catch(SyntaxError)
-	{
-		tile.textContent = "Error! Could Not Load Data!";
-		return;
-	}
-	if(parameters.length < 3)
+	if(parameters.length < 2)
 	{
 		const title = createTextSpan("All Repairs");
 		title.classList.add("title");
@@ -78,8 +54,10 @@ function Repairs_post(tile, parameters, jsondata)
 			hr.appendChild(header);
 		}
 		var buildings = [] as any[];
-		repairData.forEach(site => {
-			site["Buildings"].forEach(build => {
+		userInfo["PMMG-User-Info"]["sites"].forEach(site => {
+			if(site.type != "BASE"){return;}
+			
+			site.buildings.forEach(build => {
 				buildings.push([site["PlanetName"], build]);
 				return;
 			});
@@ -107,14 +85,14 @@ function Repairs_post(tile, parameters, jsondata)
 		tile.appendChild(title);
 		
 		var siteData = undefined;
-		repairData.forEach(site => {
-			if(site["PlanetName"].toUpperCase() == parameters[1].toUpperCase() || site["PlanetIdentifier"].toUpperCase() == parameters[1].toUpperCase())
+		userInfo["PMMG-User-Info"]["sites"].forEach(site => {
+			if(site.type == "BASE" && site["PlanetName"].toUpperCase() == parameters[1].toUpperCase() || site["PlanetNaturalId"].toUpperCase() == parameters[1].toUpperCase())
 			{
 				siteData = site;
 			}
 			return;
 		});
-		if(siteData == undefined){return;}
+		if(!siteData){return;}
 		
 		const thresholdDiv = document.createElement("div");
 		tile.appendChild(thresholdDiv);
@@ -153,7 +131,7 @@ function Repairs_post(tile, parameters, jsondata)
 			header.style.paddingTop = "0";
 			hr.appendChild(header);
 		}
-		(siteData["Buildings"] as any[]).sort(buildingSort);
+		(siteData["buildings"] as any[]).sort(buildingSort);
 		
 		const body = document.createElement("tbody");
 		table.appendChild(body);
@@ -174,20 +152,20 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 {
 	const nonProd = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
 	const materials = {};
-	siteData["Buildings"].forEach(building => {
+	siteData["buildings"].forEach(building => {
 		const row = document.createElement("tr");
 		body.appendChild(row);
-		if(nonProd.includes(building["BuildingTicker"])){return;}
-		const date = (((new Date()).getTime() - (building["BuildingLastRepair"] || building["BuildingCreated"])) / 86400000);
+		if(nonProd.includes(building["buildingTicker"])){return;}
+		const date = (((new Date()).getTime() - building.lastRepair) / 86400000);
 		if(date < parseFloat(thresholdInput.value)){return;}
 		
-		building["RepairMaterials"].forEach(mat => {
-			if(materials[mat["MaterialTicker"]] == undefined){materials[mat["MaterialTicker"]] = mat["MaterialAmount"];}
-			else{materials[mat["MaterialTicker"]] += mat["MaterialAmount"];}
+		building.repairMaterials.forEach(mat => {
+			if(materials[mat.material.ticker] == undefined){materials[mat.material.ticker] = mat.amount;}
+			else{materials[mat.material.ticker] += mat.amount;}
 			return;
 		});
 		
-		var rowData = [building["BuildingTicker"], date.toLocaleString(undefined, {maximumFractionDigits: 1}), (building["Condition"] * 100).toLocaleString(undefined, {maximumFractionDigits: 1}) + "%"];
+		var rowData = [building["buildingTicker"], date.toLocaleString(undefined, {maximumFractionDigits: 1}), (building["condition"] * 100).toLocaleString(undefined, {maximumFractionDigits: 1}) + "%"];
 		for(let point of rowData)
 		{
 			const tableElem = document.createElement("td");
@@ -230,23 +208,23 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 	return;
 }
 
-function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)
+function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)	// Buildings is an array of type: [planetName, buildingInfo]
 {
 	const nonProd = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
 	const materials = {};
 	buildings.forEach(building => {
 		const row = document.createElement("tr");
 		body.appendChild(row);
-		if(nonProd.includes(building[1]["BuildingTicker"])){return;}
-		const date = (((new Date()).getTime() - (building[1]["BuildingLastRepair"] || building[1]["BuildingCreated"])) / 86400000);
+		if(nonProd.includes(building[1]["buildingTicker"])){return;}
+		const date = (((new Date()).getTime() - building[1].lastRepair) / 86400000);
 		if(date < parseFloat(thresholdInput.value)){return;}
 		
-		building[1]["RepairMaterials"].forEach(mat => {
-			if(materials[mat["MaterialTicker"]] == undefined){materials[mat["MaterialTicker"]] = mat["MaterialAmount"];}
-			else{materials[mat["MaterialTicker"]] += mat["MaterialAmount"];}
+		building[1].repairMaterials.forEach(mat => {
+			if(materials[mat.material.ticker] == undefined){materials[mat.material.ticker] = mat.amount;}
+			else{materials[mat.material.ticker] += mat.amount;}
 		});
 		
-		var rowData = [building[1]["BuildingTicker"], building[0], date.toLocaleString(undefined, {maximumFractionDigits: 1}), (building[1]["Condition"] * 100).toLocaleString(undefined, {maximumFractionDigits: 1}) + "%"];
+		var rowData = [building[1]["buildingTicker"], building[0], date.toLocaleString(undefined, {maximumFractionDigits: 1}), (building[1]["condition"] * 100).toLocaleString(undefined, {maximumFractionDigits: 1}) + "%"];
 		for(let point of rowData)
 		{
 			const tableElem = document.createElement("td");
@@ -291,10 +269,10 @@ function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)
 
 function buildingSort(a, b)
 {
-	return a["Condition"] > b["Condition"] ? 1 : -1;
+	return a["condition"] > b["condition"] ? 1 : -1;
 }
 
 function globalBuildingSort(a, b)
 {
-	return a[1]["Condition"] > b[1]["Condition"] ? 1 : -1;
+	return a[1]["condition"] > b[1]["condition"] ? 1 : -1;
 }

@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers, parseInvName, parsePlanetName, findCorrespondingPlanet, targetedCleanup, setSettings, showBuffer, createMaterialElement} from "./util";
+import {getBuffers, parseInvName, parsePlanetName, findCorrespondingPlanet, targetedCleanup, setSettings, showBuffer, createMaterialElement, calculateBurn} from "./util";
 import {Selector} from "./Selector";
 import {Style} from "./Style";
 import {MaterialNames, SortingTriangleHTML} from  "./GameProperties";
@@ -8,14 +8,12 @@ import {MaterialNames, SortingTriangleHTML} from  "./GameProperties";
  * Sort inventory into custom categories
  */
 export class InventoryOrganizer implements Module {
-	private username;	// Username of the user
-	private webData;	// The burn from FIO
+	private userInfo;	// The burn from the user info storage
 	private result;	// The settings stored
 	private tag = "pb-inv-org";	// The tag used to identifiy elements that need to be updated
-	constructor(username, webData, result)
+	constructor(userInfo, result)
 	{
-		this.username = username;
-		this.webData = webData;
+		this.userInfo = userInfo;
 		this.result = result;
 	}
 	
@@ -49,7 +47,16 @@ export class InventoryOrganizer implements Module {
 			const planetNameElem = buffer.querySelector(Selector.InventoryName);	// Get the human-friendly name of the planet (element)
 			const planetName = planetNameElem ? parsePlanetName(planetNameElem.textContent) : "";	// Get the text out of it
 			
-			const burn = this.webData["burn"] ? findCorrespondingPlanet(planetName, this.webData["burn"][this.username]) : undefined;	// Find the burn for the specific planet, or undefined if it doesn't exist
+			var burn;
+			if(this.userInfo["PMMG-User-Info"] && findCorrespondingPlanet(planetName, this.userInfo["PMMG-User-Info"]["workforce"]))
+			{
+				const workforce = findCorrespondingPlanet(planetName, this.userInfo["PMMG-User-Info"]["workforce"]);
+				const production = findCorrespondingPlanet(planetName, this.userInfo["PMMG-User-Info"]["production"]);
+				const inventory = findCorrespondingPlanet(planetName, this.userInfo["PMMG-User-Info"]["storage"]);
+				
+				burn = calculateBurn(production, workforce, inventory);
+				
+			}
 			const inventory = buffer.querySelector(Selector.Inventory);	// The inventory element containing all the materials
 			if(!inventory || !inventory.parentElement){return;}
 			
@@ -306,9 +313,9 @@ function sortInventory(inventory, sortOptions, result, tag, screenName, planetNa
 	if(sortingDetails[3] || activeSort == "BRN")	// If burn sorting is enabled as a subsort
 	{
 		if(burn){
-			const workforceMaterials = extractMaterials(burn["WorkforceConsumption"]);	// Get a list of all the materials in each category
-			const inputMaterials = extractMaterials(burn["OrderConsumption"]);
-			const outputMaterials = extractMaterials(burn["OrderProduction"]);
+			const workforceMaterials = extractMaterials(burn, "workforce");	// Get a list of all the materials in each category
+			const inputMaterials = extractMaterials(burn, "input");
+			const outputMaterials = extractMaterials(burn, "output");
 			
 			// Create the category for workforce consumables
 			const workforceTitle = document.createElement('h3');
@@ -513,11 +520,14 @@ function createToggle(result, sortOptions, abbreviation, selected, combinedName,
 }
 
 // Extracts the material tickers from a list of material payloads, such as in FIO burn or FIO inventory payloads
-function extractMaterials(burn)
+function extractMaterials(burn, typeValue)
 {
 	const materials = [] as string[];
-	burn.forEach(mat => {
-		materials.push(mat["MaterialTicker"] || "");
+	Object.keys(burn).forEach(mat => {
+		if(burn[mat]["Type"] == typeValue)
+		{
+			materials.push(mat);
+		}
 	});
 	return materials;
 }
