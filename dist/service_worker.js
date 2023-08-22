@@ -1,6 +1,6 @@
 // Chrome-MV3 service worker
-importScripts(["default_event_payload.js"]);
-importScripts(["uploader.js"]);
+importScripts(["./default_event_payload.js"]);
+importScripts(["./uploader.js"]);
 
 if(typeof browser === "undefined") {
     var browser = chrome;
@@ -16,7 +16,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         browser.scripting
             .executeScript({
                 target: { tabId: tabId },
-                files: ["./foreground.js"]
+                files: ["foreground.js"]
             })
             .then(() => {
                 console.log("Injected the foreground script.");

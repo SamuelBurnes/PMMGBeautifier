@@ -153,8 +153,7 @@ export class XITHandler implements Module {
 					refreshButton.classList.add("button-upper-right");
 					refreshButton.classList.add(this.tag);
 					refreshButton.style.fontSize = "16px";
-					refreshButton.style.paddingTop = this.browser == "chromium" ? "12px" : "0px";
-					if(this.browser == "firefox"){refreshButton.style.marginTop = "0px";}
+					refreshButton.style.paddingTop = this.browser == "chromium" ? "12px" : "7px";
 					refreshButton.classList.add("refresh");
 					(buffer.children[3] || buffer.children[2]).insertBefore(refreshButton, (buffer.children[3] || buffer.children[2]).firstChild);
 				}

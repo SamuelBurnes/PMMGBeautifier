@@ -23,11 +23,11 @@ import { CompactUI } from "./CompactUI";
 import { calculateFinancials } from "./XIT/Finances";
 
 // Inject page_script.js directly into the webpage.
-var browser = typeof browser === "undefined" ? chrome : browser;
-var browserType = browser === chrome ? "chromium" : "firefox";
 
 function AddScriptToDOM(script_name)
 {
+	var browser = typeof browser === "undefined" ? chrome : browser;
+	
     var s = document.createElement('script');
     s.src = browser.runtime.getURL(script_name);
     s.onload = function() {
@@ -38,12 +38,12 @@ function AddScriptToDOM(script_name)
 
 AddScriptToDOM("page_script.js");
 
-if(browserType == "firefox")
+try
 {
 	// Try and get stored settings using FireFox syntax
 	browser.storage.local.get("PMMGExtended").then(mainRun, onError);
 	console.log("FireFox detected");
-} else
+} catch(ex)
 {
 	// Method throws an error if not on FF, so then try and get stored settings using Chromium syntax
 	console.log("Chromium detected");
@@ -110,7 +110,7 @@ function mainRun(result, browser?)
 	// Do FIN recording
 	if(result["PMMGExtended"]["recording_financials"] != false && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 72000000)) // 72000000
 	{
-		window.setTimeout(() => calculateFinancials(webData, userInfo, result, true), 1000);
+		//window.setTimeout(() => calculateFinancials(webData, userInfo, result, true), 1000);
 	}
 	
 	// Create the object that will run all the modules in a loop

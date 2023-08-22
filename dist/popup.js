@@ -11,6 +11,7 @@ function OnClear_Click()
 		browser.storage.local.remove("PMMG-Notes");
 		browser.storage.local.remove("PMMG-Lists");
 		browser.storage.local.remove("PMMG-Finances");
+		browser.storage.local.remove("PMMG-User-Info");
 		
 	}
 	catch(err)
@@ -19,6 +20,7 @@ function OnClear_Click()
 		chrome.storage.local.remove("PMMG-Notes");
 		chrome.storage.local.remove("PMMG-Lists");
 		chrome.storage.local.remove("PMMG-Finances");
+		chrome.storage.local.remove("PMMG-User-Info");
 
 	}
 }

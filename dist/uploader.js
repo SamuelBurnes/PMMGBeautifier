@@ -26,12 +26,12 @@ if(browser.storage.session && typeof(browser.storage.session) !== "undefined")
 	storage_location = browser.storage.session;
 }
 
-const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS"];
+const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE"];
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
 	// Testing code
-	/*const badTypes = ["CHANNEL_UNSEEN_MESSAGES_COUNT", "ACTION_COMPLETED", "DATA_DATA", "CHANNEL_MESSAGE_LIST"];
+	/*const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST"];
 	if(eventdata && !badTypes.includes(eventdata.messageType))
 	{
 		console.log(eventdata.messageType);
@@ -47,6 +47,7 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	// Log Events into Storage
 	if(eventdata && eventdata.messageType && loggedMessageTypes.includes(eventdata.messageType))
 	{
+		await sleep(20);
 		getLocalStorage("PMMG-User-Info", logEvent, eventdata);
 	}
 	
@@ -116,7 +117,9 @@ async function QueueEvent(eventdata)
 		processingqueue = false;
 	}
 }
-
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 // Turn the eventdata received by PrUN into a form stored and readable by PMMG
 // result: Dictionary with the key "PMMG-User-Info" that contains all the user's stored game data info
 // eventdata: The message sent from the server containing updated game data info
@@ -136,6 +139,7 @@ function logEvent(result, eventdata)
 	if(!result["PMMG-User-Info"]["currency"]){result["PMMG-User-Info"]["currency"] = [];}
 	if(!result["PMMG-User-Info"]["cxos"]){result["PMMG-User-Info"]["cxos"] = [];}
 	if(!result["PMMG-User-Info"]["fxos"]){result["PMMG-User-Info"]["fxos"] = [];}
+	if(!result["PMMG-User-Info"]["unread_messages"]){result["PMMG-User-Info"]["unread_messages"] = [];}
 	
 	switch(eventdata.messageType)
 	{
@@ -196,6 +200,53 @@ function logEvent(result, eventdata)
 						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
 					});
 					result["PMMG-User-Info"]["storage"].push(store);
+				}
+			});
+			break;
+		case "STORAGE_CHANGE":
+			
+			eventdata.payload.stores.forEach(store => {
+				const matchingStore = result["PMMG-User-Info"]["sites"].find(item => item.siteId === store["addressableId"]);
+				
+				const index = result["PMMG-User-Info"]["storage"].findIndex(item => item.addressableId === store.addressableId);
+				
+				if(matchingStore)
+				{
+					store["PlanetNaturalId"] = matchingStore["PlanetNaturalId"];
+					store["PlanetName"] = matchingStore["PlanetName"];
+					const givenItems = store["items"];
+					store["items"] = [];
+					givenItems.forEach(item => {
+						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+					});
+					
+					if(index != -1)
+					{
+						result["PMMG-User-Info"]["storage"][index] = store;
+					}
+					else
+					{
+						result["PMMG-User-Info"]["storage"].push(store);
+					}
+				}
+				else if(store["name"])	// Ship store
+				{
+					const matchingShipStoreIndex = result["PMMG-User-Info"]["storage"].findIndex(item => item.addressableId === store["addressableId"]);
+					
+					const givenItems = store["items"];
+					store["items"] = [];
+					givenItems.forEach(item => {
+						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+					});
+					
+					if(matchingShipStoreIndex != -1)
+					{
+						result["PMMG-User-Info"]["storage"][matchingShipStoreIndex] = store;
+					}
+					else
+					{
+						result["PMMG-User-Info"]["storage"].push(store);
+					}
 				}
 			});
 			break;
@@ -309,7 +360,7 @@ function logEvent(result, eventdata)
 			break;
 	}
 	
-	console.log(result);
+	//console.log(result);
 	setSettings(result);
 }
 
