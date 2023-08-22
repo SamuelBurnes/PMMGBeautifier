@@ -16,7 +16,6 @@
 	"https://rest.fnar.net/",
 	"storage",
 	"activeTab",
-	"storage",
 	"scripting",
 	"tabs",
 	"webNavigation"

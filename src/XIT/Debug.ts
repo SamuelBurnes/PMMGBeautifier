@@ -7,8 +7,6 @@ export function Debug(tile, parameters, result, userInfo, webData)
 	const downloadButtons = document.createElement("div");
 	tile.appendChild(downloadButtons);
 	downloadButtons.appendChild(createDownloadButton(result["PMMGExtended"], "Download Full Settings", "pmmg-settings" + Date.now().toString() + ".json"));
-	downloadButtons.appendChild(createDownloadButton(webData["burn"][result["PMMGExtended"]["username"]], "Download Burn", "pmmg-burn" + Date.now().toString() + ".json"));
-	downloadButtons.appendChild(createDownloadButton(webData["contracts"][result["PMMGExtended"]["username"]], "Download Contracts", "pmmg-contracts" + Date.now().toString() + ".json"));
 	downloadButtons.appendChild(createDownloadButton(webData, "Download All Web Data", "pmmg-web-data" + Date.now().toString() + ".json"));
 	downloadButtons.appendChild(createDownloadButton(userInfo, "Download All Collected Data", "pmmg-user-info" + Date.now().toString() + ".json"));
 	const endpointLabel = document.createElement("div");

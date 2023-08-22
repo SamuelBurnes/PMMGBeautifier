@@ -169,36 +169,20 @@ function logEvent(result, eventdata)
 			result["PMMG-User-Info"]["storage"] = result["PMMG-User-Info"]["storage"].filter(item => item.type !== "STL_FUEL_STORE");
 			
 			eventdata["payload"]["stores"].forEach(store => {
-				const matchingStore = result["PMMG-User-Info"]["sites"].find(item => item.siteId === store["addressableId"]);
-				
 				const duplicateStoreIndex = result["PMMG-User-Info"]["storage"].findIndex(item => item.addressableId === store["addressableId"]);
 				
-				if(matchingStore)
+				const givenItems = store["items"];
+				store["items"] = [];
+				givenItems.forEach(item => {
+					store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+				});
+				
+				if(duplicateStoreIndex != -1)
 				{
-					store["PlanetNaturalId"] = matchingStore["PlanetNaturalId"];
-					store["PlanetName"] = matchingStore["PlanetName"];
-					const givenItems = store["items"];
-					store["items"] = [];
-					givenItems.forEach(item => {
-						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
-					});
-					
-					if(duplicateStoreIndex != -1)
-					{
-						result["PMMG-User-Info"]["storage"][duplicateStoreIndex] = store;
-					}
-					else
-					{
-						result["PMMG-User-Info"]["storage"].push(store);
-					}
+					result["PMMG-User-Info"]["storage"][duplicateStoreIndex] = store;
 				}
-				else if(store["name"])	// Ship store
+				else
 				{
-					const givenItems = store["items"];
-					store["items"] = [];
-					givenItems.forEach(item => {
-						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
-					});
 					result["PMMG-User-Info"]["storage"].push(store);
 				}
 			});
