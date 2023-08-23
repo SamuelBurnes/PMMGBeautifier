@@ -174,7 +174,14 @@ function logEvent(result, eventdata)
 				const givenItems = store["items"];
 				store["items"] = [];
 				givenItems.forEach(item => {
-					store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+					if(item.quantity && item.quantity.material)
+					{
+						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+					}
+					else
+					{
+						console.log(item);	// Debug line. Some items seem to not have a quantity. This should help figure out what those are.
+					}
 				});
 				
 				if(duplicateStoreIndex != -1)
@@ -201,7 +208,14 @@ function logEvent(result, eventdata)
 					const givenItems = store["items"];
 					store["items"] = [];
 					givenItems.forEach(item => {
-						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+						if(item.quantity && item.quantity.material)
+						{
+							store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+						}
+						else
+						{
+							console.log(item); // Debug line. Some items seem to not have a quantity. This should help figure out what those are.
+						}
 					});
 					
 					if(index != -1)
@@ -220,7 +234,14 @@ function logEvent(result, eventdata)
 					const givenItems = store["items"];
 					store["items"] = [];
 					givenItems.forEach(item => {
-						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+						if(item.quantity && item.quantity.material)
+						{
+							store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+						}
+						else
+						{
+							console.log(item); // Debug line. Some items seem to not have a quantity. This should help figure out what those are.
+						}
 					});
 					
 					if(matchingShipStoreIndex != -1)

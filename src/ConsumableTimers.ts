@@ -101,7 +101,11 @@ export function generateBurns(buffer, thresholds, userInfo)
 					outputData.classList.add("burn-green");
 			}
 			
-			daysLeft = daysLeft.toFixed(0);
+			if(!isNaN(daysLeft))
+			{
+				daysLeft = daysLeft.toFixed(0);
+			}
+			
 			if(daysLeft == 1)
 			{
 				daysLeft += " Day";

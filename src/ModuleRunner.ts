@@ -100,7 +100,11 @@ function updateUserInfo(result, userInfo)
 {
 	userInfo["PMMG-User-Info"] = result["PMMG-User-Info"];
 	// Assign planets to storages
+	
 	const planets = {};
+	
+	if(!userInfo["PMMG-User-Info"]["sites"] || !userInfo["PMMG-User-Info"]["storage"]){return;}
+	
 	userInfo["PMMG-User-Info"]["sites"].forEach(site => {
 		planets[site.siteId] = [site.PlanetName, site.PlanetNaturalId];
 	});
