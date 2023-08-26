@@ -25,7 +25,7 @@ export class ConsumableTimers implements Module {
     if (!buffers){return};
 	
 	buffers.forEach(buffer => {
-		generateBurns(buffer, this.thresholds, this.userInfo);
+		generateBurns(buffer, this.thresholds || [3, 7], this.userInfo);
 	});
 	
 	return;

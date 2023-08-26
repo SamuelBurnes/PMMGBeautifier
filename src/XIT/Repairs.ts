@@ -131,6 +131,7 @@ export function Repairs_pre(tile, parameters, result, userInfo)
 			header.style.paddingTop = "0";
 			hr.appendChild(header);
 		}
+		if(!siteData["buildings"]){return;}
 		(siteData["buildings"] as any[]).sort(buildingSort);
 		
 		const body = document.createElement("tbody");

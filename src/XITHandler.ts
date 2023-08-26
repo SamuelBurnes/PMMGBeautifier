@@ -17,6 +17,7 @@ import {Checklists} from "./XIT/Checklists";
 import {Sort} from "./XIT/Sort";
 import {CommandLists} from "./XIT/CommandLists";
 import {Help} from "./XIT/Help";
+import {DataHealth} from "./XIT/DataHealth";
 
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
@@ -47,7 +48,8 @@ export const XITPreFunctions = {
 	"PLANNER": PrunPlanner,
 	"WIKI": Wiki,
 	"HELP": Help,
-	"FIO": FIO
+	"FIO": FIO,
+	"HEALTH": DataHealth
 }
 
 export const XITBufferTitles = {
@@ -79,7 +81,8 @@ export const XITBufferTitles = {
 	"PLANNER": "PRUN PLANNER",
 	"WIKI": "PRUN WIKI",
 	"HELP": "PMMG HELP",
-	"FIO": "FIO"
+	"FIO": "FIO",
+	"HEALTH": "DATA HEALTH"
 }
 /**
  * Handle XIT buffers

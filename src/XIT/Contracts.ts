@@ -93,6 +93,7 @@ function createContractRow(contract) {
 	materialColumn.appendChild(materialDiv);
 	if (contract["materialConditions"].length > 0) {
 		contract["materialConditions"].forEach(materialCondition => { 
+			if(!materialCondition.quantity || !materialCondition.quantity.material){return;}
 			const materialElement = createMaterialElement(materialCondition.quantity.material.ticker, "prun-remove-js", materialCondition.quantity.amount, false, true);
 			
 			if(materialElement) { 

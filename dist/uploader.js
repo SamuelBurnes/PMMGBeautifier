@@ -47,8 +47,9 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	// Log Events into Storage
 	if(eventdata && eventdata.messageType && loggedMessageTypes.includes(eventdata.messageType))
 	{
-		await sleep(20);
 		getLocalStorage("PMMG-User-Info", logEvent, eventdata);
+		await sleep(100);
+		return;
 	}
 	
 	// Process Events
@@ -117,14 +118,17 @@ async function QueueEvent(eventdata)
 		processingqueue = false;
 	}
 }
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 // Turn the eventdata received by PrUN into a form stored and readable by PMMG
 // result: Dictionary with the key "PMMG-User-Info" that contains all the user's stored game data info
 // eventdata: The message sent from the server containing updated game data info
 function logEvent(result, eventdata)
 {
+	console.log(eventdata.messageType);
 	// Reset it every time for testing
 	//result["PMMG-User-Info"] = {};
 	
@@ -139,7 +143,6 @@ function logEvent(result, eventdata)
 	if(!result["PMMG-User-Info"]["currency"]){result["PMMG-User-Info"]["currency"] = [];}
 	if(!result["PMMG-User-Info"]["cxos"]){result["PMMG-User-Info"]["cxos"] = [];}
 	if(!result["PMMG-User-Info"]["fxos"]){result["PMMG-User-Info"]["fxos"] = [];}
-	if(!result["PMMG-User-Info"]["unread_messages"]){result["PMMG-User-Info"]["unread_messages"] = [];}
 	
 	switch(eventdata.messageType)
 	{
@@ -164,12 +167,9 @@ function logEvent(result, eventdata)
 			});
 			break;
 		case "STORAGE_STORAGES":
-			result["PMMG-User-Info"]["storage"] = result["PMMG-User-Info"]["storage"].filter(item => item.type !== "SHIP_STORE");
-			result["PMMG-User-Info"]["storage"] = result["PMMG-User-Info"]["storage"].filter(item => item.type !== "FTL_FUEL_STORE");
-			result["PMMG-User-Info"]["storage"] = result["PMMG-User-Info"]["storage"].filter(item => item.type !== "STL_FUEL_STORE");
-			
+			console.log(eventdata.payload.stores);
 			eventdata["payload"]["stores"].forEach(store => {
-				const duplicateStoreIndex = result["PMMG-User-Info"]["storage"].findIndex(item => item.addressableId === store["addressableId"]);
+				const duplicateStoreIndex = result["PMMG-User-Info"]["storage"].findIndex(item => item.id === store["id"]);
 				
 				const givenItems = store["items"];
 				store["items"] = [];
@@ -177,10 +177,6 @@ function logEvent(result, eventdata)
 					if(item.quantity && item.quantity.material)
 					{
 						store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
-					}
-					else
-					{
-						console.log(item);	// Debug line. Some items seem to not have a quantity. This should help figure out what those are.
 					}
 				});
 				
@@ -365,7 +361,7 @@ function logEvent(result, eventdata)
 			break;
 	}
 	
-	//console.log(result);
+	console.log(result);
 	setSettings(result);
 }
 

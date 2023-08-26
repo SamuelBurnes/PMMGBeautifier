@@ -103,7 +103,7 @@ function updateUserInfo(result, userInfo)
 	
 	const planets = {};
 	
-	if(!userInfo["PMMG-User-Info"]["sites"] || !userInfo["PMMG-User-Info"]["storage"]){return;}
+	if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["sites"] || !userInfo["PMMG-User-Info"]["storage"]){return;}
 	
 	userInfo["PMMG-User-Info"]["sites"].forEach(site => {
 		planets[site.siteId] = [site.PlanetName, site.PlanetNaturalId];
