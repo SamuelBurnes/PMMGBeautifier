@@ -108,9 +108,9 @@ function mainRun(result, browser?)
 	window.setTimeout(() => getCXPrices(userInfo), 1000);
 	
 	// Do FIN recording
-	if(result["PMMGExtended"]["recording_financials"] != false && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 72000000)) // 72000000
+	if(result["PMMGExtended"]["recording_financials"] != false && (!result["PMMGExtended"]["last_fin_recording"] || Date.now() - result["PMMGExtended"]["last_fin_recording"] > 64800000)) // 72000000
 	{
-		//window.setTimeout(() => calculateFinancials(webData, userInfo, result, true), 1000);
+		window.setTimeout(() => calculateFinancials(webData, userInfo, result, true), 1000);
 	}
 	
 	// Create the object that will run all the modules in a loop
