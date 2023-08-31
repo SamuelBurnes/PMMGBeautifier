@@ -43,7 +43,8 @@ export class Sidebar implements Module {
 			});
 		}
 	});
-	if((sidebar.children[sidebar.children.length-1] as HTMLElement).classList.contains(this.tag))
+	const lastButton = (sidebar.children[sidebar.children.length-1] as HTMLElement);
+	if(lastButton.classList.contains(this.tag) && lastButton.onclick)
 	{
 		return;
 	}
