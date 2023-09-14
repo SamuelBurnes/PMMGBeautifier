@@ -1,7 +1,7 @@
-import {clearChildren, getLocalStorage, createTextSpan, createLink, setSettings, createTable, Popup, showWarningDialog, findCorrespondingPlanet, CategorySort} from "../util";
+import {clearChildren, getLocalStorage, createTextSpan, createLink, setSettings, createTable, Popup} from "../util";
 import {Style, TextColors} from "../Style";
 
-export function Checklists(tile, parameters, pmmgResult, userInfo, webData)
+export function Checklists(tile, parameters, pmmgResult, userInfo)
 {
 	clearChildren(tile);
 	if(parameters.length == 1)
@@ -13,7 +13,7 @@ export function Checklists(tile, parameters, pmmgResult, userInfo, webData)
 	{
 		// Display the specified check
 		const checkName = (parameters.slice(1)).join("_");
-		getLocalStorage("PMMG-Checklists", displayChecklist, [tile, checkName, pmmgResult, webData]);
+		getLocalStorage("PMMG-Checklists", displayChecklist, [tile, checkName, pmmgResult]);
 		
 	}
 	return userInfo;
@@ -87,15 +87,15 @@ function generateCheckTable(result, tile)	// Create a list of all checklists
 		
 	});
 	
+	tile.style.minHeight = "auto";
 	return [result, tile];
 }
 
 function displayChecklist(result, params)	// Create an individual checklist
 {
-	if(!params || !params[0] || !params[1] || !params[2] || !params[3]){return;}
+	if(!params || !params[0] || !params[1] || !params[2]){return;}
 	const tile = params[0];
 	const name = params[1];
-	const webData = params[3];
 	const pmmgResult = params[2];
 	
 	if(!result["PMMG-Checklists"]){result["PMMG-Checklists"] = {};}
@@ -123,7 +123,7 @@ function displayChecklist(result, params)	// Create an individual checklist
 	if(result["PMMG-Checklists"][name])	// Checklist already exists
 	{
 		result["PMMG-Checklists"][name].forEach(item => {
-			const checkItem = new CheckItem(item, name, checkItems);
+			const checkItem = new CheckItem(item, name, checkItems, tile, pmmgResult);
 			checkItems.push(checkItem);
 			conditionsDiv.appendChild(checkItem.item);
 		});
@@ -137,54 +137,6 @@ function displayChecklist(result, params)	// Create an individual checklist
 	const optionsDiv = document.createElement("div");
 	optionsDiv.style.marginTop = "5px";
 	tile.appendChild(optionsDiv);
-	// Button to complete all checklist items
-	const completeAll = document.createElement("button");
-	completeAll.classList.add(...Style.Button);
-	completeAll.classList.add(...Style.ButtonSuccess);
-	optionsDiv.appendChild(completeAll);
-	completeAll.style.marginLeft = "5px";
-	completeAll.style.marginBottom = "2px";
-	completeAll.textContent = "COMPLETE ALL";
-	
-	// When "complete all" is clicked, for each item, if it isn't completed, click it to complete it
-	completeAll.addEventListener("click", function() {	
-		checkItems.forEach(item => {
-			if(!item.condition.completed)
-			{
-				item.changeCheckedState();
-			}
-		});
-		getLocalStorage("PMMG-Checklists", storeChecklistState, [name, checkItems]);
-	});
-	
-	// Button to delete all checked checklist items
-	const deleteAll = document.createElement("button");
-	deleteAll.classList.add(...Style.Button);
-	deleteAll.classList.add(...Style.ButtonDanger);
-	optionsDiv.appendChild(deleteAll);
-	deleteAll.style.marginLeft = "2px";
-	deleteAll.style.marginBottom = "2px";
-	deleteAll.textContent = "DELETE COMPLETED";
-	
-	deleteAll.addEventListener("click", function() {
-		showWarningDialog(tile, "Are you sure you want to delete all completed checklist items?", "Confirm", function() {
-			const removeIndexes = [] as number[];
-			for(var i = 0; i < checkItems.length; i++)
-			{
-				if(checkItems[i].condition.completed)
-				{
-					const toRemove = checkItems.splice(i, 1)[0];
-					conditionsDiv.removeChild(toRemove.item);
-					
-					removeIndexes.push(i);
-					
-					i--;
-				}
-			}
-			
-			getLocalStorage("PMMG-Checklists", updateThenRemove, [name, removeIndexes]);
-		});
-	});
 	
 	const addButton = document.createElement("button");
 	addButton.classList.add(...Style.Button);
@@ -198,31 +150,34 @@ function displayChecklist(result, params)	// Create an individual checklist
 		const popup = new Popup(tile, "Checklist Item Editor");
 		
 		// Type row (present on all)
-		popup.addPopupRow("dropdown", "Type", ["Text", "Resupply", "Repairs", "Construct", "Transport", 0], "The type of checklist item being added.", updateInfo, [popup, info, pmmgResult, webData]);
+		popup.addPopupRow("dropdown", "Type", ["Text", "Resupply", "Repairs", "Construct", "Transport", 0], "The type of checklist item being added.", updateInfo, [popup, info, pmmgResult]);
 		
 		// Date row (present on all)
-		popup.addPopupRow("date", "Due Date", undefined, undefined, updateInfo, [popup, info, pmmgResult, webData]);
+		popup.addPopupRow("date", "Due Date", undefined, undefined, updateInfo, [popup, info, pmmgResult]);
+		
+		// Recurring period row (present on all)
+		popup.addPopupRow("number", "Recurring Period (Days)", undefined, "How often the checklist item will be added back. Will not function without a due date.", updateInfo, [popup, info, pmmgResult]);
 		
 		// Text row (Only present on text type)
-		popup.addPopupRow("text", "Text", undefined, undefined, updateInfo, [popup, info, pmmgResult, webData]);
+		popup.addPopupRow("text", "Text", undefined, undefined, updateInfo, [popup, info, pmmgResult]);
 		popup.rows[2].rowInput.focus();
 		
 		// Confirm/add row (present on all)
-		popup.addPopupRow("button", "CMD", "SAVE", "Save and add the checklist item.", addChecklistItem, [popup, info, name, tile, pmmgResult, webData]);
+		popup.addPopupRow("button", "CMD", "SAVE", "Save and add the checklist item.", addChecklistItem, [popup, info, name, tile, pmmgResult]);
 	});
 	
+	tile.style.minHeight = "auto";
 	return [result];
 }
 
 // Updates the interface on the add/edit screen to reflect the values of the type dropdown
 function updateInfo(junk, params)
 {
-	if(!params[0] || !params[1] || !params[2] || !params[3]){return;}
+	if(!params[0] || !params[1] || !params[2]){return;}
 	
 	const popup = params[0];
 	const info = params[1];
 	const pmmgResult = params[2];
-	const webData = params[3];
 	
 	const typeValue = popup.rows[0].rowInput.selectedOptions[0].value;
 	
@@ -231,29 +186,28 @@ function updateInfo(junk, params)
 	{
 		// Delete all rows (except universal ones at the top)
 		const numRows = popup.rows.length;
-		for(var i = 2; i < numRows - 1; i++)
+		for(var i = 3; i < numRows - 1; i++)
 		{
 			popup.removePopupRow(2);
 		}
 		if(typeValue == "Text")	// If it was just changed back to text...
 		{
 			// Add in the text row
-			popup.addPopupRow("text", "Text", info["name"], undefined, updateInfo, [popup, info, pmmgResult, webData]);
+			popup.addPopupRow("text", "Text", info["name"], undefined, updateInfo, [popup, info, pmmgResult]);
 		}
 		else if(typeValue == "Resupply")
 		{
 			// Add in planet row
 			const planetBurns = [] as any[];
-			const username = pmmgResult["PMMGExtended"]["username"];
-			if(webData["burn"] && username && webData["burn"][username])
+			/*if(webData["burn"] && username && webData["burn"][username])
 			{
 				webData["burn"][username].forEach(burnInfo => {
 					planetBurns.push(burnInfo["PlanetName"]);
 				});
-			}
+			}*/ // Detect burn, rewrite with non-webdata
 			planetBurns.push(0);
-			popup.addPopupRow("dropdown", "Planet", planetBurns, "The planet to resupply. Ex: JS-952c, OT-580b, Gibson", updateInfo, [popup, info, pmmgResult, webData]);
-			popup.addPopupRow("number", "Days", "0", "The number of days of supplies", updateInfo, [popup, info, pmmgResult, webData]);
+			popup.addPopupRow("dropdown", "Planet", planetBurns, "The planet to resupply. Ex: JS-952c, OT-580b, Gibson", updateInfo, [popup, info, pmmgResult]);
+			popup.addPopupRow("number", "Days", "0", "The number of days of supplies", updateInfo, [popup, info, pmmgResult]);
 		}
 		
 		popup.moveRowToBottom(2);
@@ -282,6 +236,7 @@ function updateInfo(junk, params)
 	
 	info["type"] = typeValue;
 	info["duedate"] = popup.rows[1].rowInput.value == "" ? undefined : (new Date(popup.rows[1].rowInput.value)).getTime();
+	info["recurring"] = popup.rows[2].rowInput.value == "" ? undefined : popup.rows[2].rowInput.value;
 	
 	console.log(info);
 	return junk;
@@ -290,33 +245,35 @@ function updateInfo(junk, params)
 // Saves the info from the add interface to a new checklist item and stores it
 function addChecklistItem(params)
 {
-	if(!params[0] || !params[1] || !params[2] || !params[3] || !params[4] || !params[5]){return;}
+	if(!params[1] || !params[2] || !params[3] || !params[4]){return;}
 	
 	const popup = params[0];
 	const info = params[1];
 	const name = params[2];
 	const tile = params[3];
 	const pmmgResult = params[4];
-	const webData = params[5];
 	
 	// Destroy the popup
-	popup.destroy();
+	if(popup)
+	{
+		popup.destroy();
+	}
 	
 	// Store the info
-	getLocalStorage("PMMG-Checklists", updateThenStore, [info, name, tile, pmmgResult, webData]);
+	getLocalStorage("PMMG-Checklists", updateThenStore, [info, name, tile, pmmgResult]);
 }
 
 // Once the current stored checklists have been retrieved, add the new one and set it.
 function updateThenStore(result, params)
 {
-	if(!params[0] || !params[1] || !params[2] || !params[3] || !params[4]){return;}
+	console.log(result);
+	if(!params[0] || !params[1] || !params[2] || !params[3]){return;}
 	if(!result["PMMG-Checklists"]){result["PMMG-Checklists"] = {};}
 	
 	const info = params[0];
 	const name = params[1];
 	const tile = params[2];
 	const pmmgResult = params[3];
-	const webData = params[4];
 	
 	if(!result["PMMG-Checklists"][name]){result["PMMG-Checklists"][name] = [];}
 	
@@ -325,6 +282,7 @@ function updateThenStore(result, params)
 	newInfo["duedate"] = info["duedate"];
 	newInfo["completed"] = info["completed"];
 	newInfo["type"] = info["type"];
+	newInfo["recurring"] = info["recurring"];
 	
 	switch(info["type"])
 	{
@@ -332,14 +290,13 @@ function updateThenStore(result, params)
 			newInfo["name"] = info["name"];
 			result["PMMG-Checklists"][name].push(newInfo);
 			break;
-		case "Resupply":
+		case "Resupply":	// USES OLD FIO BURN. NEED TO REFACTOR!
 			newInfo["planet"] = info["planet"];
 			newInfo["days"] = info["days"];
 			
 			newInfo["name"] = "Supply [[p:" + info["planet"] + "]] with " + newInfo["days"] + " " + (newInfo["days"] == "1" ? "day" : "days") + " of consumables.";
 			
-			var username = pmmgResult["PMMGExtended"]["username"];
-			
+			/*
 			if(username && newInfo["planet"] && webData["burn"] && webData["burn"][username])
 			{
 				const burn = findCorrespondingPlanet(newInfo["planet"], webData["burn"][username]);
@@ -384,6 +341,7 @@ function updateThenStore(result, params)
 				});
 
 			}
+			*/
 			break;
 	}
 	
@@ -391,8 +349,11 @@ function updateThenStore(result, params)
 	
 	setSettings(result);
 	
+	const height = calculateTileHeight(tile) + 50;
+	tile.style.minHeight = height.toString() + "px";
+	
 	clearChildren(tile);
-	getLocalStorage("PMMG-Checklists", displayChecklist, [tile, name, pmmgResult, webData]);
+	getLocalStorage("PMMG-Checklists", displayChecklist, [tile, name, pmmgResult]);
 }
 
 // Remove a check item
@@ -412,12 +373,14 @@ function updateThenRemove(result, params)
 			
 		}
 	});
-	
+	console.log("After removing:")
+	console.log(result);
 	setSettings(result);
 }
 
+// I'm not sure what this function is for. This whole module is a mess
 // Store checklist state in settings (pass into getLocalStorage function)
-function storeChecklistState(checklistResult, params)
+/*function storeChecklistState(checklistResult, params)
 {
 	if(!params[0] || !params[1]){return;}
 	const checklistName = params[0];
@@ -435,6 +398,8 @@ function storeChecklistState(checklistResult, params)
 	
 	setSettings(checklistResult);
 }
+*/
+
 
 // Create the name text (with hyperlinks)
 function createName(name)
@@ -486,10 +451,16 @@ const filledCircle = `<svg width="15" height="15" viewBox = "10 10 80 80">
   <path d="M 50 10 A 40 40 0 1 0 50 90 A 40 40 0 1 0 50 10 Z M 50 20 A 30 30 0 1 1 50 80 A 30 30 0 1 1 50 20 Z" fill="#f7a600" stroke="none" stroke-width="0" /><circle cx="50" cy="50" r="20" fill="#f7a600" stroke="none" stroke-width="2" />
 </svg>`
 
-//function createNewItemInterface(tile, result, listName, checklistItems: CheckItem[], currentItem: CheckItem)
-//{
+// Calculate the height of all elements in a tile so that when it is cleared, it does not jutter the current view of the user
+function calculateTileHeight(tile)
+{
+	var height = 0;
+	Array.from(tile.children).forEach(child => {
+		height += (child as HTMLElement).getBoundingClientRect().height || 0;
+	});
 	
-//}
+	return height;
+}
 
 class CheckItem {
 	public condition;
@@ -501,7 +472,7 @@ class CheckItem {
 	public checklistName;
 	//private allChecklistItems;
 	
-	constructor(condition, checklistName, allChecklistItems)
+	constructor(condition, checklistName, allChecklistItems, tile, pmmgResult)
 	{
 		this.condition = condition;	// The dictionary containing info on the checklist item
 		this.checklistName = checklistName;	// The name of the checklist this item is a part of
@@ -545,10 +516,44 @@ class CheckItem {
 		this.item.appendChild(mainTextDiv);
 		
 		const thisObject = this;
+		const item = this.item;
 		
 		this.checkCircle.addEventListener("click", function() {
 			thisObject.changeCheckedState()
-			getLocalStorage("PMMG-Checklists", storeChecklistState, [checklistName, allChecklistItems]);
+			
+			if(!thisObject.condition.completed){return;}
+			
+			// Start the countdown to delete/recur the checklist item
+			setTimeout(async function() {
+				
+				if(!thisObject.condition.completed){return;}
+				
+				const toRemoveIndex = allChecklistItems.findIndex(obj => obj == thisObject);
+				if (toRemoveIndex !== -1) {
+					// Use the splice method to remove the object at the specified index
+					allChecklistItems.splice(toRemoveIndex, 1);
+				}
+				if(item.parentElement)
+				{
+					(item.parentElement).removeChild(item);
+				}
+				await getLocalStorage("PMMG-Checklists", updateThenRemove, [checklistName, [toRemoveIndex]]);
+				
+				
+				// Handle recurring objects
+				if(thisObject.condition.duedate && thisObject.condition.recurring)
+				{
+					setTimeout(function(){
+						thisObject.condition.completed = false;
+						
+						thisObject.condition.duedate = thisObject.condition.duedate + 86400000*parseFloat(thisObject.condition.recurring);
+						addChecklistItem([null, thisObject.condition, checklistName, tile, pmmgResult, {}]);
+					}, 20);
+				}
+				
+				
+				return;
+			}, 4000);
 		});
 	}
 	

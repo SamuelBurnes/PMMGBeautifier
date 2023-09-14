@@ -191,6 +191,8 @@ export const PMMGStyle = `
 	color: rgb(153, 153, 153)
 }
 .check-item {
+	display: flex;
+	justify-content: space-between;
 	border-bottom: solid 1px #555;
 }
 .checked-text {

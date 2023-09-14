@@ -36,7 +36,6 @@ export class ConsumableTimers implements Module {
 export function generateBurns(buffer, thresholds, userInfo)
 {
 	if(!userInfo["PMMG-User-Info"]){return;}
-	const production = userInfo["PMMG-User-Info"]["production"];
 	const workforce = userInfo["PMMG-User-Info"]["workforce"];
 	const inventories = userInfo["PMMG-User-Info"]["storage"];
 	
@@ -54,11 +53,10 @@ export function generateBurns(buffer, thresholds, userInfo)
 		burnHeader.textContent = "Burn";
 	});
 	
-	const planetProduction = findCorrespondingPlanet(name, production);
 	const planetWorkforce = findCorrespondingPlanet(name, workforce);
 	const planetInv = findCorrespondingPlanet(name, inventories, true);
 	
-	const planetBurn = calculateBurn(planetProduction, planetWorkforce, planetInv);
+	const planetBurn = calculateBurn(null, planetWorkforce, planetInv);
 	
 	
 	const elements = Array.from(buffer.querySelectorAll("table > tbody > tr") as HTMLElement[]);

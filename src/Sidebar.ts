@@ -45,6 +45,7 @@ export class Sidebar implements Module {
 	});
 	if((sidebar.children[sidebar.children.length-1] as HTMLElement).classList.contains(this.tag))
 	{
+		//console.log(sidebar.children[sidebar.children.length-1])
 		return;
 	}
 	this.buttons.forEach(buttonInfo => {
