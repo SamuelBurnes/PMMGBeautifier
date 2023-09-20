@@ -19,7 +19,7 @@ export class Sidebar implements Module {
   {
 	const sidebar = document.getElementById(Selector.LeftSidebar);
 	
-	if(!this.buttons){this.buttons = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["LEAD", "LEAD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"]];}
+	if(!this.buttons){this.buttons = [["BS", "BS"], ["CONT", "CONTS"], ["COM", "COM"], ["CORP", "CORP"], ["CXL", "CXL"], ["FIN", "FIN"], ["FLT", "FLT"], ["INV", "INV"], ["MAP", "MAP"], ["PROD", "PROD"], ["LEAD", "LEAD"], ["CMDS", "CMDS"], ["SET", "XIT SETTINGS"], ["HELP", "XIT HELP"]];}
 	if(!sidebar){return;}
 	
 	this.defaultButtons.forEach(defaultButton => {

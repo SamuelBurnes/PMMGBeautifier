@@ -298,12 +298,11 @@ function logEvent(result, eventdata)
 			matchIndex = result["PMMG-User-Info"]["production"].findIndex(item => item.siteId === eventdata["payload"]["siteId"]);
 			
 			const siteInfo = {"lines": [], "siteId": eventdata["payload"]["siteId"]};
-			
 			eventdata["payload"]["productionLines"].forEach(line => {
 				const planetId = line["address"]["lines"][1]["entity"]["naturalId"];
 				const planetName = line["address"]["lines"][1]["entity"]["name"];
 				
-				const prodLine = {"PlanetName": planetName, "PlanetNaturalId": planetId, "capacity": line["capacity"], "condition": line["condition"], "efficiency": line["efficiency"], "type": line["type"], "orders": []};
+				const prodLine = {"PlanetName": planetName, "PlanetNaturalId": planetId, "capacity": line["capacity"], "condition": line["condition"], "efficiency": line["efficiency"], "efficiencyFactors": line["efficiencyFactors"], "type": line["type"], "orders": []};
 				
 				line["orders"].forEach(order => {
 					const orderInfo = {};

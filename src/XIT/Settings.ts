@@ -20,40 +20,6 @@ export function Settings(tile, parameters, result, userInfo, webData, modules)
 	websiteLink.classList.add("link");
 	websiteLink.textContent = "PMMG's Website";
 	helpDiv.appendChild(websiteLink);
-	
-	const authenticationHeader = document.createElement('h3');
-    authenticationHeader.appendChild(document.createTextNode("Authentication Settings"));
-	authenticationHeader.appendChild(createToolTip("Enter your FIO username and API key", "right"));
-	authenticationHeader.classList.add(...Style.SidebarSectionHead);
-	tile.appendChild(authenticationHeader);
-	const usernameDiv = document.createElement("div");
-	const usernameLabel = createTextSpan("FIO Username: ");
-	const usernameInput = document.createElement("input");
-	usernameInput.value = result["PMMGExtended"]["username"] || "";
-	usernameInput.addEventListener("input", function(){
-		result["PMMGExtended"]["username"] = !usernameInput.value || usernameInput.value == "" ? undefined : usernameInput.value;
-		setSettings(result);
-	});
-	usernameInput.classList.add("input-text");
-	usernameDiv.appendChild(usernameLabel);
-	usernameDiv.appendChild(usernameInput);
-	tile.appendChild(usernameDiv);
-	
-	const apiDiv = document.createElement("div");
-	const apiLabel = createTextSpan("FIO API Key: ");
-	apiLabel.style.minWidth = "77px";
-	apiLabel.style.display = "inline-block";
-	const apiInput = document.createElement("input");
-	apiInput.value = result["PMMGExtended"]["apikey"] || "";
-	apiInput.addEventListener("input", function(){
-		result["PMMGExtended"]["apikey"] = !apiInput.value || apiInput.value == "" ? undefined : apiInput.value;
-		setSettings(result);
-	});
-	apiInput.classList.add("input-text");
-	apiInput.type = "password";
-	apiDiv.appendChild(apiLabel);
-	apiDiv.appendChild(apiInput);
-	tile.appendChild(apiDiv);
 
 	const enhancedColorHeader = document.createElement('h3');
     enhancedColorHeader.appendChild(document.createTextNode("Color Scheme"));
@@ -195,6 +161,40 @@ export function Settings(tile, parameters, result, userInfo, webData, modules)
 	addButton.style.marginLeft = "4px";
 	addButton.style.marginBottom = "4px";
 	tile.appendChild(addButton);
+	
+	const authenticationHeader = document.createElement('h3');
+    authenticationHeader.appendChild(document.createTextNode("Authentication Settings"));
+	authenticationHeader.appendChild(createToolTip("Enter your FIO username and API key", "right"));
+	authenticationHeader.classList.add(...Style.SidebarSectionHead);
+	tile.appendChild(authenticationHeader);
+	const usernameDiv = document.createElement("div");
+	const usernameLabel = createTextSpan("FIO Username: ");
+	const usernameInput = document.createElement("input");
+	usernameInput.value = result["PMMGExtended"]["username"] || "";
+	usernameInput.addEventListener("input", function(){
+		result["PMMGExtended"]["username"] = !usernameInput.value || usernameInput.value == "" ? undefined : usernameInput.value;
+		setSettings(result);
+	});
+	usernameInput.classList.add("input-text");
+	usernameDiv.appendChild(usernameLabel);
+	usernameDiv.appendChild(usernameInput);
+	tile.appendChild(usernameDiv);
+	
+	const apiDiv = document.createElement("div");
+	const apiLabel = createTextSpan("FIO API Key: ");
+	apiLabel.style.minWidth = "77px";
+	apiLabel.style.display = "inline-block";
+	const apiInput = document.createElement("input");
+	apiInput.value = result["PMMGExtended"]["apikey"] || "";
+	apiInput.addEventListener("input", function(){
+		result["PMMGExtended"]["apikey"] = !apiInput.value || apiInput.value == "" ? undefined : apiInput.value;
+		setSettings(result);
+	});
+	apiInput.classList.add("input-text");
+	apiInput.type = "password";
+	apiDiv.appendChild(apiLabel);
+	apiDiv.appendChild(apiInput);
+	tile.appendChild(apiDiv);
 	
 	const screenUnpackHeader = document.createElement('h3');
     screenUnpackHeader.appendChild(document.createTextNode("Screen Unpack Exclusions"));

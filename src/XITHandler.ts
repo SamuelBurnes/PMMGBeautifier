@@ -12,8 +12,8 @@ import {EnhancedBurn_pre} from "./XIT/Burn";
 import {Contracts_pre} from "./XIT/Contracts";
 import {PRuN_pre, Prosperity_pre, Sheets_pre, Discord_pre, PrunPlanner, Wiki, FIO} from "./XIT/Web";
 import {FIOInv_pre} from "./XIT/Inventory";
-import {Notes} from "./XIT/Notes_New";
-import {Checklists} from "./XIT/Checklists_New_New";
+import {Notes} from "./XIT/Notes";
+import {Checklists} from "./XIT/Checklists";
 import {Sort} from "./XIT/Sort";
 import {CommandLists} from "./XIT/CommandLists";
 import {Help} from "./XIT/Help";
@@ -80,7 +80,7 @@ export const XITBufferTitles = {
 	"PRUNPLANNER": "PRUN PLANNER",
 	"PLANNER": "PRUN PLANNER",
 	"WIKI": "PRUN WIKI",
-	"HELP": "PMMG HELP",
+	"HELP": "PMMG EXTENDED HELP",
 	"FIO": "FIO",
 	"HEALTH": "DATA HEALTH"
 }

@@ -1,5 +1,4 @@
 import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan, showWarningDialog} from "../util";
-import {CHECK_INDICATOR} from "./Checklists";
 
 export function Notes(tile, parameters)
 {
@@ -61,7 +60,6 @@ function generateNotesTable(result, tile)
 	
 	var anyNotes = false;
 	names.forEach(name => {
-		if(name.substring(0, 7) == CHECK_INDICATOR){return;}
 		anyNotes = true;
 		const row = document.createElement("tr");
 		const nameColumn = document.createElement("td");
@@ -74,7 +72,7 @@ function generateNotesTable(result, tile)
 		body.appendChild(row);
 		
 		nameColumn.appendChild(createLink(name, "XIT NOTES_" + name));
-		lengthColumn.appendChild(createTextSpan(result["PMMG-Notes"][name].length.toLocaleString() + " Character" + (result["PMMG-Notes"][name].length == 1 ? "" : "s")));
+		lengthColumn.appendChild(createTextSpan(result["PMMG-Notes"][name].toString().length.toLocaleString() + " Character" + (result["PMMG-Notes"][name].toString().length == 1 ? "" : "s")));
 		
 		const deleteButton = document.createElement("button");
 		deleteButton.classList.add("delete-button");
@@ -129,11 +127,11 @@ function dispStoredNote(result, params)
 	
 	if(result["PMMG-Notes"][noteName])
 	{
-		textbox.value = result["PMMG-Notes"][noteName];
+		textbox.value = result["PMMG-Notes"][noteName].toString();
 	}
 	textbox.addEventListener("input", function()
 	{
-		getLocalStorage("PMMG-Notes", updateThenStoreNote, [noteName, textbox.value || ""]);
+		getLocalStorage("PMMG-Notes", updateThenStoreNote, [noteName, textbox.value.toString() || ""]);
 	});
 	return;
 }

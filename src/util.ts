@@ -175,15 +175,15 @@ export function findCorrespondingPlanet(planet, data, needBase?)
 	if(!data || !planet){return undefined;}
 	for(var i = 0; i < data.length; i++)
 	{
-		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase() && (!needBase || data[i]["type"] == "STORE"))	// If the natural ID matches: XX-000x
+		if(planet && data[i]["PlanetNaturalId"] && data[i]["PlanetNaturalId"].toLowerCase() == planet.toLowerCase() && (!needBase || data[i]["type"] == "STORE" || data[i]["type"] == "BASE"))	// If the natural ID matches: XX-000x
 		{
 			return data[i];
 		}
-		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase() && (!needBase || data[i]["type"] == "STORE"))	// If the planet name matches
+		else if(planet && data[i]["PlanetName"] && data[i]["PlanetName"].toLowerCase() == planet.toLowerCase() && (!needBase || data[i]["type"] == "STORE" || data[i]["type"] == "BASE"))	// If the planet name matches
 		{
 			return data[i];
 		}
-		else if(planet && data[i]["PlanetNaturalId"] && PlanetNames[planet] && PlanetNames[planet].toLowerCase() == data[i]["PlanetNaturalId"].toLowerCase() && (!needBase || data[i]["type"] == "STORE"))	// When planet name isn't in the payload, convert it to natural ID
+		else if(planet && data[i]["PlanetNaturalId"] && PlanetNames[planet] && PlanetNames[planet].toLowerCase() == data[i]["PlanetNaturalId"].toLowerCase() && (!needBase || data[i]["type"] == "STORE" || data[i]["type"] == "BASE"))	// When planet name isn't in the payload, convert it to natural ID
 		{
 			return data[i];
 		}

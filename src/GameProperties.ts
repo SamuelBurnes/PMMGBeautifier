@@ -27,6 +27,8 @@ export const RatingColors = {
 	"A": "#f6a204"
 }
 
+export const NonProductionBuildings = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
+
 export const FriendlyNames = {
 	"LocalMarketAds": "LM Unit Prices",
 	"OrderETAs": "Order ETAs",

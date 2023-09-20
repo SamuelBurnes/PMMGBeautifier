@@ -1,5 +1,5 @@
 import {clearChildren, createTextSpan, createTable} from "../util";
-import {TextColors} from "../Style";
+import {TextColors, Style} from "../Style";
 
 export function DataHealth(tile, parameters, result, userInfo)
 {
@@ -105,6 +105,25 @@ export function DataHealth(tile, parameters, result, userInfo)
 	
 	const cxPriceAge = userInfo["PMMG-User-Info"]["cx_prices"] ? ((Date.now() - userInfo["PMMG-User-Info"]["cx_prices"]["Age"]) / 3600000).toLocaleString(undefined, {maximumFractionDigits: 0}) + "h" : false as any;
 	otherTable.appendChild(createTableRow("CX Price Age", cxPriceAge));
+	
+	const clearButton = document.createElement("button");
+	clearButton.textContent = "Clear User Data";
+	clearButton.classList.add(...Style.Button);
+	clearButton.classList.add(...Style.ButtonPrimary);
+	clearButton.style.margin = "4px";
+	clearButton.style.display = "block";
+	clearButton.addEventListener("click", function() {
+		try
+		{
+			browser.storage.local.remove("PMMG-User-Info");
+		}
+		catch(err)
+		{
+			chrome.storage.local.remove("PMMG-User-Info");
+
+		}
+	});
+	tile.appendChild(clearButton);
 	
 	return [parameters, result];
 }

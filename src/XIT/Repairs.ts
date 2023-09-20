@@ -1,4 +1,5 @@
 import {createTextSpan, clearChildren, setSettings} from "../util";
+import {NonProductionBuildings} from "../GameProperties";
 
 export function Repairs_pre(tile, parameters, result, userInfo)
 {
@@ -151,12 +152,11 @@ export function Repairs_pre(tile, parameters, result, userInfo)
 
 function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 {
-	const nonProd = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
 	const materials = {};
 	siteData["buildings"].forEach(building => {
 		const row = document.createElement("tr");
 		body.appendChild(row);
-		if(nonProd.includes(building["buildingTicker"])){return;}
+		if(NonProductionBuildings.includes(building["buildingTicker"])){return;}
 		const date = (((new Date()).getTime() - building.lastRepair) / 86400000);
 		if(date < parseFloat(thresholdInput.value)){return;}
 		
@@ -211,12 +211,12 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 
 function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)	// Buildings is an array of type: [planetName, buildingInfo]
 {
-	const nonProd = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
+	const NonProductionBuildings = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
 	const materials = {};
 	buildings.forEach(building => {
 		const row = document.createElement("tr");
 		body.appendChild(row);
-		if(nonProd.includes(building[1]["buildingTicker"])){return;}
+		if(NonProductionBuildings.includes(building[1]["buildingTicker"])){return;}
 		const date = (((new Date()).getTime() - building[1].lastRepair) / 86400000);
 		if(date < parseFloat(thresholdInput.value)){return;}
 		
