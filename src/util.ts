@@ -332,6 +332,10 @@ export function XITWebRequest(tile, parameters, callbackFunction, url, requestTy
 	};
 	xhr.timeout = 10000;
 	xhr.open(requestType, url, true);
+	if(url.includes("fnar"))
+	{
+		xhr.setRequestHeader("X-FIO-Application", "PMMGExtended");
+	}
 	if(header) {
 		xhr.setRequestHeader(header[0], header[1]);
 	}
