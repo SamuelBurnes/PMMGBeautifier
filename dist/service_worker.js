@@ -26,7 +26,7 @@ browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 browser.runtime.onMessage.addListener(async function(request, sender, sendResponse)
 {
-    if (request.message === "websocket_update")
+    if (request.message === "pmmg_websocket_update")
     {
         //console.debug("Listener: websocket_update");
         //console.debug(request);

@@ -13,9 +13,9 @@ window.addEventListener("message", function(event) {
     if(typeof browser === "undefined") {
         var browser = chrome;
     }
-    if (event.data.message && event.data.message === "websocket_update") {
+    if (event.data.message && event.data.message === "pmmg_websocket_update") {
         browser.runtime.sendMessage({
-            message: "websocket_update",
+            message: "pmmg_websocket_update",
             payload: event.data.payload
         });
     }

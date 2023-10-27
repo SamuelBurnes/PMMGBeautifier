@@ -21,6 +21,7 @@ import { HeaderMinimizer } from "./HeaderMinimizer";
 import { PendingContracts } from "./PendingContracts";
 import { CompactUI } from "./CompactUI";
 import { calculateFinancials } from "./XIT/Finances";
+import { FormulaReplacer } from "./FormulaEvaluator";
 
 // Inject page_script.js directly into the webpage.
 
@@ -133,7 +134,8 @@ function mainRun(result, browser?)
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
 		  new PendingContracts(userInfo),
-		  new CompactUI(result)
+		  new CompactUI(result),
+		  new FormulaReplacer()
 	], result, webData, userInfo, browser);
 	
 	// Start the loop

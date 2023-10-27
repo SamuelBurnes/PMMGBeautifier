@@ -98,7 +98,7 @@ export class ModuleRunner {
 
 function updateUserInfo(result, userInfo)
 {
-	userInfo["PMMG-User-Info"] = result["PMMG-User-Info"];
+	userInfo["PMMG-User-Info"] = result["PMMG-User-Info"] || {};
 	// Assign planets to storages
 	
 	const planets = {};

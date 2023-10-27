@@ -39,7 +39,7 @@ else
             //console.debug("Websocket message occurred");
             window.postMessage(
                 { 
-                    message: "websocket_update",
+                    message: "pmmg_websocket_update",
                     payload: event.data,
                 }
             );

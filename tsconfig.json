@@ -8,9 +8,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "alwaysStrict": true,
-    "baseUrl": "./src",
+    "baseUrl": "./",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+	"moduleResolution": "node",
+	"esModuleInterop": true,
     "types": [
       "chrome"
     ],
