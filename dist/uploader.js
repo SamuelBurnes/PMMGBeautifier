@@ -295,6 +295,7 @@ function logEvent(result, eventdata)
 			result["PMMG-User-Info"]["contracts"] = eventdata["payload"]["contracts"];
 			break;
 		case "PRODUCTION_SITE_PRODUCTION_LINES":
+			console.log(eventdata["payload"]);
 			matchIndex = result["PMMG-User-Info"]["production"].findIndex(item => item.siteId === eventdata["payload"]["siteId"]);
 			
 			const siteInfo = {"lines": [], "siteId": eventdata["payload"]["siteId"]};

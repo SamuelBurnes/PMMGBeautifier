@@ -110,8 +110,14 @@ export function Wiki(tile, parameters)
 export function PrunPlanner(tile, parameters)
 {
 	clearChildren(tile);
+	var link = "https://prunplanner.org";
+	for(var i = 1; i < parameters.length; i++)
+	{
+		link += "/" + parameters[i];
+	}
+	
 	const frame = document.createElement("iframe");
-		frame.src = parameters[1] ? "https://prunplanner.org/" + parameters[1] : "https://prunplanner.org/";
+		frame.src = link;
 		frame.style.borderWidth = "0";
 		frame.style.height = "100%";
 		frame.style.width = "100%";

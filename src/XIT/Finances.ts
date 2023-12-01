@@ -519,7 +519,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		if(finResult["History"])
 		{
 			const oldestDate = new Date(finResult["History"][0][0]);
-			const oldestDateElem = createTextSpan("Oldest data recorded on " + oldestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"}));
+			const oldestDateElem = createTextSpan("Oldest data recorded on " + oldestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit", year:"numeric"}));
 			infoDiv.appendChild(oldestDateElem);
 			oldestDateElem.style.marginTop = "5px";
 			oldestDateElem.style.display = "block";

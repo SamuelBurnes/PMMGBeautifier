@@ -87,7 +87,7 @@ export function Repairs_pre(tile, parameters, result, userInfo)
 		
 		var siteData = undefined;
 		userInfo["PMMG-User-Info"]["sites"].forEach(site => {
-			if(site.type == "BASE" && site["PlanetName"].toUpperCase() == parameters[1].toUpperCase() || site["PlanetNaturalId"].toUpperCase() == parameters[1].toUpperCase())
+			if(site.type == "BASE" && (site["PlanetName"].toUpperCase() == parameters[1].toUpperCase() || site["PlanetNaturalId"].toUpperCase() == parameters[1].toUpperCase()))
 			{
 				siteData = site;
 			}
