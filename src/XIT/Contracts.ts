@@ -11,14 +11,14 @@ from "../util";
 
 import { TextColors } from "../Style";
 
-import { FactionHeaders} from "../GameProperties";
+import { FactionHeaders } from "../GameProperties";
 
 export function Contracts_pre( tile, parameters, pmmgResult, result ) // "result" is "userInfo"
 {
 	clearChildren( tile );
 
 	if ( !result[ "PMMG-User-Info" ] || !result[ "PMMG-User-Info" ][ "contracts" ] )
-    {
+	{
 		tile.textContent = "Loading Contract Data...";
 		tile.id = "pmmg-reload";
 		return;
@@ -28,60 +28,61 @@ export function Contracts_pre( tile, parameters, pmmgResult, result ) // "result
 
 	let validContracts = contractData.filter( c => !invalidContractStatus.includes( c[ "status" ] ) );
 
-	validContracts.map(
-        contract =>
-        {
-            contract[ "IsFaction" ] = false;
-            contract[ "materialConditions" ] = [];
+	validContracts.map(  //LARGE BLOCK START
+		contract =>
+		{
+			contract[ "IsFaction" ] = false;
+			contract[ "materialConditions" ] = [];
 
-            let selfConditions = [] as any[];
-            let partnerConditions = [] as any[];
-            contract.conditions.map(
-                ( condition ) =>
-                {
-                    // Determine if REPUTATION condition type exists to denote Faction contract
-                    if ( condition[ "type" ] === "REPUTATION" )
-                        contract[ "IsFaction" ] = true;
+			let selfConditions = [] as any[];
+			let partnerConditions = [] as any[];
+			
+			contract.conditions.map(
+				( condition ) =>
+				{
+					// Determine if REPUTATION condition type exists to denote Faction contract
+					if ( condition[ "type" ] === "REPUTATION" )
+						contract[ "IsFaction" ] = true;
 
-                    if ( condition[ "quantity" ] !== null && materialFulfilmentType.includes( condition[ "type" ] ) )
-                        contract[ "materialConditions" ].push( condition );
+					if ( condition[ "quantity" ] !== null && materialFulfilmentType.includes( condition[ "type" ] ) )
+						contract[ "materialConditions" ].push( condition );
 
-                    // Categorize conditions by who fulfills it
-                    if ( condition[ "party" ] === contract[ "party" ] )
-                        selfConditions.push( condition );
-                    else
-                        partnerConditions.push( condition );
-                }
-            );
+					// Categorize conditions by who fulfills it
+					if ( condition[ "party" ] === contract[ "party" ] )
+						selfConditions.push( condition );
+					else
+						partnerConditions.push( condition );
+				}
+			);
 
-		// Sort each category by ConditionIndex
-            selfConditions.sort( conditionSort );
-            partnerConditions.sort( conditionSort );
+			// Sort each category by ConditionIndex
+			selfConditions.sort( conditionSort );
+			partnerConditions.sort( conditionSort );
 
-            // Clear out default condition list and replace with named arrays
-            contract.FilteredConditions = {};
-            contract.FilteredConditions[ "self" ] = selfConditions;
-            contract.FilteredConditions[ "partner" ] = partnerConditions;
-        }
-    );
+			// Clear out default condition list and replace with named arrays
+			contract.FilteredConditions = {};
+			contract.FilteredConditions[ "self" ] = selfConditions;
+			contract.FilteredConditions[ "partner" ] = partnerConditions;
+		}
+	); //LARGE BLOCK END
 
 	validContracts.sort( ContractSort );
-
+	
 	const table = createTable( tile, [ "Contract ID", "Material", "Partner's Conditions", "My Conditions" ] );
 	if ( validContracts.length === 0 )
-    {
+	{
 		const row = createNoContractsRow(4);
 		table.appendChild(row);
 	}
-    else
-    {
+	else
+	{
 		validContracts.forEach(
-            contract =>
-            {
-                const row = createContractRow( contract );
-                table.appendChild( row );
-            }
-        );
+			contract =>
+			{
+				const row = createContractRow( contract );
+				table.appendChild( row );
+			}
+		);
 	}
 
 	return [ parameters, pmmgResult ];
@@ -114,61 +115,61 @@ function createContractRow( contract )
 	materialColumn.style.width = "32px";
 	materialColumn.style.paddingLeft = "10px";
 
-    const materialDiv = document.createElement( "div" );
+	const materialDiv = document.createElement( "div" );
 	materialColumn.appendChild( materialDiv );
 
 	if ( contract[ "materialConditions" ].length > 0 )
-    {
+	{
 		contract[ "materialConditions" ].forEach(
-            materialCondition =>
-            {
-                if ( !materialCondition.quantity || !materialCondition.quantity.material )
-                {
-                    return;
-                }
+			materialCondition =>
+			{
+				if ( !materialCondition.quantity || !materialCondition.quantity.material )
+				{
+					return;
+				}
 
-                const materialElement = createMaterialElement(
-                    materialCondition.quantity.material.ticker,
-                    "prun-remove-js",
-                    materialCondition.quantity.amount,
-                    false,
-                    true
-                )
+				const materialElement = createMaterialElement(
+					materialCondition.quantity.material.ticker,
+					"prun-remove-js",
+					materialCondition.quantity.amount,
+					false,
+					true
+				)
 
-                if ( materialElement )
-                {
-                    materialElement.style.marginBottom = "4px";
-                    materialDiv.appendChild( materialElement );
-                }
-                return;
-            }
-        );
+				if ( materialElement )
+				{
+					materialElement.style.marginBottom = "4px";
+					materialDiv.appendChild( materialElement );
+				}
+				return;
+			}
+		);
 	}
 	row.appendChild( materialColumn );
 
 	const partnerColumn = document.createElement( "td" );
 	var faction;
 	if ( contract[ "IsFaction" ] )
-    {
+	{
 		Object.keys( FactionHeaders ).forEach(
-            factionName =>
-            {
-                if ( contract.partner.name.includes( factionName ) )
-                {
-                    faction = FactionHeaders[ factionName ];
-                }
-                return;
-            }
-        );
+			factionName =>
+			{
+				if ( contract.partner.name.includes( factionName ) )
+				{
+					faction = FactionHeaders[ factionName ];
+				}
+				return;
+			}
+		);
 	}
 
 	if ( !faction )
-    {
+	{
 		let partnerLink = createLink( contract.partner.name, "CO " + contract.partner.code );
 		partnerColumn.appendChild( partnerLink );
 	}
-    else
-    {
+	else
+	{
 		let partnerLink = createLink( contract.partner.name, "FA " + faction );
 		partnerColumn.appendChild( partnerLink );
 	}
@@ -192,14 +193,14 @@ function createContractRow( contract )
 function createNoContractsRow( colspan )
 {
 	var line = document.createElement( "tr" );
-    
+	
 	const textColumn = document.createElement( "td" );
 	textColumn.setAttribute( 'colspan', `${colspan}` );
 	textColumn.textContent = "No contracts";
 	
-    line.appendChild( textColumn );
+	line.appendChild( textColumn );
 	
-    return line;
+	return line;
 }
 
 function conditionSort( a, b ) 
