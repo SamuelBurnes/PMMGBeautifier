@@ -5,6 +5,7 @@ import { FriendlyNames } from "./GameProperties";
 export interface Module {
   run();
   cleanup();
+  frequency?;
 }
 
 interface ModuleEntry {
@@ -12,6 +13,7 @@ interface ModuleEntry {
   name: string;
   friendlyName: string;
   enabled: boolean;
+  frequency: number;
   count: number;
   cleanupTime: number;
   runTime: number;
@@ -22,10 +24,11 @@ export class ModuleRunner {
   private readonly xit: XITHandler;	// The XIT module, run separately
   private userInfo;
   private result;	// The stored settings
+  private loopNum = 0;	// The number of loops performed
   constructor(modules: Module[], result, webData, userInfo, browser) {
 	// Construct global variables
     this.modules = modules.map(m => this.moduleToME(m));
-	this.xit = new XITHandler(result, userInfo, webData, this.modules, browser);
+	this.xit = new XITHandler(userInfo, webData, this.modules, browser);
 	this.result = result;
 	this.userInfo = userInfo;
 	
@@ -48,6 +51,7 @@ export class ModuleRunner {
     return {
       module,
       name: module.constructor.name,
+	  frequency: module.frequency || 1,
 	  friendlyName: FriendlyNames[module.constructor.name] || module.constructor.name,
       enabled: true,
       count: 0,
@@ -57,6 +61,7 @@ export class ModuleRunner {
   }
 
   loop() {
+	this.loopNum++;
 	// Render all XIT buffers
 	this.xit.run();
 	
@@ -70,23 +75,16 @@ export class ModuleRunner {
 		}
 	}
 	
-	// For each module, run it, clean it, and measure its performance
+	// For each module, run it, clean it
     this.modules.map(entry => {
-      if (entry.enabled) {
-        const t0 = performance.now();
+      if (entry.enabled && this.loopNum % entry.frequency == 0) {
         entry.module.cleanup();
-        const cleanupTime = performance.now() - t0;
-        const t1 = performance.now();
         entry.module.run();
-        const runTime = performance.now() - t1;
         entry.count++;
-        entry.cleanupTime += cleanupTime;
-        entry.runTime += runTime;
       }
 	  
     });
-
-    // @TODO: Vary the interval based on module performance
+	
     window.setTimeout(() => this.loop(), 250);
   }
   
