@@ -272,7 +272,7 @@ function updatePopupInfo(junk, params) {
                 planetNames = userInfo["PMMG-User-Info"].workforce.map(planet => planet.PlanetName);
             }
 
-            if ( info.planet && planetNames.includes(info.planet) )
+            if ( info.planet && planetNames.includes(info.planet) && planetNames.length !== 1  )
             {
                 planetNames.push(planetNames.indexOf(info.planet));
             }
@@ -286,7 +286,7 @@ function updatePopupInfo(junk, params) {
             if (userInfo["PMMG-User-Info"].sites) {
                 planetNames = userInfo["PMMG-User-Info"].sites.filter(site => site.type == "BASE").map(site => site.PlanetName);
             }
-            if (info.planet && planetNames.includes(info.planet)) {
+            if (info.planet && planetNames.includes(info.planet) && planetNames.length !== 1 ) {
                 planetNames.push(planetNames.indexOf(info.planet));
             }
 
