@@ -257,7 +257,9 @@ const friendlyConditionText =
 	PAYMENT: "Payment",
 	PICKUP_SHIPMENT: "Pickup Shipment",
 	PROVISION_SHIPMENT: "Provision",
-	PROVISION: "Provision"
+	PROVISION: "Provision",
+	LOAN_PAYOUT: "Loan Payout",
+	LOAN_INSTALLMENT: "Loan Installment"
 }
 
 const materialFulfilmentType = 
