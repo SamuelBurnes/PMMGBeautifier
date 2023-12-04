@@ -18,6 +18,7 @@ export function Checklists(tile, parameters, pmmgResult, userInfo)
 		displayChecklist(tile, userInfo, checkName);
 	}
 	return [pmmgResult];
+
 }
 
 // Might need to rewrite
@@ -129,14 +130,15 @@ function checklistDuedateSort(a, b)
 	{
 		return aDuedate > bDuedate ? 1 : -1;
 	}
+
 	else if (aDuedate && !bDuedate)
 	{
-		return -1;
-	}
+        return -1;
+    }
 	else
 	{
-		return 1;
-	}
+        return 1;
+    }
 }
 
 function calculateDuedate(checklist)
@@ -328,8 +330,6 @@ function updatePopupInfo(junk, params)
 		}
 		else if (typeValue == "Repair")
 		{
-
-
 			if (userInfo["PMMG-User-Info"].sites)
 			{
 				planetNames = userInfo["PMMG-User-Info"].sites.filter(site => site.type == "BASE").map(site => site.PlanetName);
@@ -556,8 +556,8 @@ function updateStoredChecklists(result, params)
 		{
 			if (toDelete)
 			{
-				result["PMMG-Checklists"][checklist.name][outerIndex].children.splice(innerIndex, 1);
-			}
+                result["PMMG-Checklists"][checklist.name][outerIndex].children.splice(innerIndex, 1);
+            }
 			else
 			{
 				result["PMMG-Checklists"][checklist.name][outerIndex].children[innerIndex] = toUpdate;
