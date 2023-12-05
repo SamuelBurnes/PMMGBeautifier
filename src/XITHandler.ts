@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers, createTextSpan, getLocalStorage} from "./util";
+import {getBuffers, createTextSpan} from "./util";
 import {Selector} from "./Selector";
 import {Start} from "./XIT/Start";
 import {Settings} from "./XIT/Settings";
@@ -91,28 +91,22 @@ export class XITHandler implements Module {
   private tag = "pb-xit";
   private webData;
   private modules;
+  private result;
   private browser;
   private userInfo;
-  public result;
   
-  constructor(userInfo, webData, modules, browser)
+  constructor(result, userInfo, webData, modules, browser)
   {  
 	this.userInfo = userInfo;
 	this.webData = webData;
 	this.modules = modules;
+	this.result = result;
 	this.browser = browser;
   }
   cleanup() {
     //genericCleanup(this.tag);	// Don't clean up because causes flashing when doing asynchronous requests
   }
-  updateResult(newResult, obj)
-  {
-	obj.result = newResult;
-  }
   run() {
-    // Get latest copy of "PMMGExtended" stored data into this.result
-	getLocalStorage("PMMGExtended", this.updateResult, this);
-	
     const buffers = getBuffers("XIT");
     if (!buffers) return;
 	const webData = this.webData;

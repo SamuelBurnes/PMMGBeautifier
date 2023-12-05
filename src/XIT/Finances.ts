@@ -52,16 +52,6 @@ export function Fin_pre(tile, parameters, result, userInfo, webData)
 	return;
 }
 
-function formatTime(seconds: number): string {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-
-    const formattedTime = `${String(hours)}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-    
-    return formattedTime;
-}
-
 // Draw the correct screen based on the parameters (should split out into multiple functions probably)
 function chooseScreen(finResult, params)	// Params consists of [tile, parameters, result, webData]
 {
@@ -535,16 +525,10 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			oldestDateElem.style.display = "block";
 			
 			const newestDate = new Date(finResult["History"][finResult["History"].length - 1][0]);
-			const newestDateElem = createTextSpan("Latest data recorded at " + newestDate.toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) + " on " + newestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit", year:"numeric"}));
+			const newestDateElem = createTextSpan("Latest data recorded at " + newestDate.toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) + " on " + newestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit", year: "numeric"}));
 			infoDiv.appendChild(newestDateElem);
 			newestDateElem.style.marginTop = "5px";
 			newestDateElem.style.display = "block";
-			
-			const playTime = formatTime(result["PMMGExtended"]["play_time"] || 0)
-			const playTimeElem = createTextSpan("Total Play Time: " + playTime);
-			infoDiv.appendChild(playTimeElem);
-			playTimeElem.style.marginTop = "5px";
-			playTimeElem.style.display = "block";
 		}
 		
 	}
