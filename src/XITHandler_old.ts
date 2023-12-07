@@ -19,13 +19,6 @@ import {CommandLists} from "./XIT/CommandLists";
 import {Help} from "./XIT/Help";
 import {DataHealth} from "./XIT/DataHealth";
 
-export interface XITModule {
-	create();
-	update();
-	destroy();
-	name: string;
-}
-
 export const XITPreFunctions = {
 	"INV": FIOInv_pre,
 	"DISCORD": Discord_pre,

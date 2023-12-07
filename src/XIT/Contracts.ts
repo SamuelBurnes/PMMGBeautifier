@@ -97,7 +97,7 @@ const invalidContractStatus =
 	"REJECTED"
 ];
 
-function createContractRow( contract )
+function createContractRow(contract)
 {
 	var row = document.createElement( "tr" );
 
