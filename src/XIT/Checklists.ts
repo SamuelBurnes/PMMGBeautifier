@@ -1,4 +1,4 @@
-import {clearChildren, getLocalStorage, setSettings, createTextSpan, createTable, createLink, Popup, showWarningDialog, findCorrespondingPlanet, calculateBurn} from "../util";
+import {clearChildren, getLocalStorage, setSettings, createTextSpan, createTable, createLink, Popup, PopupRow, showWarningDialog, findCorrespondingPlanet, calculateBurn} from "../util";
 import {Style, TextColors} from "../Style";
 import {NonProductionBuildings} from "../GameProperties";
 
@@ -249,7 +249,7 @@ function updatePopupInfo(junk, params)
 	{
 		// Delete all rows (except universal ones at the top)
 		const numRows = popup.rows.length;
-		for(var i = 3; i < numRows - 2; i++)
+		for(let i = 3; i < numRows - 2; i++)
 		{
 			popup.removePopupRow(3);
 		}
@@ -263,7 +263,7 @@ function updatePopupInfo(junk, params)
 		else if(typeValue == "Resupply")	// If it was changed to Resupply
 		{
 			// Add in the planet row
-			var planetNames = [] as any[];
+			let planetNames = [] as any[];
 			
 			if(userInfo["PMMG-User-Info"]["workforce"])
 			{
@@ -281,7 +281,7 @@ function updatePopupInfo(junk, params)
 		}
 		else if(typeValue == "Repair")
 		{
-			var planetNames = [] as any[];
+			let planetNames = [] as any[];
 			
 			if(userInfo["PMMG-User-Info"]["sites"])
 			{
@@ -300,7 +300,10 @@ function updatePopupInfo(junk, params)
 		popup.moveRowToBottom(3);
 		popup.moveRowToBottom(3);
 	}
-	
+
+	let planetRow: PopupRow;
+	let daysRow: PopupRow;
+
 	// Update the values in info
 	switch(typeValue)
 	{
@@ -312,11 +315,11 @@ function updatePopupInfo(junk, params)
 			}
 			break;
 		case "Resupply":
-			var planetRow = popup.getRowByName("Planet");
-			var daysRow = popup.getRowByName("Days");
+			planetRow = popup.getRowByName("Planet");
+			daysRow = popup.getRowByName("Days");
 			if(planetRow)
 			{
-				info["planet"] = planetRow.rowInput.selectedOptions[0].value;
+				info["planet"] = (planetRow.rowInput as HTMLSelectElement).selectedOptions[0].value;
 			}
 			if(daysRow)
 			{
@@ -328,7 +331,7 @@ function updatePopupInfo(junk, params)
 			daysRow = popup.getRowByName("Threshold");
 			if(planetRow)
 			{
-				info["planet"] = planetRow.rowInput.selectedOptions[0].value;
+				info["planet"] = (planetRow.rowInput as HTMLSelectElement).selectedOptions[0].value;
 			}
 			if(daysRow)
 			{

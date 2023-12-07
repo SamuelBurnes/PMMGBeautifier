@@ -25,7 +25,7 @@ export function createNode(htmlString) {
 }
 
 // Create an option element for a select list
-export function createSelectOption(optionLabel, optionValue, rightAlign?) 
+export function createSelectOption(optionLabel: string, optionValue: string, rightAlign?: boolean | undefined)
 {
 	const option = document.createElement("option");
 	option.value = optionValue;
@@ -36,7 +36,7 @@ export function createSelectOption(optionLabel, optionValue, rightAlign?)
 
 /**
  * parse a duration into an actual ETA string
- * @param duration
+ * @param parsedSeconds
  * @returns {string}
  */
 export function convertDurationToETA(parsedSeconds) {
@@ -989,7 +989,7 @@ export function drawPieChart(data, size, text?, colors?)
 	const context = canvas.getContext("2d");
 	if(!context){return null;}
 	
-	for(var i = 0; i < data.length; i++){
+	for(let i = 0; i < data.length; i++){
 		const pieAngle = data[i] / sum * 2 * Math.PI;
 		context.beginPath();
 		context.arc(centerX, centerY, pieSize, angle, angle + pieAngle);
@@ -1015,7 +1015,7 @@ export function drawPieChart(data, size, text?, colors?)
 	angle = 0; 
 	var minX = centerX - pieSize;
 	var maxX = centerX + pieSize;
-	for(var i = 0; i < data.length; i++)
+	for(let i = 0; i < data.length; i++)
 	{
 		const pieAngle = data[i] / sum * 2 * Math.PI;
 		const percent = " - " + (data[i] / sum * 100).toLocaleString(undefined, {"maximumFractionDigits": 0}) + "%";
@@ -1048,14 +1048,14 @@ export function drawPieChart(data, size, text?, colors?)
 
 export class Popup
 {
-	private overlapDiv;	// The popup element
-	private form;	// The form element to which all rows are added
-	private tile;
-	public rows: PopupRow[];	// All the popup rows
+	private overlapDiv: HTMLDivElement;	// The popup element
+	private form: HTMLDivElement;		// The form element to which all rows are added
+	private tile: HTMLElement;
+	public rows: PopupRow[];			// All the popup rows
 	
-	constructor(tile, name)
+	constructor(tile: HTMLElement, name: string)
 	{
-		this.rows = [] as PopupRow[];
+		this.rows = [];
 		this.tile = tile;
 		
 		this.overlapDiv = document.createElement("div");
@@ -1128,12 +1128,12 @@ export class Popup
 	}
 }
 
-class PopupRow
+export class PopupRow
 {
-	public rowType;
-	public rowLabel;
-	public row;
-	public rowInput;
+	public rowType: "text" | "date" | "number" | "dropdown" | "button";
+	public rowLabel: HTMLLabelElement;
+	public row: HTMLDivElement;
+	public rowInput: HTMLInputElement | HTMLSelectElement | HTMLButtonElement;
 	
 	// rowType: Either "text" or "button" or "dropdown" or "checkbox"
 	// label: Label of the row
@@ -1141,11 +1141,16 @@ class PopupRow
 	// tooltip: Text to appear on the tooltip, undefined or null for no tool tip
 	// rowInputCallback: Function called when input is clicked/changed
 	// params: Callback Function parameters
-	constructor(rowType, label, inputText, tooltip, callback, params?)
+	constructor(rowType: "text" | "date" | "number" | "dropdown" | "button",
+				label: string | null,
+				inputText: string | string[] | null,
+				tooltip: string | null,
+				callback: (...params: any[]) => void,
+				params?: any)
 	{
 		this.rowType = rowType;
-		this.rowLabel = label;
-		
+		// this.rowLabel = label;
+
 		if(rowType == "text" || rowType == "date" || rowType == "number")
 		{
 			this.row = document.createElement("div");
@@ -1164,7 +1169,7 @@ class PopupRow
 			
 			if(inputText)
 			{
-				this.rowInput.value = inputText;
+				this.rowInput.value = inputText as string;
 			}
 			
 			if(rowType == "date")
@@ -1205,18 +1210,19 @@ class PopupRow
 			
 			this.rowInput.name = "popup-dropdown" + Math.floor(Math.random() * 10000).toString();
 			this.rowInput.id = "popup-dropdown" + Math.floor(Math.random() * 10000).toString();
-			
-			const selectedIndex = inputText[inputText.length - 1];
-			inputText = inputText.slice(0, -1);
-			
-			inputText.forEach(text => {
+
+			let inputTextArray = inputText as string[];
+			const selectedIndex = inputTextArray[inputTextArray.length - 1];
+			inputTextArray = inputTextArray.slice(0, -1);
+
+			inputTextArray.forEach(text => {
 				this.rowInput.appendChild(createSelectOption(text, text));
 			});
 			
-			if(this.rowInput.children[selectedIndex])
+			if(this.rowInput.options[selectedIndex])
 			{
-				(this.rowInput.children[selectedIndex] as HTMLOptionElement).selected = true;
-				this.rowInput.selectedIndex = selectedIndex;
+				this.rowInput.options[selectedIndex].selected = true;
+				this.rowInput.value = selectedIndex;
 			}
 			
 			inputDiv.appendChild(this.rowInput);
@@ -1243,7 +1249,7 @@ class PopupRow
 			inputDiv.classList.add(...Style.FormSaveInput);
 			this.row.appendChild(inputDiv);
 			this.rowInput = document.createElement("button");
-			this.rowInput.textContent = inputText;
+			this.rowInput.textContent = inputText as string;
 			this.rowInput.classList.add(...Style.Button);
 			this.rowInput.classList.add(...Style.ButtonPrimary);
 			inputDiv.appendChild(this.rowInput);

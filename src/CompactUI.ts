@@ -1,7 +1,7 @@
 import { Module } from "./ModuleRunner";
 import { getBuffers, createTextSpan } from "./util";
 import { Selector } from "./Selector";
-import { WithStyles, Style } from "Style";
+import { WithStyles, Style } from "./Style";
 
 
 export class CompactUI implements Module {
