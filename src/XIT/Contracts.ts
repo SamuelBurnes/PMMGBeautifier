@@ -13,79 +13,106 @@ import { TextColors } from "../Style";
 
 import { FactionHeaders } from "../GameProperties";
 
-export function Contracts_pre( tile, parameters, pmmgResult, result ) // "result" is "userInfo"
-{
-	clearChildren( tile );
 
-	if ( !result[ "PMMG-User-Info" ] || !result[ "PMMG-User-Info" ][ "contracts" ] )
+export class Contracts {
+	private tile: HTMLElement;
+	public parameters: string[];
+	public pmmgSettings;
+	private userInfo;
+	
+	public name = "CONTRACTS";
+	
+	constructor(tile, parameters, pmmgSettings, userInfo)
 	{
-		tile.textContent = "Loading Contract Data...";
-		tile.id = "pmmg-reload";
+		this.tile = tile;
+		this.parameters = parameters;
+		this.pmmgSettings = pmmgSettings;
+		this.userInfo = userInfo;
+	}
+	
+	create_buffer()
+	{
+		clearChildren( this.tile );
+
+		if ( !this.userInfo[ "PMMG-User-Info" ] || !this.userInfo[ "PMMG-User-Info" ][ "contracts" ] )
+		{
+			this.tile.textContent = "Loading Contract Data...";
+			this.tile.id = "pmmg-reload";
+			return;
+		}
+
+		const contractData = this.userInfo[ "PMMG-User-Info" ][ "contracts" ];
+
+		let validContracts = contractData.filter( c => !invalidContractStatus.includes( c[ "status" ] ) );
+
+		validContracts.map(  //LARGE BLOCK START
+			contract =>
+			{
+				contract[ "IsFaction" ] = false;
+				contract[ "materialConditions" ] = [];
+
+				let selfConditions = [] as any[];
+				let partnerConditions = [] as any[];
+				
+				contract.conditions.map(
+					( condition ) =>
+					{
+						// Determine if REPUTATION condition type exists to denote Faction contract
+						if ( condition[ "type" ] === "REPUTATION" )
+							contract[ "IsFaction" ] = true;
+
+						if ( condition[ "quantity" ] !== null && materialFulfilmentType.includes( condition[ "type" ] ) )
+							contract[ "materialConditions" ].push( condition );
+
+						// Categorize conditions by who fulfills it
+						if ( condition[ "party" ] === contract[ "party" ] )
+							selfConditions.push( condition );
+						else
+							partnerConditions.push( condition );
+					}
+				);
+
+				// Sort each category by ConditionIndex
+				selfConditions.sort( conditionSort );
+				partnerConditions.sort( conditionSort );
+
+				// Clear out default condition list and replace with named arrays
+				contract.FilteredConditions = {};
+				contract.FilteredConditions[ "self" ] = selfConditions;
+				contract.FilteredConditions[ "partner" ] = partnerConditions;
+			}
+		); //LARGE BLOCK END
+
+		validContracts.sort( ContractSort );
+		
+		const table = createTable( this.tile, [ "Contract ID", "Material", "Partner's Conditions", "My Conditions" ] );
+		if ( validContracts.length === 0 )
+		{
+			const row = createNoContractsRow(4);
+			table.appendChild(row);
+		}
+		else
+		{
+			validContracts.forEach(
+				contract =>
+				{
+					const row = createContractRow( contract );
+					table.appendChild( row );
+				}
+			);
+		}
+
 		return;
 	}
 
-	const contractData = result[ "PMMG-User-Info" ][ "contracts" ];
-
-	let validContracts = contractData.filter( c => !invalidContractStatus.includes( c[ "status" ] ) );
-
-	validContracts.map(  //LARGE BLOCK START
-		contract =>
-		{
-			contract[ "IsFaction" ] = false;
-			contract[ "materialConditions" ] = [];
-
-			let selfConditions = [] as any[];
-			let partnerConditions = [] as any[];
-			
-			contract.conditions.map(
-				( condition ) =>
-				{
-					// Determine if REPUTATION condition type exists to denote Faction contract
-					if ( condition[ "type" ] === "REPUTATION" )
-						contract[ "IsFaction" ] = true;
-
-					if ( condition[ "quantity" ] !== null && materialFulfilmentType.includes( condition[ "type" ] ) )
-						contract[ "materialConditions" ].push( condition );
-
-					// Categorize conditions by who fulfills it
-					if ( condition[ "party" ] === contract[ "party" ] )
-						selfConditions.push( condition );
-					else
-						partnerConditions.push( condition );
-				}
-			);
-
-			// Sort each category by ConditionIndex
-			selfConditions.sort( conditionSort );
-			partnerConditions.sort( conditionSort );
-
-			// Clear out default condition list and replace with named arrays
-			contract.FilteredConditions = {};
-			contract.FilteredConditions[ "self" ] = selfConditions;
-			contract.FilteredConditions[ "partner" ] = partnerConditions;
-		}
-	); //LARGE BLOCK END
-
-	validContracts.sort( ContractSort );
-	
-	const table = createTable( tile, [ "Contract ID", "Material", "Partner's Conditions", "My Conditions" ] );
-	if ( validContracts.length === 0 )
+	update_buffer()
 	{
-		const row = createNoContractsRow(4);
-		table.appendChild(row);
+		// Nothing to update (for now)
 	}
-	else
+	destroy_buffer()
 	{
-		validContracts.forEach(
-			contract =>
-			{
-				const row = createContractRow( contract );
-				table.appendChild( row );
-			}
-		);
+		// Nothing constantly running so nothing to destroy
 	}
-
-	return [ parameters, pmmgResult ];
 }
 
 const invalidContractStatus =

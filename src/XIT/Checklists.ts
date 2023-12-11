@@ -2,26 +2,49 @@ import {clearChildren, getLocalStorage, setSettings, createTextSpan, createTable
 import {Style, TextColors} from "../Style";
 import {NonProductionBuildings} from "../GameProperties";
 
-export function Checklists(tile, parameters, pmmgResult, userInfo)
-{
-	clearChildren(tile);
+
+export class Checklists {
+	private tile: HTMLElement;
+	private parameters: string[];
+	public pmmgResult;
+	private userInfo;
+	public name = "CHECKLIST";
 	
-	
-	
-	
-	if(parameters.length == 1)
+	constructor(tile, parameters, pmmgResult, userInfo)
 	{
-		// Display table of checks and links to open each or delete each
-		getLocalStorage("PMMG-Checklists", generateCheckTable, tile);
+		this.tile = tile;
+		this.parameters = parameters;
+		this.pmmgResult = pmmgResult;
+		this.userInfo = userInfo;
 	}
-	else
+	
+	create_buffer()
 	{
-		// Display the specified check
-		const checkName = (parameters.slice(1)).join(" ");
-		displayChecklist(tile, userInfo, checkName);
+		clearChildren(this.tile);
 		
+		if(this.parameters.length == 1)
+		{
+			// Display table of checks and links to open each or delete each
+			getLocalStorage("PMMG-Checklists", generateCheckTable, this.tile);
+		}
+		else
+		{
+			// Display the specified check
+			const checkName = (this.parameters.slice(1)).join(" ");
+			displayChecklist(this.tile, this.userInfo, checkName);
+			
+		}
+		return;
 	}
-	return [pmmgResult];
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
 
 // Might need to rewrite

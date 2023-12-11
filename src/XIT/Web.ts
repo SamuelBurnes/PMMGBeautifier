@@ -1,61 +1,123 @@
 import {clearChildren} from "../util";
 
-export function PRuN_pre(tile)
-{
-	clearChildren(tile);
-	const prun = document.createElement("iframe");
-		prun.src = "https://apex.prosperousuniverse.com/#/";
-		prun.width = "100%";
-		prun.height = "100%";
-		prun.style.borderWidth = "0";
-	tile.appendChild(prun);
-	return;
-}
-
-export function Prosperity_pre(tile, parameters)
-{
-	clearChildren(tile);
-	var url = "https://prosperity-prun.netlify.app/";
-	if(parameters.length == 3)
+export class PrUN {
+	private tile: HTMLElement;
+	public name = "PRUN-CEPTION";
+	
+	constructor(tile)
 	{
-		url += "?from=" + parameters[1] + "&to=" + parameters[2];
+		this.tile = tile;
 	}
 	
-	const prosp = document.createElement("iframe");
-		prosp.src = url;
-		prosp.width = "100%";
-		prosp.height = "100%";
-		prosp.style.borderWidth = "0";
-	tile.appendChild(prosp);
-	return;
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		const prun = document.createElement("iframe");
+			prun.src = "https://apex.prosperousuniverse.com/#/";
+			prun.width = "100%";
+			prun.height = "100%";
+			prun.style.borderWidth = "0";
+		this.tile.appendChild(prun);
+		return;
+	}
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
 
+export class Prosperity {
+	private tile: HTMLElement;
+	private parameters: string[];
+	public name = "PROSPERITY";
+	
+	constructor(tile, parameters)
+	{
+		this.tile = tile;
+		this.parameters = parameters;
+	}
+	
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		var url = "https://prosperity-prun.netlify.app/";
+		if(this.parameters.length == 3)
+		{
+			url += "?from=" + this.parameters[1] + "&to=" + this.parameters[2];
+		}
+		
+		const prosp = document.createElement("iframe");
+			prosp.src = url;
+			prosp.width = "100%";
+			prosp.height = "100%";
+			prosp.style.borderWidth = "0";
+		this.tile.appendChild(prosp);
+		return;
+	}
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
+}
+
+export class Sheets {
+	private tile: HTMLElement;
+	private parameters: string[];
+	public name = "GOOGLE SHEETS";
+	
+	constructor(tile, parameters)
+	{
+		this.tile = tile;
+		this.parameters = parameters;
+	}
+	
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		if(this.parameters.length < 2)
+		{
+			this.tile.textContent = "Error! Not Enough Parameters!";
+			return;
+		}
+		for(var i = 2; i < this.parameters.length; i++)
+		{
+			this.parameters[1] += "_" + this.parameters[i];
+		}
+		const sheet = document.createElement("iframe");
+			sheet.src = "https://docs.google.com/spreadsheets/d/" + this.parameters[1] + "/edit?usp=sharing";
+			sheet.style.borderWidth = "0";
+			sheet.style.height = "100%";
+			sheet.style.width = "100%";
+		this.tile.appendChild(sheet);
+		return;
+	}
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
+}
+
+/* // All Discord server stuff is broken. Changes to widgetbot? Not many people seem to use it so I'll remove it for the time being.
 const DiscordServers = {
 	"UFO": ["855488309802172469", "855489711635431475"],
 	"FIOC": ["807992640247300116", "808451512351195166"],
 	"AHI": ["704907707634941982", "797157877324185650"],
 	"PCT": ["667551433503014924", "667551433503014927"]
-}
-
-export function Sheets_pre(tile, parameters)
-{
-	clearChildren(tile);
-	if(parameters.length < 2)
-	{
-		tile.textContent = "Error! Not Enough Parameters!";
-		return;
-	}
-	for(var i = 2; i < parameters.length; i++)
-	{
-		parameters[1] += "_" + parameters[i];
-	}
-	const sheet = document.createElement("iframe");
-		sheet.src = "https://docs.google.com/spreadsheets/d/" + parameters[1] + "/edit?usp=sharing";
-		sheet.style.borderWidth = "0";
-		sheet.style.height = "100%";
-		sheet.style.width = "100%";
-	tile.appendChild(sheet);
-	return;
 }
 
 export function Discord_pre(tile, parameters)
@@ -95,42 +157,105 @@ export function Discord_pre(tile, parameters)
 	tile.appendChild(discord);
 	return;
 }
+*/
 
-export function Wiki(tile, parameters)
-{
-	clearChildren(tile);
-	const frame = document.createElement("iframe");
-		frame.src = parameters[1] && parameters[1].toLowerCase() == "resources" ? "https://handbook.apex.prosperousuniverse.com/wiki/community-resources/index.html" : "https://handbook.apex.prosperousuniverse.com/wiki/index.html";
-		frame.style.borderWidth = "0";
-		frame.style.height = "100%";
-		frame.style.width = "100%";
-	tile.appendChild(frame);
-}
-
-export function PrunPlanner(tile, parameters)
-{
-	clearChildren(tile);
-	var link = "https://prunplanner.org";
-	for(var i = 1; i < parameters.length; i++)
+export class Wiki {
+	private tile: HTMLElement;
+	private parameters: string[];
+	public name = "PRUN WIKI";
+	
+	constructor(tile, parameters)
 	{
-		link += "/" + parameters[i];
+		this.tile = tile;
+		this.parameters = parameters;
 	}
 	
-	const frame = document.createElement("iframe");
-		frame.src = link;
-		frame.style.borderWidth = "0";
-		frame.style.height = "100%";
-		frame.style.width = "100%";
-	tile.appendChild(frame);
-	return;
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		const frame = document.createElement("iframe");
+			frame.src = this.parameters[1] && this.parameters[1].toLowerCase() == "resources" ? "https://handbook.apex.prosperousuniverse.com/wiki/community-resources/index.html" : "https://handbook.apex.prosperousuniverse.com/wiki/index.html";
+			frame.style.borderWidth = "0";
+			frame.style.height = "100%";
+			frame.style.width = "100%";
+		this.tile.appendChild(frame);
+	}
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
-export function FIO(tile)
-{
-	clearChildren(tile);
-	const frame = document.createElement("iframe");
-		frame.src = "https://fio.fnar.net/";
-		frame.style.borderWidth = "0";
-		frame.style.height = "100%";
-		frame.style.width = "100%";
-	tile.appendChild(frame);
+
+export class PrunPlanner {
+	private tile: HTMLElement;
+	private parameters: string[];
+	public name = "PRUN PLANNER";
+	
+	constructor(tile, parameters)
+	{
+		this.tile = tile;
+		this.parameters = parameters;
+	}
+	
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		var link = "https://prunplanner.org";
+		for(var i = 1; i < this.parameters.length; i++)
+		{
+			link += "/" + this.parameters[i];
+		}
+		
+		const frame = document.createElement("iframe");
+			frame.src = link;
+			frame.style.borderWidth = "0";
+			frame.style.height = "100%";
+			frame.style.width = "100%";
+		this.tile.appendChild(frame);
+		return;
+	}
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
+}
+
+export class FIO {
+	private tile: HTMLElement;
+	public name = "FIO";
+	
+	constructor(tile)
+	{
+		this.tile = tile;
+	}
+	
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		const frame = document.createElement("iframe");
+			frame.src = "https://fio.fnar.net/";
+			frame.style.borderWidth = "0";
+			frame.style.height = "100%";
+			frame.style.width = "100%";
+		this.tile.appendChild(frame);
+	}
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }

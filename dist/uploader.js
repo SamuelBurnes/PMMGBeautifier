@@ -309,7 +309,7 @@ function logEvent(result, eventdata)
 					const orderInfo = {};
 					orderInfo.completed = order.completed;
 					orderInfo.started = order.started ? order.started.timestamp : order.started;
-					orderInfo.duration = order.duration.millis;
+					orderInfo.duration = order.duration ? order.duration.millis : null;	// Did this null value kill stuff down the line?
 					orderInfo.halted = order.halted;
 					orderInfo.productionFee = order.productionFee;
 					orderInfo.recurring = order.recurring;

@@ -1,21 +1,41 @@
 import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan, makePopupSpacer, createPopupInputRow, getValueOfPopupRow, showWarningDialog} from "../util";
 import {Style} from "../Style";
 
-export function CommandLists(tile, parameters)
-{
-	clearChildren(tile);
-	if(parameters.length == 1)
+export class CommandLists {
+	private tile: HTMLElement;
+	private parameters: string[];
+	public name = "COMMAND LIST";
+	
+	constructor(tile, parameters)
 	{
-		// Display table of lists and links to open each or delete each
-		getLocalStorage("PMMG-Lists", generateListTable, tile);
+		this.tile = tile;
+		this.parameters = parameters;
 	}
-	else
+	
+	create_buffer()
 	{
-		// Display the specified list
-		getLocalStorage("PMMG-Lists", dispStoredList, [tile, parameters]);
-		
+		clearChildren(this.tile);
+		if(this.parameters.length == 1)
+		{
+			// Display table of lists and links to open each or delete each
+			getLocalStorage("PMMG-Lists", generateListTable, this.tile);
+		}
+		else
+		{
+			// Display the specified list
+			getLocalStorage("PMMG-Lists", dispStoredList, [this.tile, this.parameters, this]);
+			
+		}
+		return;
 	}
-	return;
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
 
 function generateListTable(result, tile)
@@ -101,6 +121,7 @@ function dispStoredList(result, param)
 {
 	const tile = param[0];
 	const parameters = param[1];
+	const listObj = param[2];
 	const listName = (parameters.slice(1)).join("_");
 	
 	const nameDiv = document.createElement("div");
@@ -162,12 +183,12 @@ function dispStoredList(result, param)
     addButton.classList.add(...Style.ButtonPrimary);
 	
 	addButton.addEventListener("click", function() {
-		createEditInterface(tile, result, parameters, result["PMMG-Lists"][listName] || []);
+		createEditInterface(tile, result, parameters, result["PMMG-Lists"][listName] || [], listObj);
 		return;
 	});
 }
 
-function createEditInterface(tile, result, parameters, settings: any[] = [])
+function createEditInterface(tile, result, parameters, settings: any[] = [], listObj)
 {
 	const prefilled = settings.length != 0;
 	
@@ -266,7 +287,7 @@ function createEditInterface(tile, result, parameters, settings: any[] = [])
 		
 		result["PMMG-Lists"][listName] = commandInfo;
 		setSettings(result);
-		CommandLists(tile, parameters);
+		listObj.create_buffer();
 		
 		return;
 	});

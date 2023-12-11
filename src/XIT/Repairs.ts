@@ -1,153 +1,181 @@
 import {createTextSpan, clearChildren, setSettings} from "../util";
 import {NonProductionBuildings} from "../GameProperties";
 
-export function Repairs_pre(tile, parameters, result, userInfo)
-{
-	clearChildren(tile);
-	if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["sites"])
-	{
-		tile.textContent = "Loading Repair Data...";
-		tile.id = "pmmg-reload";
-		return;
-	}
+export class Repairs {
+	private tile: HTMLElement;
+	private parameters: string[];
+	private pmmgSettings;
+	private userInfo;
+	public name = "REPAIRS";
 	
-	if(parameters.length < 2)
+	constructor(tile, parameters, pmmgSettings, userInfo)
 	{
-		const title = createTextSpan("All Repairs");
-		title.classList.add("title");
-		tile.appendChild(title);
+		this.tile = tile;
+		this.parameters = parameters;
+		this.pmmgSettings = pmmgSettings;
+		this.userInfo = userInfo;
+	}
+
+	create_buffer()
+	{
+		// Declare class parameters in static context
+		const pmmgSettings = this.pmmgSettings;
 		
-		const thresholdDiv = document.createElement("div");
-		tile.appendChild(thresholdDiv);
-		
-		const thresholdInput = document.createElement("input");
-		thresholdInput.classList.add("input-text");
-		const thresholdText = createTextSpan("Age Threshold:");
-		thresholdText.style.paddingLeft = "5px";
-		thresholdInput.type = "number";
-		thresholdInput.value = result["PMMGExtended"]["repair_threshold"] ? result["PMMGExtended"]["repair_threshold"] : "70";
-		thresholdInput.style.width = "60px";
-		thresholdDiv.appendChild(thresholdText);
-		thresholdDiv.appendChild(thresholdInput);
-		const matTitle = createTextSpan("Shopping Cart");
-		matTitle.classList.add("title");
-		matTitle.style.paddingBottom = "2px";
-		tile.appendChild(matTitle);
-		const matDiv = document.createElement("div");
-		tile.appendChild(matDiv);
-		const buiTitle = createTextSpan("Buildings");
-		buiTitle.classList.add("title");
-		buiTitle.style.paddingTop = "5px";
-		buiTitle.style.paddingBottom = "2px";
-		tile.appendChild(buiTitle);
-		const table = document.createElement("table");
-		
-		const head = document.createElement("thead");
-		const hr = document.createElement("tr");
-		head.appendChild(hr);
-		table.appendChild(head);
-		tile.appendChild(table);
-		for(let t of ["Ticker", "Planet", "Age", "Condition"])
+		clearChildren(this.tile);
+		if(!this.userInfo["PMMG-User-Info"] || !this.userInfo["PMMG-User-Info"]["sites"])
 		{
-			const header = document.createElement("th");
-			header.textContent = t;
-			header.style.paddingTop = "0";
-			hr.appendChild(header);
+			this.tile.textContent = "Loading Repair Data...";
+			this.tile.id = "pmmg-reload";
+			return;
 		}
-		var buildings = [] as any[];
-		userInfo["PMMG-User-Info"]["sites"].forEach(site => {
-			if(site.type != "BASE"){return;}
+		
+		if(this.parameters.length < 2)
+		{
+			const title = createTextSpan("All Repairs");
+			title.classList.add("title");
+			this.tile.appendChild(title);
 			
-			site.buildings.forEach(build => {
-				buildings.push([site["PlanetName"], build]);
+			const thresholdDiv = document.createElement("div");
+			this.tile.appendChild(thresholdDiv);
+			
+			const thresholdInput = document.createElement("input");
+			thresholdInput.classList.add("input-text");
+			const thresholdText = createTextSpan("Age Threshold:");
+			thresholdText.style.paddingLeft = "5px";
+			thresholdInput.type = "number";
+			thresholdInput.value = this.pmmgSettings["PMMGExtended"]["repair_threshold"] ? this.pmmgSettings["PMMGExtended"]["repair_threshold"] : "70";
+			thresholdInput.style.width = "60px";
+			thresholdDiv.appendChild(thresholdText);
+			thresholdDiv.appendChild(thresholdInput);
+			const matTitle = createTextSpan("Shopping Cart");
+			matTitle.classList.add("title");
+			matTitle.style.paddingBottom = "2px";
+			this.tile.appendChild(matTitle);
+			const matDiv = document.createElement("div");
+			this.tile.appendChild(matDiv);
+			const buiTitle = createTextSpan("Buildings");
+			buiTitle.classList.add("title");
+			buiTitle.style.paddingTop = "5px";
+			buiTitle.style.paddingBottom = "2px";
+			this.tile.appendChild(buiTitle);
+			const table = document.createElement("table");
+			
+			const head = document.createElement("thead");
+			const hr = document.createElement("tr");
+			head.appendChild(hr);
+			table.appendChild(head);
+			this.tile.appendChild(table);
+			for(let t of ["Ticker", "Planet", "Age", "Condition"])
+			{
+				const header = document.createElement("th");
+				header.textContent = t;
+				header.style.paddingTop = "0";
+				hr.appendChild(header);
+			}
+			var buildings = [] as any[];
+			this.userInfo["PMMG-User-Info"]["sites"].forEach(site => {
+				if(site.type != "BASE"){return;}
+				
+				site.buildings.forEach(build => {
+					buildings.push([site["PlanetName"], build]);
+					return;
+				});
 				return;
 			});
-			return;
-		});
-		buildings.sort(globalBuildingSort);
-		
-		const body = document.createElement("tbody");
-		table.appendChild(body);
-		generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput);
-		
-		thresholdInput.addEventListener("input", function(){
-			clearChildren(body);
+			buildings.sort(globalBuildingSort);
 			
+			const body = document.createElement("tbody");
+			table.appendChild(body);
 			generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput);
-			result["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
-			setSettings(result);
-		});
-		
-	}
-	else
-	{
-		const title = createTextSpan(parameters[1] + " Repairs");
-		title.classList.add("title");
-		tile.appendChild(title);
-		
-		var siteData = undefined;
-		userInfo["PMMG-User-Info"]["sites"].forEach(site => {
-			if(site.type == "BASE" && (site["PlanetName"].toUpperCase() == parameters[1].toUpperCase() || site["PlanetNaturalId"].toUpperCase() == parameters[1].toUpperCase()))
-			{
-				siteData = site;
-			}
-			return;
-		});
-		if(!siteData){return;}
-		
-		const thresholdDiv = document.createElement("div");
-		tile.appendChild(thresholdDiv);
-		
-		const thresholdInput = document.createElement("input");
-		thresholdInput.classList.add("input-text");
-		const thresholdText = createTextSpan("Age Threshold:");
-		thresholdText.style.paddingLeft = "5px";
-		thresholdInput.type = "number";
-		thresholdInput.value = result["PMMGExtended"]["repair_threshold"] ? result["PMMGExtended"]["repair_threshold"] : "70";
-		thresholdInput.style.width = "60px";
-		thresholdDiv.appendChild(thresholdText);
-		thresholdDiv.appendChild(thresholdInput);
-		const matTitle = createTextSpan("Shopping Cart");
-		matTitle.classList.add("title");
-		matTitle.style.paddingBottom = "2px";
-		tile.appendChild(matTitle);
-		const matDiv = document.createElement("div");
-		tile.appendChild(matDiv);
-		const buiTitle = createTextSpan("Buildings");
-		buiTitle.classList.add("title");
-		buiTitle.style.paddingTop = "5px";
-		buiTitle.style.paddingBottom = "2px";
-		tile.appendChild(buiTitle);
-		const table = document.createElement("table");
-		
-		const head = document.createElement("thead");
-		const hr = document.createElement("tr");
-		head.appendChild(hr);
-		table.appendChild(head);
-		tile.appendChild(table);
-		for(let t of ["Ticker", "Age", "Condition"])
-		{
-			const header = document.createElement("th");
-			header.textContent = t;
-			header.style.paddingTop = "0";
-			hr.appendChild(header);
-		}
-		if(!siteData["buildings"]){return;}
-		(siteData["buildings"] as any[]).sort(buildingSort);
-		
-		const body = document.createElement("tbody");
-		table.appendChild(body);
-		generateRepairScreen(body, matDiv, siteData, thresholdInput);
-		
-		thresholdInput.addEventListener("input", function(){
-			clearChildren(body);
 			
+			thresholdInput.addEventListener("input", function(){
+				clearChildren(body);
+				
+				generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput);
+				pmmgSettings["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
+				setSettings(pmmgSettings);
+			});
+			
+		}
+		else
+		{
+			const title = createTextSpan(this.parameters[1] + " Repairs");
+			title.classList.add("title");
+			this.tile.appendChild(title);
+			
+			var siteData = undefined;
+			this.userInfo["PMMG-User-Info"]["sites"].forEach(site => {
+				if(site.type == "BASE" && (site["PlanetName"].toUpperCase() == this.parameters[1].toUpperCase() || site["PlanetNaturalId"].toUpperCase() == this.parameters[1].toUpperCase()))
+				{
+					siteData = site;
+				}
+				return;
+			});
+			if(!siteData){return;}
+			
+			const thresholdDiv = document.createElement("div");
+			this.tile.appendChild(thresholdDiv);
+			
+			const thresholdInput = document.createElement("input");
+			thresholdInput.classList.add("input-text");
+			const thresholdText = createTextSpan("Age Threshold:");
+			thresholdText.style.paddingLeft = "5px";
+			thresholdInput.type = "number";
+			thresholdInput.value = this.pmmgSettings["PMMGExtended"]["repair_threshold"] ? this.pmmgSettings["PMMGExtended"]["repair_threshold"] : "70";
+			thresholdInput.style.width = "60px";
+			thresholdDiv.appendChild(thresholdText);
+			thresholdDiv.appendChild(thresholdInput);
+			const matTitle = createTextSpan("Shopping Cart");
+			matTitle.classList.add("title");
+			matTitle.style.paddingBottom = "2px";
+			this.tile.appendChild(matTitle);
+			const matDiv = document.createElement("div");
+			this.tile.appendChild(matDiv);
+			const buiTitle = createTextSpan("Buildings");
+			buiTitle.classList.add("title");
+			buiTitle.style.paddingTop = "5px";
+			buiTitle.style.paddingBottom = "2px";
+			this.tile.appendChild(buiTitle);
+			const table = document.createElement("table");
+			
+			const head = document.createElement("thead");
+			const hr = document.createElement("tr");
+			head.appendChild(hr);
+			table.appendChild(head);
+			this.tile.appendChild(table);
+			for(let t of ["Ticker", "Age", "Condition"])
+			{
+				const header = document.createElement("th");
+				header.textContent = t;
+				header.style.paddingTop = "0";
+				hr.appendChild(header);
+			}
+			if(!siteData["buildings"]){return;}
+			(siteData["buildings"] as any[]).sort(buildingSort);
+			
+			const body = document.createElement("tbody");
+			table.appendChild(body);
 			generateRepairScreen(body, matDiv, siteData, thresholdInput);
-			result["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
-			setSettings(result);
-		});
+			
+			thresholdInput.addEventListener("input", function(){
+				clearChildren(body);
+				
+				generateRepairScreen(body, matDiv, siteData, thresholdInput);
+				pmmgSettings["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
+				setSettings(pmmgSettings);
+			});
+		}
+		return;
 	}
-	return;
+
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
 
 function generateRepairScreen(body, matDiv, siteData, thresholdInput)

@@ -1,7 +1,7 @@
 import {Module} from "./ModuleRunner";
 import {getBuffers, createTextSpan} from "./util";
 import {Selector} from "./Selector";
-import {Start} from "./XIT/Start";
+/*import {Start} from "./XIT/Start";
 import {Settings} from "./XIT/Settings";
 import {Debug} from "./XIT/Debug";
 import {Calculator} from "./XIT/Calculator";
@@ -17,80 +17,69 @@ import {Checklists} from "./XIT/Checklists";
 import {Sort} from "./XIT/Sort";
 import {CommandLists} from "./XIT/CommandLists";
 import {Help} from "./XIT/Help";
+import {DataHealth} from "./XIT/DataHealth";*/
+import {FIOInventory} from "./XIT/Inventory";
+import {FIOChat} from "./XIT/Chat";
+import {Calculator} from "./XIT/Calculator";
 import {DataHealth} from "./XIT/DataHealth";
+import {Burn} from "./XIT/Burn";
+import {Contracts} from "./XIT/Contracts";
+import {CommandLists} from "./XIT/CommandLists";
+import {Debug} from "./XIT/Debug";
+import {Finances} from "./XIT/Finances";
+import {Help} from "./XIT/Help";
+import {Repairs} from "./XIT/Repairs";
+import {Settings} from "./XIT/Settings";
+import {Sort} from "./XIT/Sort";
+import {Start} from "./XIT/Start";
+import {PrUN, Prosperity, Sheets, Wiki, PrunPlanner, FIO} from "./XIT/Web";
+import {Checklists} from "./XIT/Checklists";
 
-export interface XITModule {
-	create();
-	update();
-	destroy();
-	name: string;
+// This is the structure all classes should follow. For some reason extending classes in other files shows XITModule as undefined.
+// Not the best solution, but it works. Be careful implementing new modules that they include these functions.
+export abstract class XITModule {
+	abstract create_buffer();	// Clear and recreate the buffer
+	abstract update_buffer();	// Partially update the buffer
+	abstract destroy_buffer();	// Destroys any continuous objects not automatically destroyed on buffer close
+	abstract name: string;		// Title of the buffer
 }
 
-export const XITPreFunctions = {
-	"INV": FIOInv_pre,
-	"DISCORD": Discord_pre,
-	"SHEETS": Sheets_pre,
-	"PROSPERITY": Prosperity_pre,
-	"PRUN": PRuN_pre,
-	"FIN": Fin_pre,
-	"CHAT": Chat_pre,
-	"BURN": EnhancedBurn_pre,
-	"SETTINGS": Settings,
-	"CONTRACTS": Contracts_pre,
-	"REPAIRS": Repairs_pre,
+const XITClasses: {[key: string]: new(...args: any[]) => XITModule} = {
+	"INV": FIOInventory,
 	"CALCULATOR": Calculator,
 	"CALC": Calculator,
-	"START": Start,
-	"DEBUG": Debug,
-	"NOTE": Notes,
-	"NOTES": Notes,
-	"CHECK": Checklists,
-	"CHECKS": Checklists,
-	"CHECKLIST": Checklists,
-	"CHECKLISTS": Checklists,
-	"SORT": Sort,
+	"CHAT": FIOChat,
+	"HEALTH": DataHealth,
+	"BURN": Burn,
+	"CONTS": Contracts,
+	"CONTRACTS": Contracts,
 	"LIST": CommandLists,
 	"LISTS": CommandLists,
-	"PRUNPLANNER": PrunPlanner,
-	"PLANNER": PrunPlanner,
-	"WIKI": Wiki,
+	"DEBUG": Debug,
+	"FIN": Finances,
+	"FINANCE": Finances,
+	"FINANCES": Finances,
 	"HELP": Help,
+	"REPAIRS": Repairs,
+	"SET": Settings,
+	"SETTINGS": Settings,
+	"SORT": Sort,
+	"START": Start,
+	"PRUN": PrUN,
+	"PROSPERITY": Prosperity,
+	"SHEET": Sheets,
+	"SHEETS": Sheets,
+	"WIKI": Wiki,
+	"PLANNER": PrunPlanner,
+	"PLAN": PrunPlanner,
+	"PRUNPLANNER": PrunPlanner,
 	"FIO": FIO,
-	"HEALTH": DataHealth
+	"CHECK": Checklists,
+	"CHECKLIST": Checklists,
+	"CHECKLISTS": Checklists
 }
 
-export const XITBufferTitles = {
-	"INV": "FIO INVENTORY",
-	"DISCORD": "DISCORD SERVER",
-	"SHEETS": "GOOGLE SHEETS",
-	"PROSPERITY": "PROSPERITY",
-	"PRUN": "PRUN-CEPTION",
-	"FIN": "FINANCIAL OVERVIEW",
-	"CHAT": "CHAT",
-	"BURN": "ENHANCED BURN",
-	"SETTINGS": "PMMG SETTINGS",
-	"CONTRACTS": "PENDING CONTRACTS",
-	"REPAIRS": "REPAIRS",
-	"CALC": "CALCULATOR",
-	"CALCULATOR": "CALCULATOR",
-	"START": "STARTING WITH PMMG",
-	"DEBUG": "DEBUG",
-	"NOTE": "NOTE",
-	"NOTES": "NOTE",
-	"CHECK": "CHECKLIST",
-	"CHECKS": "CHECKLIST",
-	"CHECKLIST": "CHECKLIST",
-	"CHECKLISTS": "CHECKLIST",
-	"SORT": "SORTING OPTIONS",
-	"LIST": "COMMAND LIST",
-	"LISTS": "COMMAND LIST",
-	"PRUNPLANNER": "PRUN PLANNER",
-	"PLANNER": "PRUN PLANNER",
-	"WIKI": "PRUN WIKI",
-	"HELP": "PMMG EXTENDED HELP",
-	"FIO": "FIO",
-	"HEALTH": "DATA HEALTH"
-}
+
 /**
  * Handle XIT buffers
  */
@@ -116,8 +105,6 @@ export class XITHandler implements Module {
   run() {
     const buffers = getBuffers("XIT");
     if (!buffers) return;
-	const webData = this.webData;
-	const userInfo = this.userInfo;
 	buffers.forEach(buffer => {
 		const tile = (buffer.querySelector(Selector.XITTile)) as HTMLElement;
 		if(!tile){return;}
@@ -146,8 +133,6 @@ export class XITHandler implements Module {
 			parameters[i] = parameters[i].trim()
 		}
 		
-		if(tile.firstChild && (tile.firstChild as HTMLElement).id == "pmmg-reload"){XITPreFunctions[parameters[0].toUpperCase()](tile.firstChild, parameters, this.pmmgSettings, userInfo, webData, this.modules, false);return;}
-		
 		tile.classList.add("xit-tile");
 		if(tile.firstChild)
 		{
@@ -155,7 +140,7 @@ export class XITHandler implements Module {
 		}
 		
 		const refreshButton = document.createElement("div");
-		if(!tile.firstChild || (tile.firstChild && ((tile.firstChild as HTMLElement).id != "pmmg-no-match")))
+		if(!tile.firstChild || (tile.firstChild && ((tile.firstChild as HTMLElement).id != "pmmg-no-match")))	// Add refresh button if one hasn't been added
 		{
 				if(buffer.getElementsByClassName("refresh").length == 0)
 				{
@@ -174,8 +159,7 @@ export class XITHandler implements Module {
 		
 		tile.appendChild(contentDiv);
 		
-		const preFunc = XITPreFunctions[parameters[0].toUpperCase()];
-		if(!preFunc)
+		if(!XITClasses[parameters[0].toUpperCase()])	// If not a valid command
 		{
 			tile.textContent = "Error! No Matching Function!";
 			if(!tile.firstChild){return;}
@@ -183,12 +167,11 @@ export class XITHandler implements Module {
 		}
 		else
 		{
-			Array.from(buffer.querySelectorAll(Selector.BufferTitle))[0].textContent = XITBufferTitles[parameters[0].toUpperCase()];	// Title the buffer
-			const modules = this.modules;
-			var pmmgSettings = this.pmmgSettings;
-			refreshButton.addEventListener("click", function(){preFunc(contentDiv, parameters, pmmgSettings, userInfo, webData, modules, true);});
 			(tile.firstChild as HTMLElement).id = "pmmg-load-success";
-			preFunc(contentDiv, parameters, this.pmmgSettings, userInfo, webData, modules, false);
+			const XITObj = new XITClasses[parameters[0].toUpperCase()](contentDiv, parameters, this.pmmgSettings, this.userInfo, this.webData, this.modules);	// Make new XIT object
+			refreshButton.addEventListener("click", XITObj.create_buffer());	// Add refresh listener
+			(buffer.querySelector(Selector.BufferTitle) as HTMLElement).textContent = XITObj.name;	// Title the buffer
+			
 		}
 		return;
 		

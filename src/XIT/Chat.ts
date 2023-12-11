@@ -1,15 +1,38 @@
 import {clearChildren, XITWebRequest} from "../util";
 
-export function Chat_pre(tile, parameters)
-{
-	clearChildren(tile);
-	if(parameters.length < 2)
+
+export class FIOChat {
+	private tile;
+	private parameters;
+	
+	public name = "FIO Chat";
+	
+	constructor(tile, parameters)
 	{
-		tile.textContent = "Error! Not Enough Parameters!";
+		this.tile = tile;
+		this.parameters = parameters;
 	}
 	
-	XITWebRequest(tile, parameters, Chat_post, "https://rest.fnar.net/chat/display/" + parameters[1], "GET", undefined, undefined);
-	return;
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		if(this.parameters.length < 2)
+		{
+			this.tile.textContent = "Error! Not Enough Parameters!";
+		}
+		
+		XITWebRequest(this.tile, this.parameters, Chat_post, "https://rest.fnar.net/chat/display/" + this.parameters[1], "GET", undefined, undefined);
+		return;
+	}
+	
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
 
 function Chat_post(chatDiv, parameters, jsondata)

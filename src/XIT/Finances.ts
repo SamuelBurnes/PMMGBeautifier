@@ -2,73 +2,106 @@ import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getL
 import {Style, TextColors} from "../Style";
 import {CurrencySymbols} from "../GameProperties";
 
-export function Fin_pre(tile, parameters, result, userInfo, webData)
-{
-	clearChildren(tile);
-	if(result["PMMGExtended"]["recording_financials"] == false)	// If not recording financial info, show screen with checkbox to enable
+export class Finances {
+	private tile: HTMLElement;
+	private parameters: string[];
+	private pmmgSettings;
+	private userInfo;
+	private webData;
+	
+	public name = "FINANCES";
+
+	
+	constructor(tile, parameters, pmmgSettings, userInfo, webData)
 	{
-		// Create a header explaining the situation
-		const header = document.createElement("h3");
-		header.textContent = "You are not recording daily financial data, would you like to enable recording?";
-		header.style.textAlign = "center";
-		header.style.width = "100%";
-		tile.appendChild(header);
-		
-		// Div holding the checkbox
-		const checkboxDiv = document.createElement("div");
-		checkboxDiv.style.alignItems = "center"
-		checkboxDiv.style.display = "flex";
-		checkboxDiv.style.justifyContent = "center"
-		checkboxDiv.style.paddingBottom = "5px";
-		tile.appendChild(checkboxDiv);
-		
-		const checkbox = document.createElement("input");
-		checkbox.type = "checkbox";
-		checkbox.style.display = "inline-block";
-		checkboxDiv.appendChild(checkbox);
-		
-		const label = document.createElement("div");
-		label.textContent = "Enable Recording (Refresh needed to take effect)";
-		label.style.display = "inline-block";
-		label.style.marginTop = "2px";
-		checkboxDiv.appendChild(label);
-		
-		const explainDiv = document.createElement("div");
-		explainDiv.style.padding = "5px"
-		tile.appendChild(explainDiv);
-		explainDiv.appendChild(createTextSpan("PMMG can record your finances (using FIO data) to provide a more accurate estimate than the in-game FIN screen. The data is pulled at most every 24 hours and is stored locally like your other settings. You can access all the information from the XIT FIN buffer."));
-		
-		// Flip the settings when checkbox is checked
-		checkbox.addEventListener("click", function(){
-			result["PMMGExtended"]["recording_financials"] = checkbox.checked;
-			setSettings(result);
-		});
-		
-		return;
+		this.tile = tile;
+		this.parameters = parameters;
+		this.pmmgSettings = pmmgSettings;
+		this.userInfo = userInfo;
+		this.webData = webData;
 	}
 	
-	// Get stored financial data
-	getLocalStorage("PMMG-Finance", chooseScreen, [tile, parameters, result, webData, userInfo]);
-	return;
+	create_buffer()
+	{
+		clearChildren(this.tile);
+		if(this.pmmgSettings["PMMGExtended"]["recording_financials"] == false)	// If not recording financial info, show screen with checkbox to enable
+		{
+			// Create a header explaining the situation
+			const header = document.createElement("h3");
+			header.textContent = "You are not recording daily financial data, would you like to enable recording?";
+			header.style.textAlign = "center";
+			header.style.width = "100%";
+			this.tile.appendChild(header);
+			
+			// Div holding the checkbox
+			const checkboxDiv = document.createElement("div");
+			checkboxDiv.style.alignItems = "center"
+			checkboxDiv.style.display = "flex";
+			checkboxDiv.style.justifyContent = "center"
+			checkboxDiv.style.paddingBottom = "5px";
+			this.tile.appendChild(checkboxDiv);
+			
+			const checkbox = document.createElement("input");
+			checkbox.type = "checkbox";
+			checkbox.style.display = "inline-block";
+			checkboxDiv.appendChild(checkbox);
+			
+			const label = document.createElement("div");
+			label.textContent = "Enable Recording (Refresh needed to take effect)";
+			label.style.display = "inline-block";
+			label.style.marginTop = "2px";
+			checkboxDiv.appendChild(label);
+			
+			const explainDiv = document.createElement("div");
+			explainDiv.style.padding = "5px"
+			this.tile.appendChild(explainDiv);
+			explainDiv.appendChild(createTextSpan("PMMG can record your finances (using FIO data) to provide a more accurate estimate than the in-game FIN screen. The data is pulled at most every 24 hours and is stored locally like your other settings. You can access all the information from the XIT FIN buffer."));
+			
+			// Declare class parameters in static context
+			const pmmgSettings = this.pmmgSettings;
+			
+			// Flip the settings when checkbox is checked
+			checkbox.addEventListener("click", function(){
+				pmmgSettings["PMMGExtended"]["recording_financials"] = checkbox.checked;
+				setSettings(pmmgSettings);
+			});
+			
+			return;
+		}
+		
+		// Get stored financial data
+		getLocalStorage("PMMG-Finance", chooseScreen, [this.tile, this.parameters, this.pmmgSettings, this.webData, this.userInfo, this]);
+		return;
+	}
+
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
 
 // Draw the correct screen based on the parameters (should split out into multiple functions probably)
-function chooseScreen(finResult, params)	// Params consists of [tile, parameters, result, webData]
+function chooseScreen(finResult, params)	// Params consists of [tile, parameters, pmmgSettings, webData]
 {
 	finResult = finResult["PMMG-Finance"];
 	if(!params[0] || !params[1] || !params[2] || !params[3]){return;}
 	const tile = params[0];
 	const parameters = params[1];
-	const result = params[2];
+	const pmmgSettings = params[2];
 	const webData = params[3];
 	const userInfo = params[4];
+	const finObj = params[5];
 	
 	// Determine the array of CX prices to use
 	var CX = "AI1";
 	var priceType = "Average";
-	if(result["PMMGExtended"]["pricing_scheme"])
+	if(pmmgSettings["PMMGExtended"]["pricing_scheme"])
 	{
-		const interpreted = interpretCX(result["PMMGExtended"]["pricing_scheme"], result);
+		const interpreted = interpretCX(pmmgSettings["PMMGExtended"]["pricing_scheme"], pmmgSettings);
 		CX = interpreted[0];
 		priceType = interpreted[1];
 	}
@@ -128,17 +161,17 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		});
 		
 		// Set value to what is in settings
-		if(!result["PMMGExtended"]["pricing_scheme"] || (!PricingSchemes[result["PMMGExtended"]["pricing_scheme"]] && !CustomSchemes[result["PMMGExtended"]["pricing_scheme"]]))
+		if(!pmmgSettings["PMMGExtended"]["pricing_scheme"] || (!PricingSchemes[pmmgSettings["PMMGExtended"]["pricing_scheme"]] && !CustomSchemes[pmmgSettings["PMMGExtended"]["pricing_scheme"]]))
 		{
 			(priceSelect.children[0] as HTMLOptionElement).selected = true;
 		}
-		else if(PricingSchemes[result["PMMGExtended"]["pricing_scheme"]])
+		else if(PricingSchemes[pmmgSettings["PMMGExtended"]["pricing_scheme"]])
 		{
-			(priceSelect.children[PricingSchemes[result["PMMGExtended"]["pricing_scheme"]]] as HTMLOptionElement).selected = true;
+			(priceSelect.children[PricingSchemes[pmmgSettings["PMMGExtended"]["pricing_scheme"]]] as HTMLOptionElement).selected = true;
 		}
 		else
 		{
-			(priceSelect.children[CustomSchemes[result["PMMGExtended"]["pricing_scheme"]]] as HTMLOptionElement).selected = true;
+			(priceSelect.children[CustomSchemes[pmmgSettings["PMMGExtended"]["pricing_scheme"]]] as HTMLOptionElement).selected = true;
 		}
 		
 		priceSelect.classList.add("select");
@@ -146,15 +179,15 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		// Create a div for Custom (Spreadsheet) option. Only visible if custom spreadsheet option is selected
 		const spreadsheetDiv = document.createElement("div");
-		if(result["PMMGExtended"]["pricing_scheme"] != "Custom (Spreadsheet)")
+		if(pmmgSettings["PMMGExtended"]["pricing_scheme"] != "Custom (Spreadsheet)")
 		{
 			spreadsheetDiv.style.display = "none";
 		}
 		
 		// Detect if changed to custom spreadsheet. Show or hide div accordingly
 		priceSelect.addEventListener("change", function(){
-			result["PMMGExtended"]["pricing_scheme"] = priceSelect.selectedOptions[0].value;
-			setSettings(result);
+			pmmgSettings["PMMGExtended"]["pricing_scheme"] = priceSelect.selectedOptions[0].value;
+			setSettings(pmmgSettings);
 			switch(priceSelect.selectedOptions[0].value)
 			{
 				case "Custom (Spreadsheet)":
@@ -191,21 +224,21 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		});
 		
 		// Set according to previous settings
-		if(!result["PMMGExtended"]["backup_pricing_scheme"] || !PricingSchemes[result["PMMGExtended"]["backup_pricing_scheme"]])
+		if(!pmmgSettings["PMMGExtended"]["backup_pricing_scheme"] || !PricingSchemes[pmmgSettings["PMMGExtended"]["backup_pricing_scheme"]])
 		{
 			(backupPriceSelect.children[0] as HTMLOptionElement).selected = true;
 		}
 		else
 		{
-			(backupPriceSelect.children[PricingSchemes[result["PMMGExtended"]["backup_pricing_scheme"]]] as HTMLOptionElement).selected = true;
+			(backupPriceSelect.children[PricingSchemes[pmmgSettings["PMMGExtended"]["backup_pricing_scheme"]]] as HTMLOptionElement).selected = true;
 		}
 		
 		backupPriceSelect.classList.add("select");
 		backupPriceSelect.style.marginLeft = "4px";
 		// Listen for change to pricing scheme, update settings accordingly
 		backupPriceSelect.addEventListener("change", function(){
-			result["PMMGExtended"]["backup_pricing_scheme"] = backupPriceSelect.selectedOptions[0].value;
-			setSettings(result);
+			pmmgSettings["PMMGExtended"]["backup_pricing_scheme"] = backupPriceSelect.selectedOptions[0].value;
+			setSettings(pmmgSettings);
 		});
 		
 		// Spreadsheet URL entry
@@ -220,13 +253,13 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		urlInput.classList.add("input-text");
 		urlDiv.appendChild(urlInput);
 		urlInput.style.marginLeft = "4px";
-		if(result["PMMGExtended"]["fin_spreadsheet"])
+		if(pmmgSettings["PMMGExtended"]["fin_spreadsheet"])
 		{
-			urlInput.value = result["PMMGExtended"]["fin_spreadsheet"];
+			urlInput.value = pmmgSettings["PMMGExtended"]["fin_spreadsheet"];
 		}
 		urlInput.addEventListener("input", function() {
-			result["PMMGExtended"]["fin_spreadsheet"] = urlInput.value == "" ? undefined : urlInput.value;
-			setSettings(result);
+			pmmgSettings["PMMGExtended"]["fin_spreadsheet"] = urlInput.value == "" ? undefined : urlInput.value;
+			setSettings(pmmgSettings);
 		});
 		
 		// Sheet name entry
@@ -240,21 +273,21 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		sheetDiv.appendChild(sheetInput);
 		sheetInput.classList.add("input-text");
 		sheetInput.style.marginLeft = "4px";
-		if(result["PMMGExtended"]["fin_sheet_name"])
+		if(pmmgSettings["PMMGExtended"]["fin_sheet_name"])
 		{
-			sheetInput.value = result["PMMGExtended"]["fin_sheet_name"];
+			sheetInput.value = pmmgSettings["PMMGExtended"]["fin_sheet_name"];
 		}
 		sheetInput.addEventListener("input", function() {
-			result["PMMGExtended"]["fin_sheet_name"] = sheetInput.value == "" ? undefined : sheetInput.value;
-			setSettings(result);
+			pmmgSettings["PMMGExtended"]["fin_sheet_name"] = sheetInput.value == "" ? undefined : sheetInput.value;
+			setSettings(pmmgSettings);
 		});
 		
 		// Table summarizing prices
 		const resultDiv = document.createElement("div");
 		spreadsheetDiv.appendChild(resultDiv);
-		if(result["PMMGExtended"]["fin_spreadsheet"] && result["PMMGExtended"]["fin_sheet_name"])
+		if(pmmgSettings["PMMGExtended"]["fin_spreadsheet"] && pmmgSettings["PMMGExtended"]["fin_sheet_name"])
 		{
-			const sheetID = result["PMMGExtended"]["fin_spreadsheet"].match(/\/d\/([^\/]+)/);
+			const sheetID = pmmgSettings["PMMGExtended"]["fin_spreadsheet"].match(/\/d\/([^\/]+)/);
 			if(sheetID && sheetID[1])
 			{
 				drawGSTable(resultDiv, webData["custom_prices"]);
@@ -357,8 +390,8 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		tile.appendChild(addButton);
 		
 		addButton.addEventListener("click", function() {
-			calculateFinancials(webData, userInfo, result, true);
-			Fin_pre(tile, parameters, result, userInfo, webData);
+			calculateFinancials(webData, userInfo, pmmgSettings, true);
+			finObj.create_buffer();
 		});
 		
 		// Create option to purge individual data points
@@ -391,7 +424,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 					
 					finResult["History"].splice(index, 1);
 					setSettings({"PMMG-Finance": finResult});
-					Fin_pre(tile, parameters, result, userInfo, webData);
+					finObj.create_buffer();
 				});
 			}, [i]));
 			row.appendChild(deleteColumn);
@@ -413,7 +446,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		tile.appendChild(clearButton);
 		
 		clearButton.addEventListener("click", function() {
-			showWarningDialog(tile, "You are about to clear all current and historical financial data. Do you want to continue?", "Confirm", clearData, result);
+			showWarningDialog(tile, "You are about to clear all current and historical financial data. Do you want to continue?", "Confirm", clearData, pmmgSettings);
 		});
 		return;
 	}
@@ -684,7 +717,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		const burnFinances = [] as any[][];
 		var totalProduced = 0;
 		var totalConsumed = 0;
-		const isCustom = result["PMMGExtended"]["pricing_scheme"] == "Custom (Spreadsheet)";
+		const isCustom = pmmgSettings["PMMGExtended"]["pricing_scheme"] == "Custom (Spreadsheet)";
 		planets.forEach(planet => {
 		
 			const planetProduction = findCorrespondingPlanet(planet, userInfo["PMMG-User-Info"]["production"]);

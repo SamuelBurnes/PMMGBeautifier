@@ -1,31 +1,55 @@
 import {clearChildren, createTextSpan, createMaterialElement, createLink, XITWebRequest} from "../util";
 import {MaterialNames} from "../GameProperties";
 
-export function FIOInv_pre(tile, parameters, result)
+export class FIOInventory
 {
-	clearChildren(tile);
-	const apikey = result["PMMGExtended"]["apikey"];
-	if(parameters.length < 2)
-	{
-		tile.textContent = "Error! Not Enough Parameters!";
-		return;
-	}
+	private tile: HTMLElement;
+	private parameters: string[];
+	private pmmgSettings;
+	public name = "FIO INVENTORY";
 	
-	if(parameters.length == 2)
+	constructor(tile, parameters, pmmgSettings)
 	{
-		parameters.push(apikey);
-		XITWebRequest(tile, parameters, FIOInv_getAllStorages, "https://rest.fnar.net/auth/group/" + parameters[1], "GET", ["Authorization", apikey], undefined);
+		this.tile = tile;
+		this.parameters = parameters;
+		this.pmmgSettings = pmmgSettings;
 	}
-	else
+
+
+	create_buffer()
 	{
-		for(var i = 3; i < parameters.length; i++)	// Allow for spaces in planet names
+		clearChildren(this.tile);
+		const apikey = this.pmmgSettings["PMMGExtended"]["apikey"];
+		if(this.parameters.length < 2)
 		{
-			parameters[2] += " " + parameters[i];
+			this.tile.textContent = "Error! Not Enough Parameters!";
+			return;
 		}
 		
-		XITWebRequest(tile, parameters, FIOInv_post, "https://rest.fnar.net/storage/" + parameters[1] + "/" + parameters[2], "GET", ["Authorization", apikey], undefined);
+		if(this.parameters.length == 2)
+		{
+			this.parameters.push(apikey);
+			XITWebRequest(this.tile, this.parameters, FIOInv_getAllStorages, "https://rest.fnar.net/auth/group/" + this.parameters[1], "GET", ["Authorization", apikey], undefined);
+		}
+		else
+		{
+			for(var i = 3; i < this.parameters.length; i++)	// Allow for spaces in planet names
+			{
+				this.parameters[2] += " " + this.parameters[i];
+			}
+			
+			XITWebRequest(this.tile, this.parameters, FIOInv_post, "https://rest.fnar.net/storage/" + this.parameters[1] + "/" + this.parameters[2], "GET", ["Authorization", apikey], undefined);
+		}
+		return;
 	}
-	return;
+	update_buffer()
+	{
+		// Nothing to update
+	}
+	destroy_buffer()
+	{
+		// Nothing constantly running so nothing to destroy
+	}
 }
 
 function FIOInv_post(tile, parameters, jsondata)
