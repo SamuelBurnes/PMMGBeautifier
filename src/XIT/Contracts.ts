@@ -19,6 +19,7 @@ export class Contracts {
 	public parameters: string[];
 	public pmmgSettings;
 	private userInfo;
+	private alive: boolean;
 	
 	public name = "CONTRACTS";
 	
@@ -28,6 +29,7 @@ export class Contracts {
 		this.parameters = parameters;
 		this.pmmgSettings = pmmgSettings;
 		this.userInfo = userInfo;
+		this.alive = true;
 	}
 	
 	create_buffer()
@@ -102,12 +104,18 @@ export class Contracts {
 			);
 		}
 
+
+		this.update_buffer();
 		return;
 	}
 
 	update_buffer()
 	{
-		// Nothing to update (for now)
+		this.alive = document.body.contains(this.tile);
+		if(this.alive)
+		{
+			window.setTimeout(() => this.create_buffer(), 3000);
+		}
 	}
 	destroy_buffer()
 	{

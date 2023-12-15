@@ -44,7 +44,7 @@ export class InventoryOrganizer implements Module {
 			const invName = parseInvName(baseNameElem[0].textContent);	// Get the name out of the element
 			if(!invName){return;}
 			
-			const planetNameElem = buffer.querySelector(Selector.InventoryName);	// Get the human-friendly name of the planet (element)
+			const planetNameElem = buffer.querySelector(Selector.BufferLink);	// Get the human-friendly name of the planet (element)
 			const planetName = planetNameElem ? parsePlanetName(planetNameElem.textContent) : "";	// Get the text out of it
 			
 			var burn;

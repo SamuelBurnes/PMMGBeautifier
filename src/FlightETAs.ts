@@ -10,8 +10,7 @@ export class FlightETAs implements Module {
     const buffers = getBuffers("SFC ");
     if (buffers == undefined) return;
 	
-	for(let buffer of buffers)
-	{
+	buffers.forEach(buffer => {
 		const elements = Array.from(buffer.querySelectorAll("table > tbody > tr"));
 		var currentTime = 0;
 		for(var i = 1; i < elements.length; i++){
@@ -32,7 +31,7 @@ export class FlightETAs implements Module {
 			const totalEta = convertDurationToETA(currentTime);
 			firstEtaData.appendChild(createTextSpan(` (${totalEta})`, this.tag))
 		}
-	}
+	});
 	return;
   }
 }

@@ -122,6 +122,24 @@ export class Settings {
 			setSettings(pmmgSettings);
 		});
 		
+		const advDiv = document.createElement("div");
+		const advLabel = document.createElement('h3');
+		advLabel.appendChild(createTextSpan("Advanced Minimalist Mode"));
+		advLabel.appendChild(createToolTip("Removes redundant information from most buffers. Not recommended for players unfamiliar with the interface.", "right"));
+		advLabel.classList.add(...Style.SidebarSectionHead);
+		advLabel.style.marginBottom = "4px";
+		advDiv.appendChild(advLabel);
+		
+		const advCheckbox = document.createElement("input");
+		advCheckbox.type = "checkbox";
+		advCheckbox.checked = pmmgSettings["PMMGExtended"]["advanced_mode"];
+		advDiv.appendChild(advCheckbox);
+		tile.appendChild(advDiv);
+		advCheckbox.addEventListener("click", function() {
+			pmmgSettings["PMMGExtended"]["advanced_mode"] = advCheckbox.checked;
+			setSettings(pmmgSettings);
+		});
+		
 		const burnDiv = document.createElement("div");
 		const burnLabel = document.createElement('h3');
 		burnLabel.appendChild(createTextSpan("Burn Settings"));

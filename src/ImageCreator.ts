@@ -22,7 +22,7 @@ export class ImageCreator implements Module {
     if (!buffers){return};
 	
 	buffers.forEach(buffer => {
-		const chatLinks = buffer.querySelectorAll(Selector.ChatLink); // Chat link elements. Also includes company code links! Make sure to filter out...
+		const chatLinks = buffer.querySelectorAll(Selector.BufferLink); // Chat link elements. Also includes company code links! Make sure to filter out...
 		const chatArea = buffer.querySelector(Selector.ChatArea);
 		if(!chatArea){return;}
 		Array.from(chatLinks).forEach(link => {

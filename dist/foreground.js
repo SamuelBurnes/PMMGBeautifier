@@ -6,20 +6,33 @@ if(typeof browser === "undefined") {
     var browser = chrome;
 }
 
-window.addEventListener("message", function(event) {
-    if (event.source != window)
+var func;
+if(typeof listen === "undefined")
+{
+	function listen(event)
+	{
+		if (event.source != window)
         return;
 
-    if(typeof browser === "undefined") {
-        var browser = chrome;
-    }
-    if (event.data.message && event.data.message === "pmmg_websocket_update") {
-        browser.runtime.sendMessage({
-            message: "pmmg_websocket_update",
-            payload: event.data.payload
-        });
-    }
-    if (event.data.message && event.data.message === "prep_registration") {
-        browser.runtime.sendMessage(event.data);
-    }
-});
+		if(typeof browser === "undefined") {
+			var browser = chrome;
+		}
+		if (event.data.message && event.data.message === "pmmg_websocket_update") {
+			browser.runtime.sendMessage({
+				message: "pmmg_websocket_update",
+				payload: event.data.payload
+			});
+		}
+		if (event.data.message && event.data.message === "prep_registration") {
+			browser.runtime.sendMessage(event.data);
+		}
+	}
+	func = listen;
+}
+else
+{
+	func = listen;
+}
+
+window.removeEventListener("message", func);
+window.addEventListener("message", func);

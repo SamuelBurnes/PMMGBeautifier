@@ -752,7 +752,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 					line.orders.forEach(order => {
 						if(!order.started && (!isRecurring || order.recurring))
 						{
-							totalDuration += order.duration;
+							totalDuration += order.duration || Infinity;
 						}
 					});
 				
@@ -1126,7 +1126,7 @@ export function calculateFinancials(webData, userInfo, result, loop)
 	});
 	
 	var liabilities = contractLiability;
-	console.log(finSnapshot);
+	//console.log(finSnapshot);
 	// History stored as [time, fixed, current, liquid, liabilities]
 	finSnapshot["History"] = [Date.now(), Math.round(fixed * 100) / 100, Math.round(current * 100) / 100, Math.round(liquid * 100) / 100, Math.round(liabilities * 100) / 100];
 	getLocalStorage("PMMG-Finance", writeFinancials, finSnapshot);

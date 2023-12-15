@@ -34,6 +34,7 @@ import {Sort} from "./XIT/Sort";
 import {Start} from "./XIT/Start";
 import {PrUN, Prosperity, Sheets, Wiki, PrunPlanner, FIO} from "./XIT/Web";
 import {Checklists} from "./XIT/Checklists";
+import {Notes} from "./XIT/Notes";
 
 // This is the structure all classes should follow. For some reason extending classes in other files shows XITModule as undefined.
 // Not the best solution, but it works. Be careful implementing new modules that they include these functions.
@@ -76,7 +77,9 @@ const XITClasses: {[key: string]: new(...args: any[]) => XITModule} = {
 	"FIO": FIO,
 	"CHECK": Checklists,
 	"CHECKLIST": Checklists,
-	"CHECKLISTS": Checklists
+	"CHECKLISTS": Checklists,
+	"NOTE": Notes,
+	"NOTES": Notes
 }
 
 
@@ -169,8 +172,9 @@ export class XITHandler implements Module {
 		{
 			(tile.firstChild as HTMLElement).id = "pmmg-load-success";
 			const XITObj = new XITClasses[parameters[0].toUpperCase()](contentDiv, parameters, this.pmmgSettings, this.userInfo, this.webData, this.modules);	// Make new XIT object
-			refreshButton.addEventListener("click", XITObj.create_buffer());	// Add refresh listener
+			refreshButton.addEventListener("click", function(){XITObj.create_buffer();});	// Add refresh listener
 			(buffer.querySelector(Selector.BufferTitle) as HTMLElement).textContent = XITObj.name;	// Title the buffer
+			XITObj.create_buffer();
 			
 		}
 		return;

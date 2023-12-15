@@ -9,7 +9,7 @@ import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getCXPrices} from "./BackgroundRunner";
-import { PMMGStyle, EnhancedColors, IconStyle } from "./Style";
+import { PMMGStyle, EnhancedColors, IconStyle, AdvancedStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
@@ -22,6 +22,7 @@ import { PendingContracts } from "./PendingContracts";
 import { CompactUI } from "./CompactUI";
 import { calculateFinancials } from "./XIT/Finances";
 import { FormulaReplacer } from "./FormulaEvaluator";
+import { AdvancedMode } from "./AdvancedMode";
 
 // Inject page_script.js directly into the webpage.
 
@@ -96,6 +97,15 @@ function mainRun(result, browser?)
 		if(doc){doc.appendChild(colors);}
 	}
 	
+	if(result["PMMGExtended"]["advanced_mode"] && doc)
+	{
+		const advancedStyle = document.createElement("style");
+		advancedStyle.type = "text/css";
+		advancedStyle.id = "pmmg-advanced";
+		advancedStyle.textContent = AdvancedStyle;
+		doc.appendChild(advancedStyle);
+	}
+	
 	// Introduce an object that will hold and be periodically updated with latest info harvested from server traffic
 	const userInfo = {};
 	
@@ -130,6 +140,7 @@ function mainRun(result, browser?)
 		  new ImageCreator(),
 		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
 		  new HeaderMinimizer(result["PMMGExtended"]["minimize_by_default"]),
+		  new AdvancedMode(result["PMMGExtended"]["advanced_mode"]),
 		  new CommandCorrecter(),
 		  new CalculatorButton(),
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),

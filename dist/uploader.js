@@ -26,7 +26,7 @@ if(browser.storage.session && typeof(browser.storage.session) !== "undefined")
 	storage_location = browser.storage.session;
 }
 
-const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE"];
+const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE"];
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
@@ -43,6 +43,8 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	{
 		return;
 	}
+	
+	console.debug(eventdata);
 	
 	// Log Events into Storage
 	if(eventdata && eventdata.messageType && loggedMessageTypes.includes(eventdata.messageType))
@@ -282,7 +284,7 @@ function logEvent(result, eventdata)
 			
 			break;
 		case "CONTRACTS_CONTRACTS":
-			const badParams = ["id", "agentContract", "canExtend", "canRequestTermination", "extensionDeadline", "terminationReceived", "terminationSent"]
+			const badParams = ["id", "canExtend", "canRequestTermination", "extensionDeadline", "terminationReceived", "terminationSent"]
 			eventdata["payload"]["contracts"].forEach(contract => {
 				badParams.forEach(param => {
 					delete contract[param];
@@ -293,6 +295,28 @@ function logEvent(result, eventdata)
 			});
 			
 			result["PMMG-User-Info"]["contracts"] = eventdata["payload"]["contracts"];
+			break;
+		case "CONTRACTS_CONTRACT":
+			const badKeys = ["id", "canExtend", "canRequestTermination", "extensionDeadline", "terminationReceived", "terminationSent"];
+			const matchingContract = result["PMMG-User-Info"]["contracts"].find(obj => obj.localId === eventdata["payload"]["localId"]);
+			if(matchingContract)	// Copy new object into old
+			{
+				const oldKeys = Object.keys(matchingContract);
+				oldKeys.forEach(key => {
+					delete matchingContract[key];
+				});
+				const newKeys = Object.keys(eventdata["payload"]);
+				newKeys.forEach(key => {
+					if(!badKeys.includes(key))
+					{
+						matchingContract[key] = eventdata["payload"][key];
+					}
+				});
+			}
+			else	// Otherwise push it in its entirety. Doesn't get rid of uneccessary params, but that's fine. They'll be wiped on the next full reload.
+			{
+				result["PMMG-User-Info"]["contracts"].push(eventdata["payload"]);
+			}
 			break;
 		case "PRODUCTION_SITE_PRODUCTION_LINES":
 			console.log(eventdata["payload"]);
@@ -309,7 +333,7 @@ function logEvent(result, eventdata)
 					const orderInfo = {};
 					orderInfo.completed = order.completed;
 					orderInfo.started = order.started ? order.started.timestamp : order.started;
-					orderInfo.duration = order.duration ? order.duration.millis : null;	// Did this null value kill stuff down the line?
+					orderInfo.duration = order.duration ? order.duration.millis : Infinity;	// Did this null value kill stuff down the line?
 					orderInfo.halted = order.halted;
 					orderInfo.productionFee = order.productionFee;
 					orderInfo.recurring = order.recurring;

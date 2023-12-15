@@ -2,16 +2,17 @@ import { Module } from "./ModuleRunner";
 import { getBuffers, createTextSpan } from "./util";
 import { Selector } from "./Selector";
 import { WithStyles, Style } from "Style";
+import { Exchanges } from "./GameProperties";
 
 
 export class CompactUI implements Module {
     private tag = "pb-compactui";
     //private username;
-    private result;
+    private pmmgSettings;
 	//private contracts;
-	constructor(result)
+	constructor(pmmgSettings)
 	{
-        this.result = result;
+        this.pmmgSettings = pmmgSettings;
 		//this.username = username;
 	}
 	
@@ -25,7 +26,7 @@ export class CompactUI implements Module {
         //console.log("Clearning Buildings");
         if (buffers){
             buffers.forEach(buffer => {
-                ClearBuildingLists(buffer, this.result, this.tag);
+                ClearBuildingLists(buffer, this.pmmgSettings, this.tag);
             });
         };
         
@@ -36,8 +37,32 @@ export class CompactUI implements Module {
                 ClearBase(buffer, this.tag);
             });
         };
+		
+		buffers = getBuffers("CXOS");
+		
+		if (buffers){
+			buffers.forEach(buffer => {
+				ShortenNames(buffer);
+			});
+		};
         return;
     }
+}
+
+function ShortenNames(buffer)
+{
+	const links = buffer.querySelectorAll(Selector.BufferLink);
+	links.forEach(link => {
+		if(link.textContent && Exchanges[link.textContent])
+		{
+			link.textContent = Exchanges[link.textContent];
+		}
+	});
+	
+	const headers = buffer.querySelectorAll("th");
+	headers.forEach(header => {
+		if(header.textContent == "Exchange"){header.textContent = "Exc.";}
+	});
 }
 
 export function HideElement(element, tag)
@@ -51,7 +76,7 @@ export function UnHideElement(element, tag)
     element.classList.remove(tag + "-hidden")
 }
 
-export function ClearBuildingLists(buffer, result, tag)
+export function ClearBuildingLists(buffer, pmmgSettings, tag)
 {
 	const nameElem = buffer.querySelector(Selector.BuildingList);
 	if(!nameElem || !nameElem.textContent) return;
@@ -191,7 +216,7 @@ export function ClearBuildingLists(buffer, result, tag)
                                     {
                                         bar[0].value = 180 - value
                                         progress = bar[0].value / bar[0].max
-                                        var threshold = result["PMMGExtended"]["repair_threshold"] ? result["PMMGExtended"]["repair_threshold"] / 180.0 : (70.0 / 180.0);
+                                        var threshold = pmmgSettings["PMMGExtended"]["repair_threshold"] ? pmmgSettings["PMMGExtended"]["repair_threshold"] / 180.0 : (70.0 / 180.0);
                                         if(progress > 0.75)
                                             bar[0].classList.add(...WithStyles(Style.ProgressBarGood))
                                         else if(progress > threshold)

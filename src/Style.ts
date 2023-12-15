@@ -213,26 +213,61 @@ export const PMMGStyle = `
 .delete-button:hover {
 	color: #222;
 }
-.notes-wrapper textarea{
-	resize: none;
-	padding: 5px;
-    margin: 5px;
-	background-color: #42361d;
-	border-width: 0px;
-	color: #cccccc;
-	font-family: "Open Sans",sans-serif;
-	font-size: 12px;
-	width: 100%;
-	height: 93%;
-}
 .notes-wrapper{
 	width: 100%;
 	height: 93%;
 	display: flex;
 }
-.notes-wrapper textarea:focus{
+
+
+
+.notes-wrapper .title.note-title {
+    padding-top: 5px;
+}
+.pb-edit-div {
+    margin: 10px;
+    padding: 10px;
+    border: 0;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px - 20px);
+    background-color: #42361d;
+    color: #cccccc;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    overflow: auto;
+	font-family: "Droid Sans",sans-serif;
+	font-size: 13.333px;
+    line-height: 1.5;
+    tab-size: 4;
+	resize: none;
+}
+.pb-edit-div:focus {
 	outline: none;
 }
+
+#note-textbox {
+    color: transparent;
+    background: transparent;
+    caret-color: #cccccc;
+    resize: none;
+    z-index: 0;
+}
+#note-textbox:focus {
+    outline: none;
+}
+#note-render-overlay {
+    pointer-events: none;
+    z-index: 1;
+}
+#note-render-overlay .link {
+    pointer-events: auto;
+    z-index: 2;
+    display: inline;
+}
+
+
+
 .check-wrapper {
 	margin: 5px;
 }
@@ -448,6 +483,16 @@ tr:hover td.burn-red {
 	fill: #000;
 	background-color: rgb(247, 166, 0);
 }`;
+
+// The styles used in the advanced minimalist mode
+export const AdvancedStyle = `
+span.GridItemView__name___h3yX9Lm {
+	display: none;
+}
+div.GridItemView__container___xP2uJz8 {
+	width: auto;
+}
+`
 
 // The enhanced colors style that improves color contrast
 export const EnhancedColors = `/* consumables (luxury) */
@@ -668,6 +713,7 @@ export const IconStyle = `
  /* PrUnIcon v0.90
 * ===============
 *
+* Written by allocater
 * Install Chrome addon: StyleBot 
 * goto: apex.prosperousuniverse.com
 * right-click anywhere, select: StyleBot -> Style Element
@@ -741,7 +787,6 @@ div.ColoredIcon__container___djaR4r2:before
   opacity: .3;
   font-size: 30px;
 }
-*/
  
 /* colored overlay icon */
 div.ColoredIcon__labelContainer___YVfgzOk:before
@@ -754,7 +799,8 @@ div.ColoredIcon__labelContainer___YVfgzOk:before
   font-size: 30px;
   color: rgba(100%, 0%, 0%, 0);
 }
- 
+
+/*
 div[title="gold ore"i] div:before 
 {
   content: "🥔";
@@ -796,7 +842,7 @@ div[title="copper ore"i] div:before
   content: "🥔";
   text-shadow: 0 0 0 red;
 }
- 
+ */
 div[title="ferro-titanium"i] div:before 
 {
   content: "🟦";

@@ -1,5 +1,5 @@
 import {Selector} from "./Selector";
-import {MaterialNames, PlanetNames, SystemNames} from "./GameProperties";
+import {MaterialNames, PlanetNames, SystemNames, Stations} from "./GameProperties";
 import {Style, CategoryColors, WithStyles, DefaultColors} from "./Style";
 
 // Download a file containing fileData with fileName
@@ -78,6 +78,24 @@ export function parseDuration(duration) {
   }
   return parsedSeconds;
 }
+
+/**
+ * Shorten planet names
+ * @param text
+ * @returns {string}
+ */
+ export function cleanPlanetName(text: string)
+ {
+	text = text.replace(/\s*\([^)]*\)/, '');	// Clear parenthesis
+	text = text.replace(/(\d)\s+(?=[a-zA-Z])/, '$1');	// Clear space between system and planet
+	text = text.replace(/.*\s-\s/, '');	// Clear system name in named systems
+	
+	if(Stations[text.slice(0, -1)])
+	{
+		text = Stations[text.slice(0, -1)];
+	}
+	return text;
+ }
 
 /**
  * Create a span with the given text
@@ -1044,6 +1062,39 @@ export function drawPieChart(data, size, text?, colors?)
 	canvas.style.marginLeft = (minX > 0 ? -minX + 5 : 5).toString() + "px";
 	canvas.style.marginRight = (maxX - 2 * size + 5).toString() + "px";
 	return canvas;
+}
+
+/**
+ * Gets one or more items from storage.
+ * @param keys - A single key to get, list of keys to get, or a dictionary specifying default values. An empty list or object will return an empty result object. Pass in null to get the entire contents of storage.
+ * @returns A Promise that resolves with an object containing items
+ */
+export function getLocalStoragePromise(keys)
+{
+	try	{
+		return browser.storage.local.get(keys);
+	}
+	catch(err) {
+		return chrome.storage.local.get(keys);
+	}
+}
+
+/**
+ * Sets multiple items in localStorage.
+ * @param items - An object which gives each key/value pair to update storage with. Any other key/value pairs in storage will not be affected. Primitive values such as numbers will serialize as expected. Values with a typeof "object" and "function" will typically serialize to {}, with the exception of Array (serializes as expected), Date, and Regex (serialize using their String representation).
+ * @returns A void Promise
+ */
+export function setLocalStoragePromise(items: {[p: string]: any}) {
+	let promise;
+
+	try	{
+		promise = browser.storage.local.set(items);
+	}
+	catch(err) {
+		promise = chrome.storage.local.set(items);
+	}
+
+	return promise;
 }
 
 export class Popup

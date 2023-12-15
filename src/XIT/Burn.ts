@@ -8,16 +8,18 @@ export class Burn {
 	private parameters: string[];
 	private pmmgSettings;
 	private userInfo;
-	private webData;
-	public name = "ENHANCED BURN";
+	private alive;
+	public name: string;
 	
-	constructor(tile, parameters, pmmgSettings, userInfo, webData)
+	constructor(tile, parameters, pmmgSettings, userInfo)
 	{
 		this.tile = tile;
 		this.parameters = parameters;
 		this.pmmgSettings = pmmgSettings;
 		this.userInfo = userInfo;
-		this.webData = webData;
+		this.alive = true;
+		
+		this.name = "ENHANCED BURN" + (parameters[1] ? " - " + parameters[1].toUpperCase() : "");
 	}
 	
 	create_buffer()
@@ -50,88 +52,12 @@ export class Burn {
 		
 		var planetBurn;
 		var settings;
-		if(this.parameters[1].toLowerCase() == "group" && this.webData["burn"])
-		{
-			// Add group burn back in later.
-			return;
-			var inv = {};
-			var cons = {};
-			var fullCommand = "";
-			if(this.parameters[3])
-			{
-				fullCommand = this.parameters.join(" ").toUpperCase();
-			}
-			this.webData["burn"][this.parameters[2]].forEach(planetData => {
-				if(this.parameters[3])
-				{
-					if(!((planetData && planetData["PlanetName"] && fullCommand.match(planetData["PlanetName"].toUpperCase())) || (planetData && planetData["PlanetNaturalId"] && fullCommand.match(planetData["PlanetNaturalId"].toUpperCase()))))
-					{
-						return;
-					}
-				}
-				if(planetData["Error"] == null)
-				{
-					planetData["Inventory"].forEach(material => {
-						if(inv[material["MaterialTicker"]] == undefined)
-						{
-							inv[material["MaterialTicker"]] = material["MaterialAmount"];
-						}
-						else
-						{
-							inv[material["MaterialTicker"]] += material["MaterialAmount"];
-						}
-						return;
-					});
-					
-					planetData["OrderConsumption"].forEach(material => {
-						if(cons[material["MaterialTicker"]] == undefined)
-						{
-							cons[material["MaterialTicker"]] = -material["DailyAmount"];
-						}
-						else
-						{
-							cons[material["MaterialTicker"]] -= material["DailyAmount"];
-						}
-					});
-					
-					planetData["WorkforceConsumption"].forEach(material => {
-						if(cons[material["MaterialTicker"]] == undefined)
-						{
-							cons[material["MaterialTicker"]] = -material["DailyAmount"];
-						}
-						else
-						{
-							cons[material["MaterialTicker"]] -= material["DailyAmount"];
-						}
-						return;
-					});
-					
-					planetData["OrderProduction"].forEach(material => {
-						if(cons[material["MaterialTicker"]] == undefined)
-						{
-							cons[material["MaterialTicker"]] = material["DailyAmount"];
-						}
-						else
-						{
-							cons[material["MaterialTicker"]] += material["DailyAmount"];
-						}
-						return;
-					});
-				}
-				return;
-			});
-		} else
-		{
-			const planetProduction = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["production"]);
-			const planetWorkforce = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["workforce"]);
-			const planetInv = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["storage"], true);
 		
-			planetBurn = calculateBurn(planetProduction, planetWorkforce, planetInv);	// The planet burn data
-			
-			// Reimplement burn settings later.
-			//settings = findCorrespondingPlanet(planet, webData["burn_settings"]);
-			if(!planetBurn || Object.keys(planetBurn).length == 0){this.tile.textContent = "Error! No Matching Planet!";return;}
-		}
+		const planetProduction = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["production"]);
+		const planetWorkforce = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["workforce"]);
+		const planetInv = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["storage"], true);
+	
+		planetBurn = calculateBurn(planetProduction, planetWorkforce, planetInv);	// The planet burn data
 		
 		if(!planetBurn){return;}
 		
@@ -290,12 +216,18 @@ export class Burn {
 		}
 		UpdateBurn(table, dispSettings);
 		this.tile.appendChild(table);
+		
+		this.update_buffer();
 		return;
 	}
 	
 	update_buffer()
 	{
-		// Nothing to update (for now)
+		this.alive = document.body.contains(this.tile);
+		if(this.alive)
+		{
+			window.setTimeout(() => this.create_buffer(), 3000);
+		}
 	}
 	destroy_buffer()
 	{

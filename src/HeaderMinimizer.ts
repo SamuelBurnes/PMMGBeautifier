@@ -27,7 +27,21 @@ export class HeaderMinimizer implements Module {
 			minimizeHeaders(buffer, this.minByDefault, this.tag);
 		});
 		
-		var buffers = getBuffers("CONT ");
+		buffers = getBuffers("CONT ");
+		if(!buffers){return;}
+		
+		buffers.forEach(buffer => {
+			minimizeHeaders(buffer, this.minByDefault, this.tag);
+		});
+		
+		buffers = getBuffers("LM ");
+		if(!buffers){return;}
+		
+		buffers.forEach(buffer => {
+			minimizeHeaders(buffer, this.minByDefault, this.tag);
+		});
+		
+		buffers = getBuffers("SYSI ");
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
@@ -44,6 +58,7 @@ function minimizeHeaders(buffer, minByDefault, tag)
 	const bufferPanel = buffer.querySelector(Selector.BufferPanel);
 	if(!bufferPanel || !bufferPanel.firstChild){return;}
 	const headers = buffer.querySelectorAll(Selector.HeaderRow);
+	if(headers.length == 0){return;}	// Don't populate empty buffers yet
 	if(headers[0] && headers[0].classList.contains(tag)){return;}
 	if(minByDefault)
 	{
@@ -89,7 +104,7 @@ function minimizeHeaders(buffer, minByDefault, tag)
 		return;
 	});
 	
-	bufferPanel.firstChild.insertBefore(createHeaderRow("Minimize", minimizeButton, tag), bufferPanel.firstChild.firstChild);
+	headers[0].parentElement.insertBefore(createHeaderRow("Minimize", minimizeButton, tag), headers[0]);
 	return;
 }
 

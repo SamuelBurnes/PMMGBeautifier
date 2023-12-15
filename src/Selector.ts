@@ -35,8 +35,7 @@ export const Selector = {
   //ChatInput: "div[class~='BArxa2yGz-u5GgiT-uvI9Q==']",
   //ChatTile: "div[class~='_8MZs-piY-+t2NOXRPhMM6A==']",
   MaterialIcon: "GridItemView__image___yMoKOZV",
-  ChatLink: "span[class~='Link__link___fa4mmMA']",
-  InventoryName: "span[class~='Link__link___fa4mmMA']",
+  BufferLink: "span[class~='Link__link___fa4mmMA']",
   FullMaterialIcon: "div[class~='GridItemView__container___xP2uJz8']",
   Inventory: "div[class~='InventoryView__grid___UyRQSX8']",
   MaterialText: "span[class~='ColoredIcon__label___OU1I4oP']",
@@ -53,5 +52,7 @@ export const Selector = {
   SidebarContract: "div[class~='Sidebar__contract___J0gmlzN']",
   SidebarContractId: "span[class~='Sidebar__contractId___Lg85TRZ']",
   BuildingList: "div[class~='SectionList__container___EtUzWyi']",
-  Divider: "div[class~='SectionList__divider___cwWO45v']"
+  Divider: "div[class~='SectionList__divider___cwWO45v']",
+  MaterialLabel: "span[class~='GridItemView__name___h3yX9Lm']",
+  SmallButton: "button[class~='Button__darkInline___z_YKa91']"
 }
