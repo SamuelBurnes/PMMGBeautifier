@@ -4,7 +4,7 @@ import {
 	createTextSpan,
 	getLocalStoragePromise,
 	setLocalStoragePromise,
-	showWarningDialog
+	showWarningDialog, showBuffer
 } from "../util";
 
 
@@ -29,6 +29,27 @@ export class Notes {
 }
 
 const StorageName = "PMMG-Notes";
+
+class NoteStructure {
+	public textbox: HTMLTextAreaElement;
+	public overlay: HTMLPreElement;
+	public wrapper: HTMLDivElement;
+	
+	constructor()
+	{
+		this.wrapper = document.createElement("div");
+		this.textbox = document.createElement("textarea");
+		this.overlay = document.createElement("pre");
+		
+		this.wrapper.appendChild(this.textbox);
+		this.wrapper.appendChild(this.overlay);
+		
+		// Add styles
+		this.textbox.classList.add("pb-note-textbox");
+		this.overlay.classList.add("pb-note-overlay");
+		this.textbox.spellcheck = false;
+	}
+}
 
 async function CreateNotes(tile: HTMLDivElement, parameters: any[])
 {
@@ -58,13 +79,11 @@ async function CreateNotes(tile: HTMLDivElement, parameters: any[])
 	nameDiv.style.paddingLeft = "10px";
 	tile.append(nameDiv);
 
-	const textbox = document.createElement("textarea");
-	textbox.classList.add("pb-edit-div");
-	textbox.contentEditable = "true";
-	tile.appendChild(textbox);
+	const note = new NoteStructure();
+	tile.appendChild(note.wrapper);
 	
 	
-	await displayStoredNote(textbox, noteName);
+	await displayStoredNote(note, noteName);
 }
 
 async function displayNotesList(tile: HTMLDivElement): Promise<void> {
@@ -167,7 +186,7 @@ async function saveNote(noteName: string, noteText: string | null): Promise<void
 	return await setLocalStoragePromise(storage);
 }
 
-async function displayStoredNote(textbox: HTMLTextAreaElement, noteName: string){
+async function displayStoredNote(note: NoteStructure, noteName: string){
 
 	let storageValue = await getLocalStoragePromise(StorageName);
 	let notesStorage = storageValue[StorageName];
@@ -178,52 +197,53 @@ async function displayStoredNote(textbox: HTMLTextAreaElement, noteName: string)
 
 	var noteText = notesStorage[noteName] ?? "";
 	
+	note.textbox.value = noteText;
 	
-	textbox.addEventListener("input", () => {
-		noteText = textbox.value;
+	note.textbox.addEventListener("input", () => {
+		noteText = note.textbox.value;
 		
 		saveNote(noteName, noteText)
 			.catch(reason => {
 				console.error("Failed to save note to local storage: %o", reason);
 			});
-			
-		console.log(noteText);
+		
+		renderNoteText(note, noteText);
+	});
+	
+	note.textbox.addEventListener("scroll", function() {
+		note.overlay.scrollTop = note.textbox.scrollTop;
+		note.overlay.scrollLeft = note.textbox.scrollLeft;
 	});
 
-	renderNoteText(textbox, noteText);
+	renderNoteText(note, noteText);
 }
 
-/*	// Leftover from attempt to add links
-
-const regexp = new RegExp('([A-Z1-9]+?)\\.(CI1|IC1|AI1|NC1)', 'dg')
-
-*/
-
-function renderNoteText(textbox: HTMLTextAreaElement, noteText: string): void {
-	textbox.value = noteText;
+function renderNoteText(note: NoteStructure, noteText: string): void {
+	// Update overlay
+	if(noteText[noteText.length - 1] == "\n"){ noteText += " "; }	// Account for final new lines
+	
+	noteText = noteText.replace(new RegExp("&", "g"), "&amp;").replace(new RegExp("<", "g"), "&lt;");	// Allow for HTML tags
+	
+	const regexp = /\b(?:[a-zA-Z0-9]{1,3}\.(?:CI1|IC1|AI1|NC1|CI2|NC2))(?!<)/;
+	var matches;
+	var counter = 0;
+	do
+	{
+		matches = noteText.match(regexp);
+		if(!matches || !matches[0]){break;}
+		
+		noteText = noteText.replace(regexp, "<span class=\"pb-note-link\">" + matches[0] + "</span>");
+		
+		counter++;
+		if(counter > 100){break;}
+	} while(matches);
+	
+	note.overlay.innerHTML = noteText;
+	
+	const links = note.overlay.getElementsByClassName("pb-note-link");
+	Array.from(links).forEach(link => {
+		link.addEventListener("click", function() {
+			showBuffer("CXP " + link.textContent);
+		});
+	});
 }
-
-/* // Leftover from attempt to add links
-
-function createNoteLink(text: string, command: string) {
-	const link = document.createElement("span");
-	link.setAttribute("data-command", command);
-	link.textContent = text;
-	link.title = text;
-	link.classList.add("link", "note-link");
-
-	// Wait, does this alone show buffers?
-
-	// link.addEventListener("click", (ev) => {
-	// 	console.log("Clicked on note link '%s' on elment %o", command, ev.target);
-	// 	if (!showBuffer(command)) {
-	// 		console.log("Failed to open buffer.");
-	// 	}
-	//
-	// 	ev.preventDefault();
-	// });
-
-	return link;
-}
-
-*/

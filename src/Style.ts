@@ -213,57 +213,77 @@ export const PMMGStyle = `
 .delete-button:hover {
 	color: #222;
 }
-.notes-wrapper{
-	width: 100%;
-	height: 93%;
-	display: flex;
-}
 
 
 
 .notes-wrapper .title.note-title {
     padding-top: 5px;
 }
-.pb-edit-div {
-    margin: 10px;
+.pb-note-overlay {
+    background-color: #42361d;
+    color: #cccccc;
+	margin: 10px;
     padding: 10px;
     border: 0;
     width: calc(100% - 20px);
     height: calc(100% - 20px - 20px);
-    background-color: #42361d;
-    color: #cccccc;
     position: absolute;
     top: 20px;
     left: 0;
-    overflow: auto;
+    overflow-wrap: anywhere;
+	white-space: pre-wrap;
+	overflow-y: scroll;
+	font-family: "Droid Sans",sans-serif;
+	font-size: 13.333px;
+    line-height: 1.5;
+    tab-size: 4;
+}
+.pb-note-overlay::-webkit-scrollbar {
+	width: 0;
+}
+.pb-note-overlay::-moz-scrollbar {
+	width: 0;
+}
+
+.pb-note-textbox {
+	color: transparent;
+	background: transparent;
+	caret-color: white;
+	margin: 10px;
+    padding: 10px;
+    border: 0;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px - 20px);
+    position: absolute;
+    top: 20px;
+    left: 0;
+    overflow-y: scroll;
+	white-space: wrap;
 	font-family: "Droid Sans",sans-serif;
 	font-size: 13.333px;
     line-height: 1.5;
     tab-size: 4;
 	resize: none;
+	z-index: 1;
 }
-.pb-edit-div:focus {
+.pb-note-textbox:focus {
 	outline: none;
 }
+.pb-note-textbox::-webkit-scrollbar {
+	width: 0;
+}
+.pb-note-textbox::-moz-scrollbar {
+	width: 0;
+}
 
-#note-textbox {
-    color: transparent;
-    background: transparent;
-    caret-color: #cccccc;
-    resize: none;
-    z-index: 0;
+.pb-note-link {
+	color: #3fa2de;
+	cursor: pointer;
+	position: relative;
+	z-index: 2;
 }
-#note-textbox:focus {
-    outline: none;
-}
-#note-render-overlay {
-    pointer-events: none;
-    z-index: 1;
-}
-#note-render-overlay .link {
-    pointer-events: auto;
-    z-index: 2;
-    display: inline;
+.pb-note-link:hover {
+	color: #f7a600 !important;
 }
 
 
