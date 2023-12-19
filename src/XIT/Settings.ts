@@ -329,7 +329,7 @@ export class Settings {
 			if(!e || !e.target){return;}
 			try
 			{
-				const fileOutput = JSON.parse(e.target.pmmgSettings as string);
+				const fileOutput = JSON.parse(e.target.result as string);
 				const exclude = ["username", "apikey", "webappid"];	// Don't overwrite username, apikey, and webappid
 				Object.keys(fileOutput).forEach(key => {
 					if(!exclude.includes(key))
@@ -341,6 +341,7 @@ export class Settings {
 				errorTextBox.style.display = "none";
 			} catch(ex)
 			{
+				console.error(ex);
 				console.log("PMMG: Error encountered processing file!");
 				errorTextBox.style.display = "inline-block";
 			}
@@ -363,7 +364,7 @@ export class Settings {
 			if(!e || !e.target){return;}
 			try
 			{
-				const fileOutput = JSON.parse(e.target.pmmgSettings as string);
+				const fileOutput = JSON.parse(e.target.result as string);
 				setSettings(fileOutput);
 				errorTextBox.style.display = "none";
 			} catch(ex)
@@ -381,7 +382,7 @@ export class Settings {
 			if(!e || !e.target){return;}
 			try
 			{
-				const fileOutput = JSON.parse(e.target.pmmgSettings as string);
+				const fileOutput = JSON.parse(e.target.result as string);
 				setSettings(fileOutput);
 				errorTextBox.style.display = "none";
 			} catch(ex)
@@ -399,7 +400,7 @@ export class Settings {
 			if(!e || !e.target){return;}
 			try
 			{
-				const fileOutput = JSON.parse(e.target.pmmgSettings as string);
+				const fileOutput = JSON.parse(e.target.result as string);
 				const finResult = {};
 				Object.keys(fileOutput).forEach(key => {
 					finResult[key] = fileOutput[key];

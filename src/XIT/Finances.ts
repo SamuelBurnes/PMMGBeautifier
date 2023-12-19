@@ -106,7 +106,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		priceType = interpreted[1];
 	}
 	
-	if(!userInfo["PMMG-User-Info"]["cx_prices"]){return;}
+	if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["cx_prices"]){return;}
 	const cxPrices = userInfo["PMMG-User-Info"]["cx_prices"][CX][priceType];	// Dictionary containing prices keyed to material tickers
 	
 	var currency = "";	// Determine currency symbol

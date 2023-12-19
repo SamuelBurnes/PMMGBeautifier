@@ -30,6 +30,7 @@ const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGE
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
+	console.log("Processing Event");
 	// Testing code
 	/*const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST"];
 	if(eventdata && !badTypes.includes(eventdata.messageType))
@@ -44,11 +45,12 @@ async function ProcessEvent(eventdata, event_list, full_event)
 		return;
 	}
 	
-	console.debug(eventdata);
+	//console.debug(eventdata);
 	
 	// Log Events into Storage
 	if(eventdata && eventdata.messageType && loggedMessageTypes.includes(eventdata.messageType))
 	{
+		console.log("Logging Event into Storage");
 		getLocalStorage("PMMG-User-Info", logEvent, eventdata);
 		await sleep(100);
 		return;
@@ -69,6 +71,7 @@ async function ProcessEvent(eventdata, event_list, full_event)
 
 		if(match_event.action == "subprocess_payload")
 		{
+			console.log("Processing Subevent")
 			await ProcessEvent(eventdata.payload.message, match_event.payload_events, full_event);
 		}
 	}
@@ -81,6 +84,7 @@ async function ProcessEvent(eventdata, event_list, full_event)
 
 function ProcessMessage(event)
 {
+	console.log("Processing Mesage");
 	var outmsg = '';
 	// Do stuff with event.data (received data).
 	var re_event = /^[0-9:\s]*(?<event>\[\s*"event".*\])[\s0-9:\.]*/m;
@@ -93,7 +97,7 @@ function ProcessMessage(event)
 		var eventdata = JSON.parse(result.groups.event)[1];
 		//console.log("Event found");
 		//console.log(eventdata);
-
+		console.log("Queueing Event");
 		QueueEvent(eventdata, transmitted_events);
     }
 }
@@ -110,6 +114,7 @@ async function QueueEvent(eventdata)
 		//console.debug("Queue event processing; queue size? " + eventQueue.length);
 
 		currentEvent = eventQueue.shift();
+		console.log("Waiting to Process Event");
 		while(currentEvent !== undefined)
 		{
 			await ProcessEvent(currentEvent, transmitted_events);
@@ -386,6 +391,7 @@ function logEvent(result, eventdata)
 	}
 	
 	console.log(result);
+	console.log("Finished Logging Event, now Setting...");
 	setSettings(result);
 }
 
@@ -394,9 +400,10 @@ function logEvent(result, eventdata)
 // Set the data in local storage. Pass it the result of a getLocalStorage call
 function setSettings(result)
 {
+	console.log("Trying to Set Data");
 	try
 	{
-		browser.storage.local.set(result);	// For FireFox, throws an error in Chrome
+		browser.storage.local.set(result).then(function(){console.log("Data Set Properly");});	// For FireFox, throws an error in Chrome
 	}
 	catch(err)
 	{
@@ -411,10 +418,11 @@ function setSettings(result)
 // Also pass the params through to the callback function
 function getLocalStorage(storageName, callbackFunction, params)
 {
+	console.log("Trying to Get Data");
 	try
 	{
 		browser.storage.local.get(storageName).then(function(result) {
-		
+			console.log("Successfully Got Data");
 			callbackFunction(result, params)
 		});	// For FireFox, throws an error in Chrome
 	} catch(err)

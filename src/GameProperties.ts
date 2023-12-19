@@ -27,7 +27,7 @@ export const RatingColors = {
 	"A": "#f6a204"
 }
 
-export const Exchanges = {"Antares Station Commodity Exchange": "ANT", "Benten Station Commodity Exchange": "BEN", "Moria Station Commodity Exchange": "MOR", "Hortus Station Commodity Exchange": "HRT", "Hubur Station Commodity Exchange": "HUB", "Arclight Station Commodity Exchange": "ARC"};
+export const Exchanges = {"Antares Station Commodity Exchange": "ANT", "Benten Station Commodity Exchange": "BEN", "Moria Station Commodity Exchange": "MOR", "Hortus Station Commodity Exchange": "HRT", "Hubur Commodity Exchange": "HUB", "Arclight Commodity Exchange": "ARC"};
 export const Stations = {"Antares Station": "ANT", "Benten Station": "BEN", "Moria Station": "MOR", "Hortus Station": "HRT", "Hubur Station": "HUB", "Acrlight Station": "ARC"};
 
 export const NonProductionBuildings = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
