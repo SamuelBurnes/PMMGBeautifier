@@ -175,6 +175,10 @@ async function saveNote(noteName: string, noteText: string | null): Promise<void
 	if (!storage) {
 		storage = {};
 	}
+	
+	if (!storage[StorageName]) {
+		storage[StorageName] = {};
+	}
 
 	if (!noteText || noteText.length === 0) {
 		storage[StorageName][noteName] = undefined;

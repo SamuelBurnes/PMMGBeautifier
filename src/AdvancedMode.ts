@@ -45,9 +45,17 @@ function cleanFleet(buffer, tag)
 	// Remove first column
 	const rows = buffer.querySelectorAll("tr");
 	rows.forEach(row => {
+		if(row.classList.contains(tag)){return;}
+		row.classList.add(tag);
 		if(row.firstChild)
 		{
 			row.firstChild.style.display = "none";
+		}
+		if(row.children && row.children[2] && row.children[2].firstChild && row.children[2].firstChild.children && row.children[2].firstChild.children[2])
+		{
+			var text = row.children[2].textContent || "";
+			text = text.replace("m³", "").replace("t", "").replace(/1,000/g,"1k").replace(/2,000/g,"2k").replace(/3,000/g,"3k");
+			row.children[2].firstChild.children[2].textContent = text;
 		}
 	});
 	
@@ -62,6 +70,31 @@ function cleanFleet(buffer, tag)
 			link.textContent = cleanPlanetName(link.textContent);
 		}
 	});
+	
+	// Shorten Status
+	const tableEntries = buffer.querySelectorAll("td");
+	tableEntries.forEach(entry => {
+		if(entry.textContent && !entry.classList.contains(tag))
+		{
+			entry.classList.add(tag);
+			if(Object.keys(shipStatus).includes(entry.textContent))
+			{
+				entry.textContent = shipStatus[entry.textContent];
+				entry.style.textAlign = "center";
+			}
+		}
+		entry.style.padding = "2px 4px";
+	});
+}
+
+const shipStatus = {
+	"take off": "↑",
+	"departing": "↗",
+	"charging": "±",
+	"jumping": "⟿",
+	"approaching": "↘",
+	"landing": "↓",
+	"stationary": "⦁"
 }
 
 function cleanCXOS(buffer)

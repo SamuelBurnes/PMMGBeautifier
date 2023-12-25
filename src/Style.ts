@@ -502,7 +502,11 @@ tr:hover td.burn-red {
 	color: #000 !important;
 	fill: #000;
 	background-color: rgb(247, 166, 0);
-}`;
+}
+div.ScrollView__view___ovf59Tk {
+	inset: -1px !important;
+}
+`;
 
 // The styles used in the advanced minimalist mode
 export const AdvancedStyle = `
