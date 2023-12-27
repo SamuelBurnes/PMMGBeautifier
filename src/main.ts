@@ -23,6 +23,7 @@ import { CompactUI } from "./CompactUI";
 import { calculateFinancials } from "./XIT/Finances";
 import { FormulaReplacer } from "./FormulaEvaluator";
 import { AdvancedMode } from "./AdvancedMode";
+import { CXOBHighlighter } from "./CXOBHighlighter";
 
 // Inject page_script.js directly into the webpage.
 
@@ -146,7 +147,8 @@ function mainRun(result, browser?)
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
 		  new PendingContracts(userInfo),
 		  new CompactUI(result),
-		  new FormulaReplacer()
+		  new FormulaReplacer(),
+		  new CXOBHighlighter(userInfo)
 	], result, webData, userInfo, browser);
 	
 	// Start the loop

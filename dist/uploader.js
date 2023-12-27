@@ -26,18 +26,20 @@ if(browser.storage.session && typeof(browser.storage.session) !== "undefined")
 	storage_location = browser.storage.session;
 }
 
-const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE"];
+const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA"];
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
 	//console.log("Processing Event");
 	// Testing code
-	/*const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST"];
+	/*
+	const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST"];
 	if(eventdata && !badTypes.includes(eventdata.messageType))
 	{
 		console.log(eventdata.messageType);
 		console.log(eventdata);
-	}*/
+	}
+	*/
 	
 	// Detect bad events
 	if (typeof eventdata === undefined || eventdata === null || typeof (eventdata.messageType) === "undefined")
@@ -381,6 +383,13 @@ function logEvent(result, eventdata)
 			eventdata.payload.currencyAccounts.forEach(account => {
 				result["PMMG-User-Info"]["currency"].push(account.currencyBalance);
 			});
+			
+			result["PMMG-User-Info"]["company-name"] = "";
+			
+			if(eventdata.payload.name)
+			{
+				result["PMMG-User-Info"]["company-name"] = eventdata.payload.name;
+			}
 			break;
 		case "FOREX_TRADER_ORDERS":	// FX Orders
 			result["PMMG-User-Info"]["fxos"] = eventdata.payload.orders;
