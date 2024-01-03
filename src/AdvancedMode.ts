@@ -128,6 +128,7 @@ function cleanFleet(buffer, tag)
 				entry.style.textAlign = "center";
 				entry.style.fontSize = "0";
 				const statusIndicator = createTextSpan(shipStatus[entry.textContent], "pb-cleanup");
+				statusIndicator.title = entry.textContent;
 				statusIndicator.style.fontSize = "11px";
 				entry.appendChild(statusIndicator);
 			}

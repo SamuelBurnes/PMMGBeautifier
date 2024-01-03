@@ -1,6 +1,6 @@
 import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile, findCorrespondingPlanet, createSmallButton} from "../util";
 import {Style, TextColors} from "../Style";
-import {CurrencySymbols} from "../GameProperties";
+import {CurrencySymbols, Consumption} from "../GameProperties";
 
 export class Finances {
 	private tile: HTMLElement;
@@ -108,6 +108,23 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 	
 	if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["cx_prices"]){return;}
 	const cxPrices = userInfo["PMMG-User-Info"]["cx_prices"][CX][priceType];	// Dictionary containing prices keyed to material tickers
+	
+	// Calculate price basket
+	const weights = {"PIO": 0.7435, "SET": 0.1954, "TEC": 0.0444, "ENG": 0.0132, "SCI": 0.0035};
+	
+	var priceBasket = 0;
+	
+	Object.keys(Consumption).forEach(workforce => {
+		var tierCost = 0;
+		Object.keys(Consumption[workforce]).forEach(mat => {
+			tierCost += averageCX(userInfo["PMMG-User-Info"]["cx_prices"], mat) * Consumption[workforce][mat];
+		});
+		
+		priceBasket += tierCost * weights[workforce];
+	});
+	
+	priceBasket /= 2030.55;	// Normalize by prices on 12/27/2023
+	//console.log(priceBasket);
 	
 	var currency = "";	// Determine currency symbol
 	switch(CX)
@@ -693,7 +710,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		
 	}
-	else if(parameters[1].toLowerCase() == "production" || parameters[1].toLowerCase() == "prox") // Revenue/profit derived from burn data
+	else if(parameters[1].toLowerCase() == "production" || parameters[1].toLowerCase() == "prod") // Revenue/profit derived from burn data
 	{
 		if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["workforce"]){
 			tile.id = "pmmg-reload";
@@ -717,7 +734,6 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		const burnFinances = [] as any[][];
 		var totalProduced = 0;
 		var totalConsumed = 0;
-		const isCustom = pmmgSettings["PMMGExtended"]["pricing_scheme"] == "Custom (Spreadsheet)";
 		planets.forEach(planet => {
 		
 			const planetProduction = findCorrespondingPlanet(planet, userInfo["PMMG-User-Info"]["production"]);
@@ -732,7 +748,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			{
 				planetWorkforce.workforce.forEach(tier => {
 					tier.needs.forEach(need => {
-						consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, need.material.ticker) * need.unitsPerInterval;
+						consumed += getPrice(cxPrices, webData["custom_prices"], pmmgSettings["PMMGExtended"]["pricing_scheme"], need.material.ticker, userInfo, priceBasket) * need.unitsPerInterval;
 					});
 				});
 			
@@ -760,11 +776,11 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 						if(!order.started && (!isRecurring || order.recurring))
 						{
 							order.inputs.forEach(mat => {
-								consumed += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.MaterialTicker) * mat.Amount * 86400000 * line.capacity / totalDuration;
+								consumed += getPrice(cxPrices, webData["custom_prices"], pmmgSettings["PMMGExtended"]["pricing_scheme"], mat.MaterialTicker, userInfo, priceBasket) * mat.Amount * 86400000 * line.capacity / totalDuration;
 							});
 							
 							order.outputs.forEach(mat => {
-								produced += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.MaterialTicker) * mat.Amount * 86400000 * line.capacity / totalDuration;
+								produced += getPrice(cxPrices, webData["custom_prices"], pmmgSettings["PMMGExtended"]["pricing_scheme"], mat.MaterialTicker, userInfo, priceBasket) * mat.Amount * 86400000 * line.capacity / totalDuration;
 							});
 						}
 					});
@@ -822,6 +838,24 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			profitElem.style.color = inv[1] - inv[2] > 0 ? TextColors.Success : TextColors.Failure;
 		});
 	}
+}
+
+function averageCX(prices, ticker)
+{
+	const CXs = ["AI1", "NC1", "IC1", "CI1"]
+	
+	var cxCount = 0;
+	var price = 0;
+	
+	CXs.forEach(cx => {
+		if(prices[cx]["Average"][ticker])
+		{
+			cxCount++;
+			price += prices[cx]["Average"][ticker];
+		}
+	});
+	
+	return cxCount == 0 ? 0 : price / cxCount;
 }
 
 function drawGSTable(resultDiv, prices)
@@ -894,9 +928,18 @@ function clearData(result)
 	return;
 }
 
-function getPrice(cxPrices, customPrices, isCustom, ticker)
+function getPrice(cxPrices, customPrices, priceScheme, ticker, userInfo, priceBasket)
 {
-	return isCustom && customPrices && customPrices[ticker] ? customPrices[ticker] : (cxPrices[ticker] ? cxPrices[ticker] : 0);
+	if(priceScheme == "Custom (Spreadsheet)" && customPrices && customPrices[ticker])
+	{
+		return customPrices[ticker];
+	}
+	else if(priceScheme == "Price Basket")
+	{
+		return averageCX(userInfo["PMMG-User-Info"]["cx_prices"], ticker) / priceBasket;
+	}
+	
+	return cxPrices[ticker] || 0;
 }
 
 const PricingSchemes = {
@@ -922,6 +965,7 @@ const PricingSchemes = {
 
 const CustomSchemes = {
 	"Custom (Spreadsheet)": 18
+//	"Price Basket": 19
 }
 
 // Actually recording and processing the financials once they are received through BackgroundRunner.
@@ -955,7 +999,22 @@ export function calculateFinancials(webData, userInfo, result, loop)
 	}
 	
 	const cxPrices = userInfo["PMMG-User-Info"]["cx_prices"][CX][priceType];
-	const isCustom = result["PMMGExtended"]["pricing_scheme"] == "Custom (Spreadsheet)"
+	
+	// Calculate price basket
+	const weights = {"PIO": 0.7435, "SET": 0.1954, "TEC": 0.0444, "ENG": 0.0132, "SCI": 0.0035};
+	
+	var priceBasket = 0;
+	
+	Object.keys(Consumption).forEach(workforce => {
+		var tierCost = 0;
+		Object.keys(Consumption[workforce]).forEach(mat => {
+			tierCost += averageCX(userInfo["PMMG-User-Info"]["cx_prices"], mat) * Consumption[workforce][mat];
+		});
+		
+		priceBasket += tierCost * weights[workforce];
+	});
+	
+	priceBasket /= 2030.55;	// Normalize by prices on 12/27/2023
 	
 	// Now we have the data, find financial value
 	const finSnapshot = {};
@@ -980,7 +1039,7 @@ export function calculateFinancials(webData, userInfo, result, loop)
 			var value = 0;
 			
 			location["items"].forEach(mat => {
-				value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.MaterialTicker) * mat.Amount;
+				value += getPrice(cxPrices, webData["custom_prices"], result["PMMGExtended"]["pricing_scheme"], mat.MaterialTicker, userInfo, priceBasket) * mat.Amount;
 			});
 			
 			var name;
@@ -1018,7 +1077,7 @@ export function calculateFinancials(webData, userInfo, result, loop)
 			var value = 0;
 			location["buildings"].forEach(building => {
 				building["reclaimableMaterials"].forEach(mat => {
-					value += getPrice(cxPrices, webData["custom_prices"], isCustom, mat.material.ticker) * mat.amount;
+					value += getPrice(cxPrices, webData["custom_prices"], result["PMMGExtended"]["pricing_scheme"], mat.material.ticker, userInfo, priceBasket) * mat.amount;
 				});
 			});
 			if(value == 0){return;}
@@ -1041,11 +1100,11 @@ export function calculateFinancials(webData, userInfo, result, loop)
 				{
 					if(condition["party"] == party)
 					{
-						contractLiability += getPrice(cxPrices, webData["custom_prices"], isCustom, condition.quantity.material.ticker) * condition.quantity.amount;
+						contractLiability += getPrice(cxPrices, webData["custom_prices"], result["PMMGExtended"]["pricing_scheme"], condition.quantity.material.ticker, userInfo, priceBasket) * condition.quantity.amount;
 					}
 					else
 					{
-						contractValue += getPrice(cxPrices, webData["custom_prices"], isCustom, condition.quantity.material.ticker) * condition.quantity.amount;
+						contractValue += getPrice(cxPrices, webData["custom_prices"], result["PMMGExtended"]["pricing_scheme"], condition.quantity.material.ticker, userInfo, priceBasket) * condition.quantity.amount;
 					}
 				}
 				else if(condition["Type"] == "PAYMENT")
@@ -1076,7 +1135,7 @@ export function calculateFinancials(webData, userInfo, result, loop)
 			
 			if(order["type"] == "SELLING")
 			{
-				cxSellValue += getPrice(cxPrices, webData["custom_prices"], isCustom, order.material.ticker) * order.amount;
+				cxSellValue += getPrice(cxPrices, webData["custom_prices"], result["PMMGExtended"]["pricing_scheme"], order.material.ticker, userInfo, priceBasket) * order.amount;
 			}
 			else
 			{
@@ -1170,7 +1229,7 @@ function interpretCX(CXString, result)
 	var priceType = "Average";
 	switch(CXString)
 	{
-		case "Custom (Manual)":
+		case "Price Basket":
 			break;
 		case "Custom (Spreadsheet)":
 			if(result["PMMGExtended"]["backup_pricing_scheme"])

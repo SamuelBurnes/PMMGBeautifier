@@ -27,6 +27,51 @@ export const RatingColors = {
 	"A": "#f6a204"
 }
 
+export const Consumption = {
+	"PIO": {
+		"RAT": 4,
+		"DW": 4,
+		"OVE": 0.5,
+		"PWO": 0.2,
+		"COF": 0.5
+	},
+	"SET": {
+		"DW": 5,
+		"RAT": 6,
+		"EXO": 0.5,
+		"PT": 0.5,
+		"KOM": 1,
+		"REP": 0.2
+	},
+	"TEC": {
+		"DW": 7.5,
+		"RAT": 7,
+		"MED": 0.5,
+		"HMS": 0.5,
+		"SCN": 0.1,
+		"ALE": 1,
+		"SC": 0.1
+	},
+	"ENG": {
+		"DW": 10,
+		"MED": 0.5,
+		"FIM": 7,
+		"HSS": 0.2,
+		"PDA": 0.1,
+		"VG": 0.2,
+		"GIN": 1
+	},
+	"SCI": {
+		"DW": 10,
+		"MED": 0.5,
+		"MEA": 7,
+		"LC": 0.2,
+		"WS": 0.1,
+		"WIN": 1,
+		"NST": 0.1
+	}
+}
+
 export const Exchanges = {"Antares Station Commodity Exchange": "ANT", "Benten Station Commodity Exchange": "BEN", "Moria Station Commodity Exchange": "MOR", "Hortus Station Commodity Exchange": "HRT", "Hubur Commodity Exchange": "HUB", "Arclight Commodity Exchange": "ARC"};
 export const Stations = {"Antares Station": "ANT", "Benten Station": "BEN", "Moria Station": "MOR", "Hortus Station": "HRT", "Hubur Station": "HUB", "Acrlight Station": "ARC"};
 
@@ -53,7 +98,8 @@ export const FriendlyNames = {
 	"PendingContracts": "Pending Contracts",
 	"CompactUI": "Compact UI",
 	"FormulaReplacer": "Formula Replacer",
-	"AdvancedMode": "Advanced Minimialist Mode (Master)"
+	"AdvancedMode": "Advanced Minimialist Mode (Master)",
+	"CXOBHighlighter": "CXOB Name Highlighter"
 }
 
 export const SortingTriangleHTML = `

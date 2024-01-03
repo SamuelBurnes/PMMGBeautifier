@@ -36,7 +36,10 @@ export class ImageCreator implements Module {
 			link.parentElement.appendChild(document.createElement("br"));
 			link.parentElement.appendChild(img);
 			link.classList.add(this.tag);
-			chatArea.scrollBy(0, (img.offsetHeight || 0) + 2);
+			
+			img.addEventListener('load', function() {
+				chatArea.scrollBy(0, (img.offsetHeight || 0) + 2);
+			});
 			return;
 		});
 		return;

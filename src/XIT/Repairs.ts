@@ -35,8 +35,12 @@ export class Repairs {
 			title.classList.add("title");
 			this.tile.appendChild(title);
 			
+			const inputDiv = document.createElement("div");
+			this.tile.appendChild(inputDiv);
+			
 			const thresholdDiv = document.createElement("div");
-			this.tile.appendChild(thresholdDiv);
+			thresholdDiv.style.display = "inline";
+			inputDiv.appendChild(thresholdDiv);
 			
 			const thresholdInput = document.createElement("input");
 			thresholdInput.classList.add("input-text");
@@ -47,6 +51,21 @@ export class Repairs {
 			thresholdInput.style.width = "60px";
 			thresholdDiv.appendChild(thresholdText);
 			thresholdDiv.appendChild(thresholdInput);
+			
+			const offsetDiv = document.createElement("div");
+			offsetDiv.style.display = "inline";
+			inputDiv.appendChild(offsetDiv);
+			
+			const offsetInput = document.createElement("input");
+			offsetInput.classList.add("input-text");
+			const offsetText = createTextSpan("Days Until Repair:");
+			offsetText.style.paddingLeft = "5px";
+			offsetInput.type = "number";
+			offsetInput.value = this.pmmgSettings["PMMGExtended"]["repair_offset"] ? this.pmmgSettings["PMMGExtended"]["repair_offset"] : "0";
+			offsetInput.style.width = "60px";
+			offsetDiv.appendChild(offsetText);
+			offsetDiv.appendChild(offsetInput);
+			
 			const matTitle = createTextSpan("Shopping Cart");
 			matTitle.classList.add("title");
 			matTitle.style.paddingBottom = "2px";
@@ -82,20 +101,27 @@ export class Repairs {
 				});
 				return;
 			});
-			buildings.sort(globalBuildingSort);
+			buildings.sort(buildingSort);
 			
 			const body = document.createElement("tbody");
 			table.appendChild(body);
-			generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput);
+			generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput, offsetInput, true);
 			
 			thresholdInput.addEventListener("input", function(){
 				clearChildren(body);
 				
-				generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput);
+				generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput, offsetInput, true);
 				pmmgSettings["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
 				setSettings(pmmgSettings);
 			});
 			
+			offsetInput.addEventListener("input", function(){
+				clearChildren(body);
+				
+				generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput, offsetInput, true);
+				pmmgSettings["PMMGExtended"]["repair_offset"] = offsetInput.value || "0";
+				setSettings(pmmgSettings);
+			});
 		}
 		else
 		{
@@ -103,18 +129,23 @@ export class Repairs {
 			title.classList.add("title");
 			this.tile.appendChild(title);
 			
-			var siteData = undefined;
+			var siteData = [] as any[];
 			this.userInfo["PMMG-User-Info"]["sites"].forEach(site => {
-				if(site.type == "BASE" && (site["PlanetName"].toUpperCase() == this.parameters[1].toUpperCase() || site["PlanetNaturalId"].toUpperCase() == this.parameters[1].toUpperCase()))
+				if(site.type == "BASE" && (site["PlanetName"].toUpperCase() == this.parameters[1].toUpperCase() || site["PlanetNaturalId"].toUpperCase() == this.parameters[1].toUpperCase()) && site.buildings)
 				{
-					siteData = site;
+					site.buildings.forEach(building => {
+						siteData.push([this.parameters[1], building]);
+					});
 				}
 				return;
 			});
-			if(!siteData){return;}
+			
+			const inputDiv = document.createElement("div");
+			this.tile.appendChild(inputDiv);
 			
 			const thresholdDiv = document.createElement("div");
-			this.tile.appendChild(thresholdDiv);
+			thresholdDiv.style.display = "inline";
+			inputDiv.appendChild(thresholdDiv);
 			
 			const thresholdInput = document.createElement("input");
 			thresholdInput.classList.add("input-text");
@@ -125,6 +156,21 @@ export class Repairs {
 			thresholdInput.style.width = "60px";
 			thresholdDiv.appendChild(thresholdText);
 			thresholdDiv.appendChild(thresholdInput);
+			
+			const offsetDiv = document.createElement("div");
+			offsetDiv.style.display = "inline";
+			inputDiv.appendChild(offsetDiv);
+			
+			const offsetInput = document.createElement("input");
+			offsetInput.classList.add("input-text");
+			const offsetText = createTextSpan("Days Until Repair:");
+			offsetText.style.paddingLeft = "5px";
+			offsetInput.type = "number";
+			offsetInput.value = this.pmmgSettings["PMMGExtended"]["repair_offset"] ? this.pmmgSettings["PMMGExtended"]["repair_offset"] : "0";
+			offsetInput.style.width = "60px";
+			offsetDiv.appendChild(offsetText);
+			offsetDiv.appendChild(offsetInput);
+			
 			const matTitle = createTextSpan("Shopping Cart");
 			matTitle.classList.add("title");
 			matTitle.style.paddingBottom = "2px";
@@ -150,18 +196,25 @@ export class Repairs {
 				header.style.paddingTop = "0";
 				hr.appendChild(header);
 			}
-			if(!siteData["buildings"]){return;}
-			(siteData["buildings"] as any[]).sort(buildingSort);
+			siteData.sort(buildingSort);
 			
 			const body = document.createElement("tbody");
 			table.appendChild(body);
-			generateRepairScreen(body, matDiv, siteData, thresholdInput);
+			generateGeneralRepairScreen(body, matDiv, siteData, thresholdInput, offsetInput, false);
 			
 			thresholdInput.addEventListener("input", function(){
 				clearChildren(body);
 				
-				generateRepairScreen(body, matDiv, siteData, thresholdInput);
+				generateGeneralRepairScreen(body, matDiv, siteData, thresholdInput, offsetInput, false);
 				pmmgSettings["PMMGExtended"]["repair_threshold"] = thresholdInput.value || "70";
+				setSettings(pmmgSettings);
+			});
+			
+			offsetInput.addEventListener("input", function(){
+				clearChildren(body);
+				
+				generateGeneralRepairScreen(body, matDiv, siteData, thresholdInput, offsetInput, false);
+				pmmgSettings["PMMGExtended"]["repair_offset"] = offsetInput.value || "0";
 				setSettings(pmmgSettings);
 			});
 		}
@@ -178,7 +231,8 @@ export class Repairs {
 	}
 }
 
-function generateRepairScreen(body, matDiv, siteData, thresholdInput)
+/*
+function generateRepairScreen(body, matDiv, siteData, thresholdInput, offsetInput)
 {
 	const materials = {};
 	siteData["buildings"].forEach(building => {
@@ -186,7 +240,7 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 		body.appendChild(row);
 		if(NonProductionBuildings.includes(building["buildingTicker"])){return;}
 		const date = (((new Date()).getTime() - building.lastRepair) / 86400000);
-		if(date < parseFloat(thresholdInput.value)){return;}
+		if(date < parseFloat(thresholdInput.value || "0") - parseFloat(offsetInput.value || "0")){return;}
 		
 		building.repairMaterials.forEach(mat => {
 			if(materials[mat.material.ticker] == undefined){materials[mat.material.ticker] = mat.amount;}
@@ -236,7 +290,126 @@ function generateRepairScreen(body, matDiv, siteData, thresholdInput)
 	});
 	return;
 }
+*/
 
+function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput, offsetInput, isGlobal) 	// Buildings is an array of type: [planetName, buildingInfo]
+{
+	const materials = {};
+	
+	if(!buildings){return;}
+	
+	buildings.forEach(buildingInfo => {
+		const planet = buildingInfo[0];
+		const building = buildingInfo[1];
+		
+		if(NonProductionBuildings.includes(building["buildingTicker"])){return;}
+		
+		
+		// Generate row showing current building %
+		const buildingRow = document.createElement("tr");
+		body.appendChild(buildingRow);
+		
+		const date = (((new Date()).getTime() - building.lastRepair) / 86400000);
+		if(date < parseFloat(thresholdInput.value || "0") - parseFloat(offsetInput.value || "0")){return;}
+		
+		var rowData;
+		if(isGlobal)
+		{
+			rowData = [building["buildingTicker"], planet, date.toLocaleString(undefined, {maximumFractionDigits: 1}), (building["condition"] * 100).toLocaleString(undefined, {maximumFractionDigits: 1}) + "%"];
+		}
+		else
+		{
+			rowData = [building["buildingTicker"], date.toLocaleString(undefined, {maximumFractionDigits: 1}), (building["condition"] * 100).toLocaleString(undefined, {maximumFractionDigits: 1}) + "%"];
+		}
+		
+		rowData.forEach(data => {
+			const tableElem = document.createElement("td");
+			buildingRow.appendChild(tableElem);
+			tableElem.appendChild(createTextSpan(data));
+		});
+		
+		// Calculate shopping cart
+		const buildingMaterials = {};
+		building.reclaimableMaterials.forEach(mat => {
+			const amount = mat.amount;
+			const ticker = mat.material.ticker;
+			if(buildingMaterials[ticker])
+			{
+				buildingMaterials[ticker] += amount;
+			}
+			else
+			{
+				buildingMaterials[ticker] = amount;
+			}
+		});
+		building.repairMaterials.forEach(mat => {
+			const amount = mat.amount;
+			const ticker = mat.material.ticker;
+			if(buildingMaterials[ticker])
+			{
+				buildingMaterials[ticker] += amount;
+			}
+			else
+			{
+				buildingMaterials[ticker] = amount;
+			}
+		});
+		
+		console.log(building);
+		const adjustedDate = date + parseFloat(offsetInput.value || "0");
+		
+		Object.keys(buildingMaterials).forEach(ticker => {
+			const amount = adjustedDate > 180 ? buildingMaterials[ticker] : Math.ceil(buildingMaterials[ticker] * adjustedDate / 180);	// This isn't quite right, but will be off by only 1 MCG at most
+			
+			if(materials[ticker])
+			{
+				materials[ticker] += amount;
+			}
+			else
+			{
+				materials[ticker] = amount;
+			}
+		});
+		
+	});
+	
+	console.log(materials);
+	
+	// Display shopping cart
+	clearChildren(matDiv);
+	matDiv.style.maxWidth = "200px";
+	
+	const table = document.createElement("table");
+	matDiv.appendChild(table);
+	const head = document.createElement("thead");
+	const hr = document.createElement("tr");
+	head.appendChild(hr);
+	table.appendChild(head);
+	for(let t of ["Material", "Amount"])
+	{
+		const header = document.createElement("th");
+		header.textContent = t;
+		header.style.paddingTop = "0";
+		hr.appendChild(header);
+	}
+	const mbody = document.createElement("tbody");
+	table.appendChild(mbody);
+	Object.keys(materials).sort().forEach(mat => {
+		const row = document.createElement("tr");
+		mbody.appendChild(row);
+		var rowData = [mat, materials[mat].toLocaleString(undefined)];
+		for(let point of rowData)
+		{
+			const tableElem = document.createElement("td");
+			row.appendChild(tableElem);
+			tableElem.appendChild(createTextSpan(point));
+		}
+		return;
+	});
+	return;
+}
+
+/*
 function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)	// Buildings is an array of type: [planetName, buildingInfo]
 {
 	const NonProductionBuildings = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
@@ -295,13 +468,9 @@ function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput)	//
 	});
 	return;
 }
+*/
 
 function buildingSort(a, b)
-{
-	return a["condition"] > b["condition"] ? 1 : -1;
-}
-
-function globalBuildingSort(a, b)
 {
 	return a[1]["condition"] > b[1]["condition"] ? 1 : -1;
 }
