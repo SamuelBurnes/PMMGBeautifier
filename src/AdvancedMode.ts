@@ -42,6 +42,12 @@ export class AdvancedMode implements Module {
 		buffers.forEach(buffer => {
 			cleanCOGCPEX(buffer, this.tag);
 		});
+
+		// Clean SHPF Buffers
+		buffers = getBuffers("SHPF");
+		buffers.forEach(buffer => {
+			cleanSHPF(buffer);
+		});
 	}
 	
 }
@@ -184,4 +190,15 @@ function cleanCOGCPEX(buffer, tag)
 			button.textContent = "vote";
 		}
 	});
+}
+
+function cleanSHPF(buffer)
+{
+	// Remove the sort options
+	const bufferInventorySortOptions = buffer.querySelectorAll(Selector.InventorySortOptions);
+	bufferInventorySortOptions?.forEach((value) => value.style.display = "none");
+	// Remove the "Weight" and "Volume" Labels
+	const storeViewName = buffer.querySelectorAll(Selector.StoreViewName);
+	storeViewName?.forEach((value) => value.style.display = "none");
+
 }

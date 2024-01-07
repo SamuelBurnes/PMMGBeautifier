@@ -55,5 +55,6 @@ export const Selector = {
   Divider: "div[class~='SectionList__divider___cwWO45v']",
   MaterialLabel: "span[class~='GridItemView__name___h3yX9Lm']",
   SmallButton: "button[class~='Button__darkInline___z_YKa91']",
-  ShipStorage: "span[class~='ShipStore__pointer___TQUMuFY']"
+  ShipStorage: "span[class~='ShipStore__pointer___TQUMuFY']",
+  StoreViewName: "span[class~='StoreView__name___eX4pgs6']"
 }
