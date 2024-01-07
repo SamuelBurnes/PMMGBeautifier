@@ -99,21 +99,4 @@ export class ModuleRunner {
 function updateUserInfo(result, userInfo)
 {
 	userInfo["PMMG-User-Info"] = result["PMMG-User-Info"] || {};
-	// Assign planets to storages
-	
-	const planets = {};
-	
-	if(!userInfo["PMMG-User-Info"] || !userInfo["PMMG-User-Info"]["sites"] || !userInfo["PMMG-User-Info"]["storage"]){return;}
-	
-	userInfo["PMMG-User-Info"]["sites"].forEach(site => {
-		planets[site.siteId] = [site.PlanetName, site.PlanetNaturalId];
-	});
-	userInfo["PMMG-User-Info"]["storage"].forEach(store => {
-		if(planets[store.addressableId])
-		{
-			store.PlanetName = planets[store.addressableId][0];
-			store.PlanetNaturalId = planets[store.addressableId][1];
-			
-		}
-	});
 }

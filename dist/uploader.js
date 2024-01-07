@@ -198,9 +198,26 @@ function logEvent(result, eventdata)
 					result["PMMG-User-Info"]["storage"].push(store);
 				}
 			});
+			
+			// Assign planet names
+			
+			if(result["PMMG-User-Info"]["sites"])
+			{
+				const planets = {};
+				result["PMMG-User-Info"]["sites"].forEach(site => {
+					planets[site.siteId] = [site.PlanetName, site.PlanetNaturalId];
+				});
+				result["PMMG-User-Info"]["storage"].forEach(store => {
+					if(planets[store.addressableId])
+					{
+						store.PlanetName = planets[store.addressableId][0];
+						store.PlanetNaturalId = planets[store.addressableId][1];
+						
+					}
+				});
+			}
 			break;
 		case "STORAGE_CHANGE":
-			
 			eventdata.payload.stores.forEach(store => {
 				const matchingStore = result["PMMG-User-Info"]["sites"].find(item => item.siteId === store["addressableId"]);
 				

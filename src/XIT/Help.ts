@@ -55,6 +55,7 @@ export class Help {
 		createTableRow(body, ["Compacted UI", "Minimizes unused portions of the UI"])
 		createTableRow(body, ["Header Minimizer", "Allows minimizing contract and CX headers"])
 		createTableRow(body, ["Color Schemes", "Changes the colors used on material icons. Set in XIT SETTINGS."])
+		createTableRow(body, ["Advanced Mode", "Hides many pieces of information further minimizing the UI. For experienced users only."])
 		
 		const xitHeader = document.createElement('h3');
 		xitHeader.appendChild(document.createTextNode("XIT Commands"));
