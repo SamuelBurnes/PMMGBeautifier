@@ -31,7 +31,9 @@ export const Style = {
   SettingsBarToggled:    ["RadioItem__indicator___QzQtjhA", "RadioItem__indicatorHorizontal___SwtwTIh", "RadioItem__active___CDscOQV", "effects__shadowPrimary___EbXJQor"],
   RadioButtonValue:      ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO"],
   SettingsText:          ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO", "RadioItem__valueHorizontal___D5AXJ9P"],
-  
+  ScreenUnderlineUntoggled: ["HeadItem__indicatorPrimary___rx46qOB", "HeadItem__indicator___A_wijoE"],
+  ScreenUnderlineToggled: ["HeadItem__indicatorPrimary___rx46qOB", "HeadItem__indicator___A_wijoE", "ScreenControls__indicatorActive___cnKagZ4", "effects__shadowPrimary___EbXJQor"],
+
   // Styles coloring overlays
   OverlappingDiv: ["Overlay__overlay___NA9HV8y"],
   GreyStripes:    ["Overlay__background___ieZpHiF", "Overlay__overlay___NA9HV8y"],

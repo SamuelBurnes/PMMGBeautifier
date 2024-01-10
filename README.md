@@ -23,6 +23,7 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * Colorful notifications based on type
 * Custom sidebar hotkeys
 * Custom settings menu
+* Unpack vertically listed screens onto the top bar
 
 # XIT Commands
 
