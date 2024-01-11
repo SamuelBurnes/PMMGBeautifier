@@ -24,6 +24,7 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * Custom sidebar hotkeys
 * Custom settings menu
 * Unpack vertically listed screens onto the top bar
+* Displays commodity links (_RAT.CI1_, _BBH.AI1_, etc.) in notes as a link to open the Commodity Price Information (CXP) buffer
 
 # XIT Commands
 
@@ -37,6 +38,8 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * XIT CHAT_{planet name} - Loads the planet chat for a specified planet.
 * XIT BURN_{planet name} - Loads workforce and material production and burn.
 * XIT BURN_GROUP_{group id} - Loads workforce and material production and burn for a whole group.
+* XIT NOTES - Opens the list of saved notes
+* XIT NOTE_NoteName - Opens or creates a new note named "NoteName"
 
 # XIT Examples
 
@@ -48,6 +51,7 @@ Thank you to yarekt for developing the base features of PMMGBeautifier that this
 * XIT FIN_PiBoy314 (needs web app ID)
 * XIT CHAT_Montem
 * XIT BURN_Gibson
+* XIT NOTE_NoteName
 
 # Setting up API Key and Web App ID
 
