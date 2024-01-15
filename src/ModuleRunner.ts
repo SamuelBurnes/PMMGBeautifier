@@ -92,12 +92,11 @@ export class ModuleRunner {
   
   loopUserInfo() {
 	getLocalStorage("PMMG-User-Info", updateUserInfo, this.userInfo);
-	window.setTimeout(() => this.loopUserInfo(), 1000);
+	window.setTimeout(() => this.loopUserInfo(), 500);
   }
 }
 
 function updateUserInfo(result, userInfo)
 {
 	userInfo["PMMG-User-Info"] = result["PMMG-User-Info"] || {};
-	// Test
 }

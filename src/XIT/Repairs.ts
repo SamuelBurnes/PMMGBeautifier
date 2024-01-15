@@ -355,7 +355,7 @@ function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput, of
 			}
 		});
 		
-		console.log(building);
+		//console.log(building);
 		const adjustedDate = date + parseFloat(offsetInput.value || "0");
 		
 		Object.keys(buildingMaterials).forEach(ticker => {
@@ -373,7 +373,7 @@ function generateGeneralRepairScreen(body, matDiv, buildings, thresholdInput, of
 		
 	});
 	
-	console.log(materials);
+	//console.log(materials);
 	
 	// Display shopping cart
 	clearChildren(matDiv);

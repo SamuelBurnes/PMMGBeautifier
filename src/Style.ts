@@ -71,6 +71,13 @@ export const Style = {
   MaterialWrapperWrapper: ["GridItemView__image___yMoKOZV"],
   MaterialOuter:          ["GridItemView__container___xP2uJz8"],
   MaterialNameText:       ["GridItemView__name___h3yX9Lm", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
+  
+  // CXOB Styles
+  CXOBAmount: ["ComExOrderBookPanel__amount___EoNHTID"],
+  CXOBOffer: ["ComExOrderBookPanel__offerPrice___kisxczh", "ComExOrderBookPanel__amount___EoNHTID"],
+  CXOBSpread: ["ComExOrderBookPanel__spread___GIYNNWd"],
+  CXOBEmpty: ["ComExOrderBookPanel__empty___yl28RaU"],
+  CXOBRequest: ["ComExOrderBookPanel__requestPrice___ZTEgYCz", "ComExOrderBookPanel__amount___EoNHTID"],
 
 }
 
@@ -148,6 +155,19 @@ export const CategoryColors = {
 
 // The style needed for PMMG's modules to function
 export const PMMGStyle = `
+.pb-scroll {
+	overflow-y: scroll;
+	flex: 1;
+	width: 120px;
+	vertical-align: top;
+}
+.pb-scroll::-webkit-scrollbar {
+	width: 0;
+}
+.pb-scroll::-moz-scrollbar {
+	width: 0;
+}
+
 .pb-minimize {
 	font-size: 14px;
 	font-weight: bold;
@@ -517,6 +537,12 @@ span.GridItemView__name___h3yX9Lm {
 }
 div.GridItemView__container___xP2uJz8 {
 	width: auto;
+}
+div.FormComponent__errorMessage___mBdvpz5 {
+	display: none;
+}
+div.FormComponent__containerError___pN__L1Q {
+	flex-wrap: nowrap;
 }
 `
 

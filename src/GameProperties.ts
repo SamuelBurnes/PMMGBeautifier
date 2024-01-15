@@ -73,6 +73,7 @@ export const Consumption = {
 }
 
 export const Exchanges = {"Antares Station Commodity Exchange": "ANT", "Benten Station Commodity Exchange": "BEN", "Moria Station Commodity Exchange": "MOR", "Hortus Station Commodity Exchange": "HRT", "Hubur Commodity Exchange": "HUB", "Arclight Commodity Exchange": "ARC"};
+export const ExchangeTickers = {"ANT": "AI1", "BEN": "CI1", "MOR": "NC1", "HRT": "IC1", "HUB": "NC2", "ARC": "CI2"}
 export const Stations = {"Antares Station": "ANT", "Benten Station": "BEN", "Moria Station": "MOR", "Hortus Station": "HRT", "Hubur Station": "HUB", "Acrlight Station": "ARC"};
 
 export const NonProductionBuildings = ["CM", "HB1", "HB2", "HB3", "HB4", "HB5", "HBB", "HBC", "HBL", "HBM", "STO"];
@@ -99,7 +100,8 @@ export const FriendlyNames = {
 	"CompactUI": "Compact UI",
 	"FormulaReplacer": "Formula Replacer",
 	"AdvancedMode": "Advanced Minimialist Mode (Master)",
-	"CXOBHighlighter": "CXOB Name Highlighter"
+	"CXOBHighlighter": "CXOB Name Highlighter",
+	"CXPOOrderBook": "CXPO Order Book"
 }
 
 export const SortingTriangleHTML = `

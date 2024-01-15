@@ -24,6 +24,7 @@ import { calculateFinancials } from "./XIT/Finances";
 import { FormulaReplacer } from "./FormulaEvaluator";
 import { AdvancedMode } from "./AdvancedMode";
 import { CXOBHighlighter } from "./CXOBHighlighter";
+import { CXPOOrderBook } from "./CXPOOrderBook";
 
 // Inject page_script.js directly into the webpage.
 
@@ -148,7 +149,8 @@ function mainRun(result, browser?)
 		  new PendingContracts(userInfo),
 		  new CompactUI(result),
 		  new FormulaReplacer(),
-		  new CXOBHighlighter(userInfo)
+		  new CXOBHighlighter(userInfo),
+		  new CXPOOrderBook(userInfo)
 	], result, webData, userInfo, browser);
 	
 	// Start the loop

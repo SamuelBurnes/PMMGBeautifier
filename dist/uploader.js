@@ -26,20 +26,20 @@ if(browser.storage.session && typeof(browser.storage.session) !== "undefined")
 	storage_location = browser.storage.session;
 }
 
-const loggedMessageTypes = ["SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA"];
+const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA"];
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
 	//console.log("Processing Event");
 	// Testing code
-	/*
-	const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST"];
+	
+	/*const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST", "CHANNEL_UNSEEN_MESSAGES_COUNT"];
 	if(eventdata && !badTypes.includes(eventdata.messageType))
 	{
 		console.log(eventdata.messageType);
 		console.log(eventdata);
-	}
-	*/
+	}*/
+	
 	
 	// Detect bad events
 	if (typeof eventdata === undefined || eventdata === null || typeof (eventdata.messageType) === "undefined")
@@ -152,6 +152,7 @@ function logEvent(result, eventdata)
 	if(!result["PMMG-User-Info"]["currency"]){result["PMMG-User-Info"]["currency"] = [];}
 	if(!result["PMMG-User-Info"]["cxos"]){result["PMMG-User-Info"]["cxos"] = [];}
 	if(!result["PMMG-User-Info"]["fxos"]){result["PMMG-User-Info"]["fxos"] = [];}
+	if(!result["PMMG-User-Info"]["cxob"]){result["PMMG-User-Info"]["cxob"] = {};}
 	
 	switch(eventdata.messageType)
 	{
@@ -174,6 +175,22 @@ function logEvent(result, eventdata)
 				
 				result["PMMG-User-Info"]["sites"].push(siteData);
 			});
+			
+			if(result["PMMG-User-Info"]["storage"])
+			{
+				const planets = {};
+				result["PMMG-User-Info"]["sites"].forEach(site => {
+					planets[site.siteId] = [site.PlanetName, site.PlanetNaturalId];
+				});
+				result["PMMG-User-Info"]["storage"].forEach(store => {
+					if(planets[store.addressableId])
+					{
+						store.PlanetName = planets[store.addressableId][0];
+						store.PlanetNaturalId = planets[store.addressableId][1];
+						
+					}
+				});
+			}
 			break;
 		case "STORAGE_STORAGES":
 			//console.log(eventdata.payload.stores);
@@ -413,6 +430,18 @@ function logEvent(result, eventdata)
 			break;
 		case "COMEX_TRADER_ORDERS":	// CX Orders
 			result["PMMG-User-Info"]["cxos"] = eventdata.payload.orders;
+			break;
+		case "COMEX_BROKER_DATA": // CXOB/CXPO Data
+			console.log(eventdata.payload)
+			result["PMMG-User-Info"]["cxob"][eventdata.payload.ticker] = eventdata.payload;
+			result["PMMG-User-Info"]["cxob"][eventdata.payload.ticker]["timestamp"] = Date.now();
+			
+			Object.keys(result["PMMG-User-Info"]["cxob"]).forEach(ticker => {
+				if(Date.now() - result["PMMG-User-Info"]["cxob"][ticker]["timestamp"] > 3600000)
+				{
+					delete result["PMMG-User-Info"]["cxob"][ticker];
+				}
+			});
 			break;
 	}
 	
