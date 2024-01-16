@@ -1,5 +1,5 @@
 import { Module } from "./ModuleRunner";
-import { getBuffers } from "./util";
+import { getBuffersFromList } from "./util";
 
 export class CXOBHighlighter implements Module {
     private tag = "pb-cxob-highlight";
@@ -15,10 +15,10 @@ export class CXOBHighlighter implements Module {
     cleanup() {
         // Nothing to clean up
     }
-    run() {
+    run(allBuffers) {
 		if(this.userInfo["PMMG-User-Info"] && this.userInfo["PMMG-User-Info"]["company-name"])
 		{
-			const buffers = getBuffers("CXOB ");
+			const buffers = getBuffersFromList("CXOB ", allBuffers);
 			buffers.forEach(buffer => {
 				highlightNames(buffer, this.userInfo, this.tag);
 			});

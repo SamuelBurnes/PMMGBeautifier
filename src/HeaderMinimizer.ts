@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers} from "./util";
+import {getBuffersFromList} from "./util";
 import {Selector} from "./Selector";
 import {Style} from "./Style";
 
@@ -19,29 +19,29 @@ export class HeaderMinimizer implements Module {
       // Nothing to clean up.
 	  return;
     }
-    run() {
-		var buffers = getBuffers("CX ");
+    run(allBuffers) {
+		var buffers = getBuffersFromList("CX ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
 			minimizeHeaders(buffer, this.minByDefault, this.tag);
 		});
 		
-		buffers = getBuffers("CONT ");
+		buffers = getBuffersFromList("CONT ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
 			minimizeHeaders(buffer, this.minByDefault, this.tag);
 		});
 		
-		buffers = getBuffers("LM ");
+		buffers = getBuffersFromList("LM ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
 			minimizeHeaders(buffer, this.minByDefault, this.tag);
 		});
 		
-		buffers = getBuffers("SYSI ");
+		buffers = getBuffersFromList("SYSI ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {

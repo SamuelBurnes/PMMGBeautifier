@@ -1,5 +1,5 @@
 import { Module } from "./ModuleRunner";
-import { getBuffers, createTextSpan } from "./util";
+import { getBuffersFromList, createTextSpan } from "./util";
 import { Selector } from "./Selector";
 import { WithStyles, Style } from "Style";
 import { Exchanges } from "./GameProperties";
@@ -21,8 +21,8 @@ export class CompactUI implements Module {
         //genericCleanup(this.tag);
         //genericUnhide(this.tag);
     }
-    run() {
-        var buffers = getBuffers("BBL");
+    run(allBuffers) {
+        var buffers = getBuffersFromList("BBL", allBuffers);
         //console.log("Clearning Buildings");
         if (buffers){
             buffers.forEach(buffer => {
@@ -30,7 +30,7 @@ export class CompactUI implements Module {
             });
         };
         
-        buffers = getBuffers("BS");
+        buffers = getBuffersFromList("BS", allBuffers);
 
         if (buffers){
             buffers.forEach(buffer => {
@@ -38,7 +38,7 @@ export class CompactUI implements Module {
             });
         };
 		
-		buffers = getBuffers("CXOS");
+		buffers = getBuffersFromList("CXOS", allBuffers);
 		
 		if (buffers){
 			buffers.forEach(buffer => {

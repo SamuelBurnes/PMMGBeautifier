@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers, parseInvName, parsePlanetName, findCorrespondingPlanet, targetedCleanup, setSettings, showBuffer, createMaterialElement, calculateBurn} from "./util";
+import {getBuffersFromList, parseInvName, parsePlanetName, findCorrespondingPlanet, targetedCleanup, setSettings, showBuffer, createMaterialElement, calculateBurn} from "./util";
 import {Selector} from "./Selector";
 import {Style} from "./Style";
 import {MaterialNames, SortingTriangleHTML} from  "./GameProperties";
@@ -21,8 +21,8 @@ export class InventoryOrganizer implements Module {
       //genericCleanup(this.tag);	// Clean up all elements with the tag
 	  return;
     }
-    run() {
-		const buffers = getBuffers("INV ");	// Get all inventory buffers
+    run(allBuffers) {
+		const buffers = getBuffersFromList("INV ", allBuffers);	// Get all inventory buffers
 		const result = this.result;
 		if (!buffers || !result || !result["PMMGExtended"]){return};
 		
@@ -39,10 +39,11 @@ export class InventoryOrganizer implements Module {
 		buffers.forEach(buffer => {	// For each buffer...
 			const sortOptions = buffer.querySelector(Selector.InventorySortOptions);	// Get the sorting option list at the top of the buffer
 			if(!sortOptions){return;}
-			const baseNameElem = buffer.getElementsByClassName(Selector.BufferHeader);	// Get the encoded name of the inventory (element)
-			if(!baseNameElem || !baseNameElem[0]){return;}
-			const invName = parseInvName(baseNameElem[0].textContent);	// Get the name out of the element
+			const baseNameElem = buffer.querySelector(Selector.BufferHeader);	// Get the encoded name of the inventory (element)
+			if(!baseNameElem){return;}
+			const invName = parseInvName(baseNameElem.textContent);	// Get the name out of the element
 			if(!invName){return;}
+			
 			
 			const planetNameElem = buffer.querySelector(Selector.BufferLink);	// Get the human-friendly name of the planet (element)
 			const planetName = planetNameElem ? parsePlanetName(planetNameElem.textContent) : "";	// Get the text out of it
@@ -88,15 +89,15 @@ export class InventoryOrganizer implements Module {
 			return;
 		});
 		
-		const shipBuffers = getBuffers("SHPI ");	// Get all ship inventory buffers
+		const shipBuffers = getBuffersFromList("SHPI ", allBuffers);	// Get all ship inventory buffers
 		if (!shipBuffers){return};
 		
 		shipBuffers.forEach(buffer => {
 			const sortOptions = buffer.querySelector(Selector.InventorySortOptions);	// Get the sorting option list at the top of the buffer
 			if(!sortOptions){return;}
-			const shipNameElem = buffer.getElementsByClassName(Selector.BufferHeader);	// Get the transponder of the ship (element)
-			if(!shipNameElem || !shipNameElem[0]){return;}
-			const shipName = parseInvName(shipNameElem[0].textContent);	// Get the text from that element
+			const shipNameElem = buffer.querySelector(Selector.BufferHeader);	// Get the transponder of the ship (element)
+			if(!shipNameElem){return;}
+			const shipName = parseInvName(shipNameElem.textContent);	// Get the text from that element
 			if(!shipName){return;}
 			
 			const inventory = buffer.querySelector(Selector.Inventory);	// The inventory element containing all the materials

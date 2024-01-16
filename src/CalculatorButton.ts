@@ -1,15 +1,15 @@
 import {Module} from "./ModuleRunner";
-import {genericCleanup, getBuffers, showBuffer} from "./util";
+import {genericCleanup, getBuffersFromList, showBuffer} from "./util";
 
 export class CalculatorButton implements Module {
   private tag = "pb-calc";
   cleanup(full: boolean = false) {
     full && genericCleanup(this.tag);
   }
-  run() {
+  run(allBuffers) {
 	const calcTags = ["LM", "CX", "XIT"];
 	calcTags.forEach(tag => {
-		const buffers = getBuffers(tag);
+		const buffers = getBuffersFromList(tag, allBuffers);
 		buffers.forEach(buffer => {
 			if(((buffer.children[3] || buffer.children[2]).firstChild as HTMLElement).classList.contains(this.tag) || ((buffer.children[3] || buffer.children[2]).children[1] as HTMLElement).classList.contains(this.tag))
 			{

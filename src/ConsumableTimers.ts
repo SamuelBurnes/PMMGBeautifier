@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {parseBaseName, findCorrespondingPlanet, createTextSpan, getBuffers, calculateBurn} from "./util";
+import {parseBaseName, findCorrespondingPlanet, createTextSpan, getBuffersFromList, calculateBurn} from "./util";
 import {Selector} from "./Selector";
 
 /**
@@ -19,8 +19,8 @@ export class ConsumableTimers implements Module {
     // Nothing to clean up.
 	return;
   }
-  run() {
-    const buffers = getBuffers("WF");
+  run(allBuffers) {
+    const buffers = getBuffersFromList("WF", allBuffers);
 	
     if (!buffers){return};
 	

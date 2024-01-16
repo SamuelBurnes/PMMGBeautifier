@@ -557,7 +557,7 @@ export function targetedCleanup(className: string, element: Element) {
 // Return all matching buffers
 export function getBuffers(bufferCode: string): HTMLElement[] {
   const nodes = document.evaluate(
-    `//div[@class='${Selector.BufferHeader}'][starts-with(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), '${bufferCode}')]/../..`,
+    `//div[@class='${Selector.BufferHeaderClass}'][starts-with(translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), '${bufferCode}')]/../..`,
     document, null, XPathResult.ANY_TYPE, null);
 	var buffers = [];
 	var node;
@@ -567,6 +567,15 @@ export function getBuffers(bufferCode: string): HTMLElement[] {
 		buffers.push(node as never);
 	}
 	return buffers;
+}
+
+// Return all matching buffers from prefound buffer list
+export function getBuffersFromList(bufferCode: string, buffers: any[]): any[] {
+  const matchingBuffers = buffers
+    .filter(([firstElement]) => firstElement.toLowerCase().startsWith(bufferCode.toLowerCase()))
+    .map(([, secondElement]) => secondElement);
+
+  return matchingBuffers;
 }
 
 // Get elements that match an XPath

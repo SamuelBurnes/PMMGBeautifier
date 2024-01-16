@@ -33,12 +33,12 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	//console.log("Processing Event");
 	// Testing code
 	
-	/*const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST", "CHANNEL_UNSEEN_MESSAGES_COUNT"];
+	const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST", "CHANNEL_UNSEEN_MESSAGES_COUNT"];
 	if(eventdata && !badTypes.includes(eventdata.messageType))
 	{
 		console.log(eventdata.messageType);
 		console.log(eventdata);
-	}*/
+	}
 	
 	
 	// Detect bad events

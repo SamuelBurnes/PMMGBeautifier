@@ -1,9 +1,10 @@
 import {XITHandler} from "./XITHandler";
-import { showBuffer, setSettings, getLocalStorage } from "./util";
+import { showBuffer, setSettings, getLocalStorage, getBuffers } from "./util";
 import { FriendlyNames } from "./GameProperties";
+import { Selector } from "./Selector";
 
 export interface Module {
-  run();
+  run(buffers: any[]);
   cleanup();
 }
 
@@ -57,8 +58,20 @@ export class ModuleRunner {
   }
 
   loop() {
+	// Gets all buffers
+	const bufferDivs = getBuffers("");
+	const buffers = [] as any[];
+	bufferDivs.forEach(buffer => {
+		const header = buffer.querySelector(Selector.BufferHeader);
+		if(!header) { return; }
+		
+		const parameters = header.textContent;
+		
+		buffers.push([parameters, buffer]);
+	});
+	
 	// Render all XIT buffers
-	this.xit.run();
+	this.xit.run(buffers);
 	
 	// Run intro if it hasn't run already
 	if(!this.result["PMMGExtended"]["loaded_before"])
@@ -77,7 +90,7 @@ export class ModuleRunner {
         entry.module.cleanup();
         const cleanupTime = performance.now() - t0;
         const t1 = performance.now();
-        entry.module.run();
+        entry.module.run(buffers);
         const runTime = performance.now() - t1;
         entry.count++;
         entry.cleanupTime += cleanupTime;

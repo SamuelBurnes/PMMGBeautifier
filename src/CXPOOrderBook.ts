@@ -1,5 +1,5 @@
 import { Module } from "./ModuleRunner";
-import { getBuffers, createTextSpan } from "./util";
+import { getBuffersFromList, createTextSpan } from "./util";
 import { Exchanges, ExchangeTickers, Materials } from "./GameProperties";
 import { Selector } from "./Selector";
 import { Style } from "./Style";
@@ -18,10 +18,10 @@ export class CXPOOrderBook implements Module {
     cleanup() {
         // Nothing to clean up
     }
-    run() {
+    run(allBuffers) {
 		if(this.userInfo["PMMG-User-Info"] && this.userInfo["PMMG-User-Info"]["company-name"])
 		{
-			const buffers = getBuffers("CXPO ");
+			const buffers = getBuffersFromList("CXPO ", allBuffers);
 			buffers.forEach(buffer => {
 				addOrderBook(buffer, this.userInfo, this.tag);
 			});

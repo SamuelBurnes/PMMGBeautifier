@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers} from "./util";
+import {getBuffersFromList} from "./util";
 import {Selector} from "./Selector";
 
 /**
@@ -16,8 +16,8 @@ export class ImageCreator implements Module {
     // Nothing to clean up.
 	return;
   }
-  run() {
-    const buffers = getBuffers("COM");
+  run(allBuffers) {
+    const buffers = getBuffersFromList("COM",allBuffers);
 	
     if (!buffers){return};
 	
@@ -25,7 +25,7 @@ export class ImageCreator implements Module {
 		const chatLinks = buffer.querySelectorAll(Selector.BufferLink); // Chat link elements. Also includes company code links! Make sure to filter out...
 		const chatArea = buffer.querySelector(Selector.ChatArea);
 		if(!chatArea){return;}
-		Array.from(chatLinks).forEach(link => {
+		(Array.from(chatLinks) as HTMLElement[]).forEach(link => {
 			const linkText = link.textContent;
 			if(!linkText || link.classList.contains(this.tag)){return;}
 			if(!isImage(linkText)){return;}

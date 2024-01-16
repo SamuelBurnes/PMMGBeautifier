@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers, createTextSpan} from "./util";
+import {getBuffersFromList, createTextSpan} from "./util";
 import {Selector} from "./Selector";
 /*import {Start} from "./XIT/Start";
 import {Settings} from "./XIT/Settings";
@@ -105,16 +105,18 @@ export class XITHandler implements Module {
   cleanup() {
     //genericCleanup(this.tag);	// Don't clean up because causes flashing when doing asynchronous requests
   }
-  run() {
-    const buffers = getBuffers("XIT");
-    if (!buffers) return;
-	buffers.forEach(buffer => {
+  run(buffers) {
+    const matchingBuffers = getBuffersFromList("XIT", buffers);
+    if (!matchingBuffers) return;
+	matchingBuffers.forEach(buffer => {
 		const tile = (buffer.querySelector(Selector.XITTile)) as HTMLElement;
 		if(!tile){return;}
 		
 		if(tile.firstChild && ((tile.firstChild as HTMLElement).id == "pmmg-load-success" || (tile.firstChild as HTMLElement).id == "pmmg-no-match")){return;}
+		const header = buffer.querySelector(Selector.BufferHeader);
+		if(!header) { return; }
 		
-		const parametersRaw = Array.from(buffer.getElementsByClassName(Selector.BufferHeader))[0].textContent;
+		const parametersRaw = header.textContent;
 		
 		if(!parametersRaw) return;
 		var parameters = [] as string[];

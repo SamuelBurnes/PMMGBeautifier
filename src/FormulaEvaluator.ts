@@ -1,5 +1,5 @@
 import {Module} from "./ModuleRunner";
-import {getBuffers, changeValue} from "./util";
+import {getBuffersFromList, changeValue} from "./util";
 
 export class FormulaReplacer implements Module {
 	private tag = "pb-formulas";
@@ -8,36 +8,36 @@ export class FormulaReplacer implements Module {
       // Nothing to clean up.
 	  return;
     }
-    run() {
-		var buffers = getBuffers("CXPO ");
+    run(allBuffers) {
+		var buffers = getBuffersFromList("CXPO ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
 			addListeners(buffer, this.tag);
 		});
 		
-		buffers = getBuffers("FXPO ");
+		buffers = getBuffersFromList("FXPO ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
 			addListeners(buffer, this.tag);
 		});
 		
-		buffers = getBuffers("LMP ");
+		buffers = getBuffersFromList("LMP ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
 			addListeners(buffer, this.tag);
 		});
 		
-		buffers = getBuffers("CONTD ");
+		buffers = getBuffersFromList("CONTD ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {
 			addListeners(buffer, this.tag);
 		});
 		
-		buffers = getBuffers("MTRA ");
+		buffers = getBuffersFromList("MTRA ", allBuffers);
 		if(!buffers){return;}
 		
 		buffers.forEach(buffer => {

@@ -1,5 +1,5 @@
 import { Module } from "./ModuleRunner";
-import { getBuffers, cleanPlanetName, createTextSpan, genericCleanup } from "./util";
+import { getBuffersFromList, cleanPlanetName, createTextSpan, genericCleanup } from "./util";
 import { Selector } from "./Selector";
 
 export class AdvancedMode implements Module {
@@ -16,35 +16,35 @@ export class AdvancedMode implements Module {
     cleanup() {
         genericCleanup("pb-cleanup")
     }
-    run() {
+    run(allBuffers) {
 		if(!this.enabled){return;}	// Must be enabled to run
 		
 		// Clean Fleet Buffers
-		var buffers = getBuffers("FLT");
+		var buffers = getBuffersFromList("FLT", allBuffers);
 		buffers.forEach(buffer => {
 			cleanFleet(buffer, this.tag);
 		});
 		
 		// Clean INV Buffers
-		var buffers = getBuffers("INV");
+		var buffers = getBuffersFromList("INV", allBuffers);
 		buffers.forEach(buffer => {
 			cleanInv(buffer, this.tag);
 		});
 		
 		// Clean CXOS Buffers
-		buffers = getBuffers("CXOS");
+		buffers = getBuffersFromList("CXOS", allBuffers);
 		buffers.forEach(buffer => {
 			cleanCXOS(buffer);
 		});
 		
 		// Clean COGCPEX Buffers
-		buffers = getBuffers("COGCPEX ");
+		buffers = getBuffersFromList("COGCPEX ", allBuffers);
 		buffers.forEach(buffer => {
 			cleanCOGCPEX(buffer, this.tag);
 		});
 
 		// Clean SHPF Buffers
-		buffers = getBuffers("SHPF");
+		buffers = getBuffersFromList("SHPF", allBuffers);
 		buffers.forEach(buffer => {
 			cleanSHPF(buffer);
 		});
@@ -55,10 +55,10 @@ export class AdvancedMode implements Module {
 function cleanInv(buffer, tag)
 {
 	// Only clean INV buffers with no other parameters
-	const bufferHeaders = Array.from(buffer.getElementsByClassName(Selector.BufferHeader));
-	if(!bufferHeaders || !bufferHeaders[0]){return;}
+	const bufferHeaders = buffer.querySelector(Selector.BufferHeader);
+	if(!bufferHeaders){return;}
 	
-	const parameters = (bufferHeaders[0] as HTMLElement).textContent;
+	const parameters = (bufferHeaders as HTMLElement).textContent;
 	if(!parameters || parameters != "INV"){return;}
 	
 	// Shorten planet names
