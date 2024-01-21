@@ -890,6 +890,8 @@ function generateGraph(graphType, finResult, locationsArray, currency)
 			const finData = [] as any[];
 		
 			finResult["History"].forEach(entry => {
+				if(entry[1] + entry[2] + entry[3] - entry[4] == 0){return;}
+				
 				dateData.push(entry[0]);
 				finData.push(entry[1] + entry[2] + entry[3] - entry[4]);
 			});

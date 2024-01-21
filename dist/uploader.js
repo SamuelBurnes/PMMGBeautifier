@@ -33,12 +33,14 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	//console.log("Processing Event");
 	// Testing code
 	
+	/*
 	const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST", "CHANNEL_UNSEEN_MESSAGES_COUNT"];
 	if(eventdata && !badTypes.includes(eventdata.messageType))
 	{
 		console.log(eventdata.messageType);
 		console.log(eventdata);
 	}
+	*/
 	
 	
 	// Detect bad events
@@ -53,8 +55,8 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	if(eventdata && eventdata.messageType && loggedMessageTypes.includes(eventdata.messageType))
 	{
 		//console.log("Logging Event into Storage");
-		getLocalStorage("PMMG-User-Info", logEvent, eventdata);
-		await sleep(100);
+		await getLocalStorage("PMMG-User-Info", logEvent, eventdata);
+		await sleep(50)
 		return;
 	}
 	
@@ -135,7 +137,7 @@ function sleep(ms) {
 // Turn the eventdata received by PrUN into a form stored and readable by PMMG
 // result: Dictionary with the key "PMMG-User-Info" that contains all the user's stored game data info
 // eventdata: The message sent from the server containing updated game data info
-function logEvent(result, eventdata)
+async function logEvent(result, eventdata)
 {
 	console.log(eventdata.messageType);
 	// Reset it every time for testing
@@ -424,6 +426,10 @@ function logEvent(result, eventdata)
 			{
 				result["PMMG-User-Info"]["company-name"] = eventdata.payload.name;
 			}
+			if(eventdata.payload.id)
+			{
+				result["PMMG-User-Info"]["company-id"] = eventdata.payload.id;
+			}
 			break;
 		case "FOREX_TRADER_ORDERS":	// FX Orders
 			result["PMMG-User-Info"]["fxos"] = eventdata.payload.orders;
@@ -432,12 +438,11 @@ function logEvent(result, eventdata)
 			result["PMMG-User-Info"]["cxos"] = eventdata.payload.orders;
 			break;
 		case "COMEX_BROKER_DATA": // CXOB/CXPO Data
-			console.log(eventdata.payload)
 			result["PMMG-User-Info"]["cxob"][eventdata.payload.ticker] = eventdata.payload;
 			result["PMMG-User-Info"]["cxob"][eventdata.payload.ticker]["timestamp"] = Date.now();
 			
 			Object.keys(result["PMMG-User-Info"]["cxob"]).forEach(ticker => {
-				if(Date.now() - result["PMMG-User-Info"]["cxob"][ticker]["timestamp"] > 3600000)
+				if(Date.now() - result["PMMG-User-Info"]["cxob"][ticker]["timestamp"] > 900000)
 				{
 					delete result["PMMG-User-Info"]["cxob"][ticker];
 				}
@@ -447,45 +452,60 @@ function logEvent(result, eventdata)
 	
 	console.log(result);
 	//console.log("Finished Logging Event, now Setting...");
-	setSettings(result);
+	await setSettings(result);
 }
 
 
 // UTIL FUNCTIONS, REMOVE WHEN INTEGRATED INTO PMMG
 // Set the data in local storage. Pass it the result of a getLocalStorage call
-function setSettings(result)
+async function setSettings(result)
 {
 	//console.log("Trying to Set Data");
+	var isSet = false;
 	try
 	{
-		browser.storage.local.set(result).then(function(){});	// For FireFox, throws an error in Chrome
+		browser.storage.local.set(result).then(function(){isSet = true});	// For FireFox, throws an error in Chrome
 	}
 	catch(err)
 	{
 		chrome.storage.local.set(result, function(){	// For Chrome, doesn't work in FireFox
 			//console.log("PMMG: Configuration Saved.");
+			isSet = true;
 		});
+	}
+	
+	while(!isSet)
+	{
+		await sleep(10)
 	}
 	return;
 }
 
 // Get the data in local storage for a given storageName. Then call the callback function.
 // Also pass the params through to the callback function
-function getLocalStorage(storageName, callbackFunction, params)
+async function getLocalStorage(storageName, callbackFunction, params)
 {
+	var isRetrieved = false;
 	//console.log("Trying to Get Data");
 	try
 	{
 		browser.storage.local.get(storageName).then(function(result) {
 			//console.log("Successfully Got Data");
+			isRetrieved = true;
 			callbackFunction(result, params)
 		});	// For FireFox, throws an error in Chrome
 	} catch(err)
 	{
 		chrome.storage.local.get([storageName], function(result)	// For Chrome, doesn't work in FireFox
 		{
+			isRetrieved = true;
 			callbackFunction(result, params);
 		});
+	}
+	
+	while(!isRetrieved)
+	{
+		await sleep(10)
 	}
 }
 

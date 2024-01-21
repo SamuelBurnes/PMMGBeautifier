@@ -34,12 +34,11 @@ function addOrderBook(buffer, userInfo, tag)
 {
 	const form = buffer.querySelector("form");
 	if(!form){return;}
-	if(form.classList.contains(tag)){return;}
 	
 	const exchange = document.evaluate("div[label/span[text()='Exchange']]//div/div", form, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLDivElement;
 	if(!exchange || !exchange.textContent){return;}
 	
-	const exchangeTicker = ExchangeTickers[Exchanges[exchange.textContent as string] as string];
+	const exchangeTicker = exchange.textContent.length == 3 ? ExchangeTickers[exchange.textContent as string] as string : ExchangeTickers[Exchanges[exchange.textContent as string] as string];
 	if(!exchangeTicker){return;}
 	
 	const material = document.evaluate("div[label/span[text()='Material']]//div/div", form, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLDivElement;
@@ -48,8 +47,15 @@ function addOrderBook(buffer, userInfo, tag)
 	const ticker = Materials[material.textContent][0] + "." + exchangeTicker;
 	
 	if(!userInfo["PMMG-User-Info"]["cxob"][ticker] || !form.parentElement){return;}
-	form.classList.add(tag);
-	console.log(userInfo["PMMG-User-Info"]["cxob"][ticker])
+	
+	if(form.classList.contains(userInfo["PMMG-User-Info"]["cxob"][ticker]["timestamp"].toString())){return;}
+	form.classList.add(userInfo["PMMG-User-Info"]["cxob"][ticker]["timestamp"]);
+	
+	
+	if(form.parentElement.children[1])
+	{
+		form.parentElement.children[1].remove()
+	}
 	
 	if(Exchanges[exchange.textContent])
 	{
@@ -61,7 +67,7 @@ function addOrderBook(buffer, userInfo, tag)
 	// Create order book parent div
 	const orderBook = document.createElement("div");
 	orderBook.classList.add("pb-scroll");
-	orderBook.style.height = form.offsetHeight + "px";
+	orderBook.style.height = "248px";
 	form.parentElement.appendChild(orderBook);
 	
 	// Format order form
@@ -111,7 +117,13 @@ function addOrderBook(buffer, userInfo, tag)
 			orderRow.appendChild(priceColumn);
 			
 			amountColumn.appendChild(createTextSpan(order.amount ? order.amount.toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞", tag));
-			priceColumn.appendChild(createTextSpan(order.limit.amount.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " " + order.limit.currency, tag));
+			priceColumn.appendChild(createTextSpan(order.limit.amount.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}), tag));
+			
+			if(order.amount && order.trader.name == userInfo["PMMG-User-Info"]["company-name"])
+			{
+				amountColumn.style.background = "rgba(255, 255, 255, 0.15)";
+				priceColumn.style.background = "rgba(255, 255, 255, 0.15)";
+			}
 		});
 	}
 	else
@@ -140,7 +152,7 @@ function addOrderBook(buffer, userInfo, tag)
 	{
 		const minSell = orderInfo.sellingOrders.reduce((minValue, obj) => Math.min(minValue, obj.limit.amount), Infinity);
 		const maxBuy = orderInfo.buyingOrders.reduce((maxValue, obj) => Math.max(maxValue, obj.limit.amount), -Infinity);
-		const spreadElem = createTextSpan((minSell - maxBuy).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + orderInfo.sellingOrders[0].limit.currency, tag);
+		const spreadElem = createTextSpan((minSell - maxBuy).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}), tag);
 		spreadElem.style.color = "#eee";
 		spreadColumn.appendChild(spreadElem);
 	}
@@ -177,7 +189,13 @@ function addOrderBook(buffer, userInfo, tag)
 			orderRow.appendChild(priceColumn);
 			
 			amountColumn.appendChild(createTextSpan(order.amount ? order.amount.toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞", tag));
-			priceColumn.appendChild(createTextSpan(order.limit.amount.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}) + " " + order.limit.currency, tag));
+			priceColumn.appendChild(createTextSpan(order.limit.amount.toLocaleString(undefined, {maximumFractionDigits: 2, minimumFractionDigits: 2}), tag));
+			
+			if(order.amount && order.trader.name == userInfo["PMMG-User-Info"]["company-name"])
+			{
+				amountColumn.style.background = "rgba(255, 255, 255, 0.15)";
+				priceColumn.style.background = "rgba(255, 255, 255, 0.15)";
+			}
 		});
 	}
 	else
@@ -191,4 +209,7 @@ function addOrderBook(buffer, userInfo, tag)
 		emptyColumn.appendChild(createTextSpan("No requests.", tag));
 		emptyRow.appendChild(emptyColumn);
 	}
+	
+	// Scroll to middle
+	orderBook.scrollTop = Math.max(offerBody.offsetHeight - 90, 0);
 }
