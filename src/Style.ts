@@ -546,6 +546,13 @@ div.FormComponent__containerError___pN__L1Q {
 }
 `
 
+// The style used to hide the chat delete button
+export const ChatDeleteStyle = `
+div.Message__controls___b3BAWCW {
+	display: none;
+}
+`
+
 // The enhanced colors style that improves color contrast
 export const EnhancedColors = `/* consumables (luxury) */
 div[title="Stellar Pale Ale"],

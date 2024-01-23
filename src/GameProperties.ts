@@ -101,7 +101,8 @@ export const FriendlyNames = {
 	"FormulaReplacer": "Formula Replacer",
 	"AdvancedMode": "Advanced Minimialist Mode (Master)",
 	"CXOBHighlighter": "CXOB Name Highlighter",
-	"CXPOOrderBook": "CXPO Order Book"
+	"CXPOOrderBook": "CXPO Order Book",
+	"ChatDeleteButton": "Toggle Chat Delete (Master)",
 }
 
 export const SortingTriangleHTML = `

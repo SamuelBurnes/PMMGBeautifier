@@ -9,7 +9,7 @@ import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getCXPrices} from "./BackgroundRunner";
-import { PMMGStyle, EnhancedColors, IconStyle, AdvancedStyle } from "./Style";
+import { PMMGStyle, EnhancedColors, IconStyle, AdvancedStyle, ChatDeleteStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
@@ -25,6 +25,7 @@ import { FormulaReplacer } from "./FormulaEvaluator";
 import { AdvancedMode } from "./AdvancedMode";
 import { CXOBHighlighter } from "./CXOBHighlighter";
 import { CXPOOrderBook } from "./CXPOOrderBook";
+import { ChatDeleteButton } from "./ChatDeleteButton";
 
 // Inject page_script.js directly into the webpage.
 
@@ -77,6 +78,7 @@ function mainRun(result, browser?)
 	const doc = document.querySelector("html");
 	if(doc){doc.appendChild(style);}
 	
+	
 	// If no module states are specified, disable screen unpack by default
 	if(!result["PMMGExtended"]["disabled"]){result["PMMGExtended"]["disabled"] = ["ScreenUnpack"];}
 	
@@ -106,6 +108,16 @@ function mainRun(result, browser?)
 		advancedStyle.id = "pmmg-advanced";
 		advancedStyle.textContent = AdvancedStyle;
 		doc.appendChild(advancedStyle);
+	}
+	
+	// Apply hiding chat delete button if enabled
+	if(result["PMMGExtended"]["chat_delete_hidden"])
+	{
+		const chatDelete = document.createElement("style");
+		chatDelete.type = "text/css";
+		chatDelete.id = "pmmg-chat-delete-style";
+		chatDelete.textContent = ChatDeleteStyle;
+		if(doc){doc.appendChild(chatDelete);}
 	}
 	
 	// Introduce an object that will hold and be periodically updated with latest info harvested from server traffic
@@ -150,7 +162,8 @@ function mainRun(result, browser?)
 		  new CompactUI(result),
 		  new FormulaReplacer(),
 		  new CXOBHighlighter(userInfo),
-		  new CXPOOrderBook(userInfo)
+		  new CXPOOrderBook(userInfo),
+		  new ChatDeleteButton(result)
 	], result, webData, userInfo, browser);
 	
 	// Start the loop

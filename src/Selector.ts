@@ -58,5 +58,7 @@ export const Selector = {
   SmallButton: "button[class~='Button__darkInline___z_YKa91']",
   ShipStorage: "span[class~='ShipStore__pointer___TQUMuFY']",
   StoreViewName: "span[class~='StoreView__name___eX4pgs6']",
-  FormLabels: ".forms__form-component___yTgP_Qa label"
+  FormLabels: ".forms__form-component___yTgP_Qa label",
+  ChannelControls: "div[class~='Channel__controls___JnQCa9m']",
+  RadioIndicator: "div[class~='RadioItem__indicator___QzQtjhA']",
 }
