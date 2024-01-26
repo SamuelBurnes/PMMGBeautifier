@@ -1,6 +1,7 @@
 import {Module} from "./ModuleRunner";
 import {Selector} from "./Selector";
 import {createTextSpan, genericCleanup} from "./util";
+import {CurrencySymbols} from "./GameProperties"
 
 // Adds the rate per unit ton or m^3 to LM ads
 export class ShippingAds implements Module {
@@ -36,8 +37,15 @@ export class ShippingAds implements Module {
 		// Create and add the price per ton/m^3 to the ad
         const totalCents = parseInt(totalCost.replace(/[,.]/g, ''));
         const perItem = (totalCents / count / 100).toLocaleString(undefined, {maximumFractionDigits: 2});
-        const priceSpan = element.querySelector(Selector.LMCommodityAdPriceSpan)!;
-        priceSpan.appendChild(createTextSpan(` (${perItem}/${unit})`, this.tag));
+        var priceSpan;	// No longer actually a span, just a text node we insert the price after
+		Array.from(element.childNodes).forEach(node => {
+			if(node.nodeValue && node.nodeValue.slice(1) in CurrencySymbols)
+			{
+				priceSpan = node;
+			}
+		});
+		if(!priceSpan){return;}
+        priceSpan.after(createTextSpan(` (${perItem}/${unit})`, this.tag));
       }
     }
 	return;

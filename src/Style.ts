@@ -528,6 +528,9 @@ tr:hover td.burn-red {
 div.ScrollView__view___ovf59Tk {
 	inset: -1px !important;
 }
+div.Head__container___3ecBw0E > div:nth-child(2) {
+  min-width: 245.14px;
+}
 `;
 
 // The styles used in the advanced minimalist mode
