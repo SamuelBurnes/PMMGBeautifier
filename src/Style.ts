@@ -525,11 +525,20 @@ tr:hover td.burn-red {
 	fill: #000;
 	background-color: rgb(247, 166, 0);
 }
+
+div.Head__container___3ecBw0E > div:nth-child(2) {
+  flex-shrink: 0;
+}
+
+// Fix PrUN Bugs
 div.ScrollView__view___ovf59Tk {
 	inset: -1px !important;
 }
-div.Head__container___3ecBw0E > div:nth-child(2) {
-  min-width: 245.14px;
+div.Channel__messageAndUserList___NCgQAtW {
+	scrollbar-width: auto;
+}
+div.SiteProductionLines__container___yQeb0SK {
+	scrollbar-width: auto;
 }
 `;
 

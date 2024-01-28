@@ -39,7 +39,7 @@ export class OrderETAs implements Module {
 					lineTimes.shift();
 					lineTimes = lineTimes.map( function(value){return value - minTime;});
 					
-					duration = parseDuration(prodItem.children[0].children[1].children[0].textContent);
+					duration = parseDuration(prodItem.children[0].children[1].textContent);
 					lineTimes.push(duration);
 					if(!isNaN(duration + timeElapsed))
 					{
@@ -48,7 +48,7 @@ export class OrderETAs implements Module {
 				  }
 				  else
 				  {
-					  duration = parseDuration(prodItem.children[1].children[1].children[0].textContent);
+					  duration = parseDuration(prodItem.children[1].children[1].textContent);
 					  lineTimes.push(duration);
 					  if(!isNaN(duration))
 					  {

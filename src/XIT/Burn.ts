@@ -177,7 +177,7 @@ export class Burn {
 			row.appendChild(nameColumn);
 			
 			const consColumn = document.createElement("td");
-			consColumn.appendChild(createTextSpan(planetBurn[material]["DailyAmount"].toLocaleString(undefined, {maximumFractionDigits: 1}) + " / Day"));
+			consColumn.appendChild(createTextSpan(planetBurn[material]["DailyAmount"].toLocaleString(undefined, {maximumFractionDigits: Math.abs(planetBurn[material]["DailyAmount"]) < 1 ? 2 : 1, minimumFractionDigits: Math.abs(planetBurn[material]["DailyAmount"]) < 1 ? 2 : undefined}) + " / Day"));
 			row.appendChild(consColumn);
 			
 			const invColumn = document.createElement("td");
