@@ -294,7 +294,8 @@ const friendlyConditionText =
 	PROVISION_SHIPMENT: "Provision",
 	PROVISION: "Provision",
 	LOAN_PAYOUT: "Loan Payout",
-	LOAN_INSTALLMENT: "Loan Installment"
+	LOAN_INSTALLMENT: "Loan Installment",
+	POWER: "Become Governor"
 }
 
 const materialFulfilmentType = 

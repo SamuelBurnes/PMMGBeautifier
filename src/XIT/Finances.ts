@@ -1096,6 +1096,7 @@ export function calculateFinancials(webData, userInfo, result, loop)
 		
 		validContracts.forEach(contract => {
 			const party = contract["party"];
+			//console.log(party)
 			contract["conditions"].forEach(condition => {
 				if(condition["status"] == "FULFILLED"){return;}
 				if(condition["type"] == "DELIVERY" || condition["type"] == "PROVISION")
@@ -1109,9 +1110,31 @@ export function calculateFinancials(webData, userInfo, result, loop)
 						contractValue += getPrice(cxPrices, webData["custom_prices"], result["PMMGExtended"]["pricing_scheme"], condition.quantity.material.ticker, userInfo, priceBasket) * condition.quantity.amount;
 					}
 				}
-				else if(condition["Type"] == "PAYMENT")
+				else if(condition["type"] == "PAYMENT")
 				{
-					if(condition["Party"] == party)
+					if(condition["party"] == party)
+					{
+						contractLiability += condition.amount.amount;
+					}
+					else
+					{
+						contractValue += condition.amount.amount;
+					}
+				}
+				else if(condition["type"] == "LOAN_INSTALLMENT")
+				{
+					if(condition["party"] == party)
+					{
+						contractLiability += condition.interest.amount + condition.repayment.amount;
+					}
+					else
+					{
+						contractValue += condition.interest.amount + condition.repayment.amount;
+					}
+				}
+				else if(condition["type"] == "LOAN_PAYOUT")
+				{
+					if(condition["party"] == party)
 					{
 						contractLiability += condition.amount.amount;
 					}

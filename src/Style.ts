@@ -532,13 +532,13 @@ div.Head__container___3ecBw0E > div:nth-child(2) {
 
 // Fix PrUN Bugs
 div.ScrollView__view___ovf59Tk {
-	inset: -1px !important;
+    inset: -1px !important;
 }
-div.Channel__messageAndUserList___NCgQAtW {
-	scrollbar-width: auto;
-}
+
+div.Channel__messageAndUserList___NCgQAtW,
 div.SiteProductionLines__container___yQeb0SK {
-	scrollbar-width: auto;
+    scrollbar-width: auto;
+    -webkit-scrollbar-width: auto;
 }
 `;
 

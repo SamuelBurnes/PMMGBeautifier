@@ -19,7 +19,14 @@ export class Burn {
 		this.userInfo = userInfo;
 		this.alive = true;
 		
-		this.name = "ENHANCED BURN" + (parameters[1] ? " - " + parameters[1].toUpperCase() : "");
+		if(parameters[1] && !parameters[2])
+		{
+			this.name = "ENHANCED BURN" + (parameters[1] ? " - " + parameters[1].toUpperCase() : "");
+		}
+		else
+		{
+			this.name = "ENHANCED BURN";
+		}
 	}
 	
 	create_buffer()
@@ -29,12 +36,7 @@ export class Burn {
 		const pmmgSettings = this.pmmgSettings;
 		
 		clearChildren(this.tile);
-		var planet;
-		if(this.parameters[1])
-		{
-			planet = this.parameters[1];
-		}
-		else
+		if(!this.parameters[1])
 		{
 			this.tile.textContent = "Error! Enter a planet name after XIT BURN (XIT BURN_UV-351a)";
 			return;
@@ -53,13 +55,79 @@ export class Burn {
 		var planetBurn;
 		var settings;
 		
-		const planetProduction = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["production"]);
-		const planetWorkforce = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["workforce"]);
-		const planetInv = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["storage"], true);
+		var production = {lines:[] as any};
+		var workforce = {workforce:[] as any};
+		var inv = {items:[] as any};
+		// To do multiple planets, just create artificial planetProduction etc. Can generalize for one, many, and all planets.
+		
+		if(this.parameters[1].toLowerCase() == "all")
+		{
+			this.userInfo["PMMG-User-Info"]["workforce"].forEach(planetWorkforce => {
+				if(!planetWorkforce.PlanetName){return;}
+				const planetProduction = findCorrespondingPlanet(planetWorkforce.PlanetName, this.userInfo["PMMG-User-Info"]["production"]);
+				const planetInv = findCorrespondingPlanet(planetWorkforce.PlanetName, this.userInfo["PMMG-User-Info"]["storage"], true);
+				
+				if(planetProduction && planetProduction.lines)
+				{
+					planetProduction.lines.forEach(line => {
+						production.lines.push(line);
+					});
+				}
+				if(planetWorkforce && planetWorkforce.workforce)
+				{
+					planetWorkforce.workforce.forEach(worker => {
+						workforce.workforce.push(worker);
+					});
+				}
+				if(planetInv && planetInv.items)
+				{
+					planetInv.items.forEach(item => {
+						inv.items.push(item);
+					});
+				}
+			});
+		}
+		else if(!this.parameters[2])
+		{
+			production = findCorrespondingPlanet(this.parameters[1], this.userInfo["PMMG-User-Info"]["production"]);
+			workforce = findCorrespondingPlanet(this.parameters[1], this.userInfo["PMMG-User-Info"]["workforce"]);
+			inv = findCorrespondingPlanet(this.parameters[1], this.userInfo["PMMG-User-Info"]["storage"], true);
+		}
+		else
+		{
+			const planets = [...parameters];
+			planets.shift();
+			planets.forEach(planet => {
+				const planetProduction = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["production"]);
+				const planetWorkforce = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["workforce"]);
+				const planetInv = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["storage"], true);
+				
+				if(planetProduction && planetProduction.lines)
+				{
+					planetProduction.lines.forEach(line => {
+						production.lines.push(line);
+					});
+				}
+				if(planetWorkforce && planetWorkforce.workforce)
+				{
+					planetWorkforce.workforce.forEach(worker => {
+						workforce.workforce.push(worker);
+					});
+				}
+				if(planetInv && planetInv.items)
+				{
+					planetInv.items.forEach(item => {
+						inv.items.push(item);
+					});
+				}
+			});
+		}
 	
-		planetBurn = calculateBurn(planetProduction, planetWorkforce, planetInv);	// The planet burn data
+		planetBurn = calculateBurn(production, workforce, inv);	// The planet burn data
 		
 		if(!planetBurn){return;}
+		
+		// Start creating burn buffer
 		
 		const screenNameElem = document.querySelector(Selector.ScreenName);
 		const screenName = screenNameElem ? screenNameElem.textContent : "";

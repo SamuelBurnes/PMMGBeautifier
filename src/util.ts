@@ -841,10 +841,10 @@ export function calculateBurn(production, workforce, inventory)
 		inventory.items.forEach(item => {
 			if(burnDict[item.MaterialTicker])	// Only care about items that are burned, not other inventory items
 			{
-				burnDict[item.MaterialTicker]["Inventory"] = item.Amount;
+				burnDict[item.MaterialTicker]["Inventory"] += item.Amount;
 				if(item.Amount != 0)
 				{
-					burnDict[item.MaterialTicker]["DaysLeft"] = burnDict[item.MaterialTicker]["DailyAmount"] > 0 ? 1000 : Math.floor(-item.Amount / burnDict[item.MaterialTicker]["DailyAmount"]);
+					burnDict[item.MaterialTicker]["DaysLeft"] = burnDict[item.MaterialTicker]["DailyAmount"] > 0 ? 1000 : Math.floor(-burnDict[item.MaterialTicker]["Inventory"] / burnDict[item.MaterialTicker]["DailyAmount"]);
 				}
 			}
 		});
