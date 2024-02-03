@@ -7,11 +7,11 @@ export class ScreenUnpack implements Module {
   private tag = "pb-screens";
   private buttonTag = "pb-screen-button";
   private exclusions;
-  private eventAbortSignal = new AbortController();
+  private eventAbortSignal;
 
   cleanup(full: boolean = false) {
     full && genericCleanup(this.tag);
-    this.eventAbortSignal.abort();
+    full && this.eventAbortSignal.abort();
   }
 
   constructor(exclusions) {
@@ -34,25 +34,35 @@ export class ScreenUnpack implements Module {
     ) {
       return;
     }
+    this.eventAbortSignal = new AbortController();
     const navbarItemClassList = navbar.children[2].classList;
     const nbitMainClassList = navbar.children[2].children[0].classList;
     const nbitUnderlineClassList = navbar.children[2].children[1].classList;
     const menu = navbar.children[1].children[1];
     var links = [] as any[];
 
-    (Array.from(menu.children) as HTMLElement[]).forEach((cn) => {
-      if (
-        cn.children.length == 4 &&
-        !this.exclusions.includes(
-          String(cn.children[1].innerHTML).toUpperCase()
-        )
-      ) {
-        links.push({
-          Name: cn.children[1].innerHTML,
-          Link: (cn.children[1] as HTMLAnchorElement).href,
-        });
+    (Array.from(menu.children) as HTMLElement[]).forEach(
+      (dropdownMenuElement) => {
+        if (
+          dropdownMenuElement.children.length == 4 &&
+          !this.exclusions.includes(
+            String(dropdownMenuElement.children[1].innerHTML).toUpperCase()
+          )
+        ) {
+          links.push({
+            Name: dropdownMenuElement.children[1].innerHTML,
+            Link: (dropdownMenuElement.children[1] as HTMLAnchorElement).href,
+          });
+          dropdownMenuElement.children[1].addEventListener(
+            "click",
+            () => {
+              this.updateHighlight(dropdownMenuElement.children[1].innerHTML);
+            },
+            { signal: this.eventAbortSignal.signal }
+          );
+        }
       }
-    });
+    );
 
     const spacerDiv = document.createElement("div");
     spacerDiv.classList.add(this.tag);
@@ -72,19 +82,22 @@ export class ScreenUnpack implements Module {
     });
 
     buttons.forEach((button) => {
-      // Add detection of activation here
+      // Add detection of activation
       button.addEventListener("click", () => {
-        this.updateHighlight(button.children[0].textContent);
+        this.updateHighlight(button.children[0].textContent ?? "");
       });
       navbar.appendChild(button);
     });
 
     const screenNameElem = document.querySelector(Selector.ScreenName); // Get the screen name
-    const screenName = screenNameElem ? screenNameElem.textContent : "";
+    const screenName =
+      screenNameElem && screenNameElem.textContent
+        ? screenNameElem.textContent
+        : "";
     this.updateHighlight(screenName);
   }
 
-  updateHighlight(screenName) {
+  updateHighlight(screenName: string) {
     screenName = screenName.toUpperCase();
     const navbar = document.getElementById(Selector.ScreenControls);
     if (navbar == null) {
