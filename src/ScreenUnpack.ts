@@ -5,10 +5,15 @@ import { genericCleanup, createNode } from "./util";
 
 export class ScreenUnpack implements Module {
   private tag = "pb-screens";
+  private buttonTag = "pb-screen-button";
   private exclusions;
+  private eventAbortSignal = new AbortController();
+
   cleanup(full: boolean = false) {
     full && genericCleanup(this.tag);
+    this.eventAbortSignal.abort();
   }
+
   constructor(exclusions) {
     exclusions = exclusions == undefined ? [] : exclusions;
     this.exclusions = [];
@@ -16,6 +21,7 @@ export class ScreenUnpack implements Module {
       this.exclusions.push(ex.toUpperCase());
     });
   }
+
   run() {
     const navbar = document.getElementById(Selector.ScreenControls);
     if (navbar == null) {
@@ -61,26 +67,43 @@ export class ScreenUnpack implements Module {
                       </div>`;
       const buttonElem = createNode(button) as HTMLElement;
       buttonElem.classList.add(this.tag);
+      buttonElem.classList.add(this.buttonTag);
       return buttonElem;
     });
 
     buttons.forEach((button) => {
       // Add detection of activation here
       button.addEventListener("click", () => {
-        // Remove active class from all buttons
-        buttons.forEach((b) => {
-          b.children[1].className = "";
-          b.children[1].classList.add(
-            ...WithStyles(Style.ScreenUnderlineUntoggled)
-          );
-        });
-        // Add active class to clicked button
+        this.updateHighlight(button.children[0].textContent);
+      });
+      navbar.appendChild(button);
+    });
+
+    const screenNameElem = document.querySelector(Selector.ScreenName); // Get the screen name
+    const screenName = screenNameElem ? screenNameElem.textContent : "";
+    this.updateHighlight(screenName);
+  }
+
+  updateHighlight(screenName) {
+    screenName = screenName.toUpperCase();
+    const navbar = document.getElementById(Selector.ScreenControls);
+    if (navbar == null) {
+      return;
+    }
+    const buttons = navbar.getElementsByClassName(this.buttonTag);
+    for (let i = 0; i < buttons.length; i++) {
+      const button = buttons[i] as HTMLElement;
+      if (button.children[0].textContent?.toUpperCase() == screenName) {
         button.children[1].className = "";
         button.children[1].classList.add(
           ...WithStyles(Style.ScreenUnderlineToggled)
         );
-      });
-      navbar.appendChild(button);
-    });
+      } else {
+        button.children[1].className = "";
+        button.children[1].classList.add(
+          ...WithStyles(Style.ScreenUnderlineUntoggled)
+        );
+      }
+    }
   }
 }
