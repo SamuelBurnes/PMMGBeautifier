@@ -105,10 +105,10 @@ export class ScreenUnpack implements Module {
     const navbarItemClassList = navbar.children[2].classList;
     const nbitMainClassList = navbar.children[2].children[0].classList;
     const nbitUnderlineClassList = navbar.children[2].children[1].classList;
-    const button = `<div class="${navbarItemClassList}">
-                        <a class="${nbitMainClassList}" style="color: inherit" href="${link}">${screenName}</a>
+    const button = `<a class="${navbarItemClassList}" href="${link}">
+                        <div class="${nbitMainClassList}" style="color: inherit" >${screenName}</div>
                         <div class="${nbitUnderlineClassList}"></div>
-                    </div>`;
+                    </a>`;
     const buttonElem = createNode(button) as HTMLElement;
     buttonElem.classList.add(this.tag);
     buttonElem.classList.add(this.buttonTag);
