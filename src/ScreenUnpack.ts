@@ -6,15 +6,15 @@ import { genericCleanup, createNode } from "./util";
 export class ScreenUnpack implements Module {
   private tag = "pb-screens";
   private buttonTag = "pb-screen-button";
-  private exclusions;
-  private eventAbortSignal;
+  private exclusions: string[];
+  private eventAbortSignal: AbortController;
 
   cleanup(full: boolean = false) {
     full && genericCleanup(this.tag);
     full && this.eventAbortSignal.abort();
   }
 
-  constructor(exclusions) {
+  constructor(exclusions: string[] | undefined = undefined) {
     exclusions = exclusions == undefined ? [] : exclusions;
     this.exclusions = [];
     exclusions.forEach((ex) => {
@@ -27,74 +27,96 @@ export class ScreenUnpack implements Module {
     if (navbar == null) {
       return;
     }
-    if (
-      (
-        navbar.children[navbar.children.length - 1] as HTMLElement
-      ).classList.contains(this.tag)
-    ) {
+    if (this.isInitialized()) {
       return;
     }
     this.eventAbortSignal = new AbortController();
-    const navbarItemClassList = navbar.children[2].classList;
-    const nbitMainClassList = navbar.children[2].children[0].classList;
-    const nbitUnderlineClassList = navbar.children[2].children[1].classList;
-    const menu = navbar.children[1].children[1];
-    var links = [] as any[];
 
+    navbar.appendChild(this.createSpacer());
+
+    const screens = this.getScreensAndAttachDropdownMenuListeners();
+    screens.forEach((screen) =>
+      this.createScreenButton(screen.Name, screen.Link)
+    );
+
+    // Highlight the current screen
+    const screenNameElem = document.querySelector(Selector.ScreenName);
+    const screenName =
+      screenNameElem && screenNameElem.textContent
+        ? screenNameElem.textContent
+        : "";
+    this.updateHighlight(screenName);
+  }
+
+  isInitialized() {
+    return document.getElementsByClassName(this.tag).length > 0;
+  }
+
+  getScreensAndAttachDropdownMenuListeners() {
+    const navbar = document.getElementById(Selector.ScreenControls);
+    if (navbar == null) {
+      return [];
+    }
+    const menu = navbar.children[1].children[1];
+    const links = [] as { Name: string; Link: string }[];
+
+    // Get the links from the dropdown menu
     (Array.from(menu.children) as HTMLElement[]).forEach(
       (dropdownMenuElement) => {
+        if (dropdownMenuElement.children.length !== 4) {
+          return;
+        }
         if (
-          dropdownMenuElement.children.length == 4 &&
           !this.exclusions.includes(
-            String(dropdownMenuElement.children[1].innerHTML).toUpperCase()
+            dropdownMenuElement.children[1].innerHTML.toUpperCase()
           )
         ) {
           links.push({
             Name: dropdownMenuElement.children[1].innerHTML,
             Link: (dropdownMenuElement.children[1] as HTMLAnchorElement).href,
           });
-          dropdownMenuElement.children[1].addEventListener(
-            "click",
-            () => {
-              this.updateHighlight(dropdownMenuElement.children[1].innerHTML);
-            },
-            { signal: this.eventAbortSignal.signal }
-          );
         }
+        // Attach listener to the dropdown menu to switch the highlight
+        dropdownMenuElement.children[1].addEventListener(
+          "click",
+          () => {
+            this.updateHighlight(dropdownMenuElement.children[1].innerHTML);
+          },
+          { signal: this.eventAbortSignal.signal }
+        );
       }
     );
+    return links;
+  }
 
+  createSpacer() {
     const spacerDiv = document.createElement("div");
     spacerDiv.classList.add(this.tag);
     spacerDiv.style.display = "inline-block";
     spacerDiv.style.width = "5px";
-    navbar.appendChild(spacerDiv);
+    return spacerDiv;
+  }
 
-    const buttons = links.map((link) => {
-      const button = `<div class="${navbarItemClassList}">
-                          <a class="${nbitMainClassList}" style="color: inherit" href="${link.Link}">${link.Name}</a>
-                          <div class="${nbitUnderlineClassList}"></div>
-                      </div>`;
-      const buttonElem = createNode(button) as HTMLElement;
-      buttonElem.classList.add(this.tag);
-      buttonElem.classList.add(this.buttonTag);
-      return buttonElem;
+  createScreenButton(screenName: string, link: string) {
+    const navbar = document.getElementById(Selector.ScreenControls);
+    if (navbar == null) {
+      return createNode("");
+    }
+    const navbarItemClassList = navbar.children[2].classList;
+    const nbitMainClassList = navbar.children[2].children[0].classList;
+    const nbitUnderlineClassList = navbar.children[2].children[1].classList;
+    const button = `<div class="${navbarItemClassList}">
+                        <a class="${nbitMainClassList}" style="color: inherit" href="${link}">${screenName}</a>
+                        <div class="${nbitUnderlineClassList}"></div>
+                    </div>`;
+    const buttonElem = createNode(button) as HTMLElement;
+    buttonElem.classList.add(this.tag);
+    buttonElem.classList.add(this.buttonTag);
+
+    buttonElem.addEventListener("click", () => {
+      this.updateHighlight(buttonElem.children[0].textContent ?? "");
     });
-
-    buttons.forEach((button) => {
-      // Add detection of activation
-      button.addEventListener("click", () => {
-        this.updateHighlight(button.children[0].textContent ?? "");
-      });
-      navbar.appendChild(button);
-    });
-
-    const screenNameElem = document.querySelector(Selector.ScreenName); // Get the screen name
-    const screenName =
-      screenNameElem && screenNameElem.textContent
-        ? screenNameElem.textContent
-        : "";
-    this.updateHighlight(screenName);
+    navbar.appendChild(buttonElem);
   }
 
   updateHighlight(screenName: string) {
