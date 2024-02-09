@@ -6,6 +6,7 @@ import { Selector } from "./Selector";
 export interface Module {
   run(buffers: any[]);
   cleanup();
+  frequency?: number;
 }
 
 interface ModuleEntry {
@@ -23,8 +24,10 @@ export class ModuleRunner {
   private readonly xit: XITHandler;	// The XIT module, run separately
   private userInfo;
   private result;	// The stored settings
+  private iteration;
   constructor(modules: Module[], result, webData, userInfo, browser) {
 	// Construct global variables
+	this.iteration = 0;
     this.modules = modules.map(m => this.moduleToME(m));
 	this.xit = new XITHandler(result, userInfo, webData, this.modules, browser);
 	this.result = result;
@@ -85,7 +88,7 @@ export class ModuleRunner {
 	
 	// For each module, run it, clean it, and measure its performance
     this.modules.map(entry => {
-      if (entry.enabled) {
+      if (entry.enabled && (!entry.module.frequency || this.iteration % entry.module.frequency == 0)) {
         const t0 = performance.now();
         entry.module.cleanup();
         const cleanupTime = performance.now() - t0;
@@ -98,6 +101,8 @@ export class ModuleRunner {
       }
 	  
     });
+	
+	this.iteration++;
 
     // @TODO: Vary the interval based on module performance
     window.setTimeout(() => this.loop(), 250);

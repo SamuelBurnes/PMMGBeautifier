@@ -36,6 +36,7 @@ export const Selector = {
   //ChatInput: "div[class~='BArxa2yGz-u5GgiT-uvI9Q==']",
   //ChatTile: "div[class~='_8MZs-piY-+t2NOXRPhMM6A==']",
   MaterialIcon: "GridItemView__image___yMoKOZV",
+  MaterialIconSelector: "div[class~='GridItemView__image___yMoKOZV']", 
   BufferLink: "span[class~='Link__link___fa4mmMA']",
   FullMaterialIcon: "div[class~='GridItemView__container___xP2uJz8']",
   Inventory: "div[class~='InventoryView__grid___UyRQSX8']",
@@ -61,4 +62,5 @@ export const Selector = {
   FormLabels: ".forms__form-component___yTgP_Qa label",
   ChannelControls: "div[class~='Channel__controls___JnQCa9m']",
   RadioIndicator: "div[class~='RadioItem__indicator___QzQtjhA']",
+  InventoryContainer: "div[class~='StoreView__container___RrvYu52']"
 }

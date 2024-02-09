@@ -106,7 +106,7 @@ function cleanFleet(buffer, tag)
 		if(row.children && row.children[2] && row.children[2].firstChild && row.children[2].firstChild.children && row.children[2].firstChild.children[2])
 		{
 			var text = row.children[2].textContent || "";
-			text = text.replace("m³", "").replace("t", "").replace(/1,000/g,"1k").replace(/2,000/g,"2k").replace(/3,000/g,"3k");
+			text = text.replace("m³", "").replace("t", "").replace(/1,000/g,"1k").replace(/2,000/g,"2k").replace(/3,000/g,"3k").replace(/1.000/g,"1k").replace(/2.000/g,"2k").replace(/3.000/g,"3k");
 			row.children[2].firstChild.children[2].textContent = text;
 		}
 	});
@@ -151,7 +151,11 @@ const shipStatus = {
 	"approaching": "↘",
 	"landing": "↓",
 	"stationary": "⦁",
-	"in transit": "⟶"
+	"in transit": "⟶",
+	"Abflug": "↗",
+	"Sprung": "⟿",
+	"stationär": "⦁",
+	
 }
 
 function cleanCXOS(buffer)

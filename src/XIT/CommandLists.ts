@@ -1,4 +1,4 @@
-import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan, makePopupSpacer, createPopupInputRow, getValueOfPopupRow, showWarningDialog} from "../util";
+import {clearChildren, getLocalStorage, setSettings, createLink, createTextSpan, makePopupSpacer, createPopupInputRow, getValueOfPopupRow, showWarningDialog, Popup, showBuffer} from "../util";
 import {Style} from "../Style";
 
 export class CommandLists {
@@ -101,6 +101,24 @@ function generateListTable(result, tile)
 		line.appendChild(textColumn);
 		body.appendChild(line);
 	}
+	
+	const newButton = document.createElement("button");
+	newButton.classList.add(...Style.Button);
+	newButton.classList.add(...Style.ButtonPrimary);
+	newButton.style.margin = "5px";
+	
+	newButton.textContent = "NEW COMMAND LIST";
+	newButton.addEventListener("click", function() {
+		const popup = new Popup(tile, "New Command List");
+		popup.addPopupRow("text", "List Name", "", "The name of the command list. The command to access will be XIT LIST_{name}", function(){});
+		popup.addPopupRow("button", "CMD", "Create", undefined, function(){
+			const nameRow = popup.getRowByName("List Name");
+			if(!nameRow || !nameRow.rowInput){return;}
+			showBuffer("XIT LIST_" + (nameRow.rowInput.value.replace(" ", "_") || ""));
+			popup.destroy();
+		}); 
+	});
+	tile.appendChild(newButton);
 	return;
 }
 function updateThenStoreList(result, params)

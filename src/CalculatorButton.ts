@@ -3,6 +3,7 @@ import {genericCleanup, getBuffersFromList, showBuffer} from "./util";
 
 export class CalculatorButton implements Module {
   private tag = "pb-calc";
+  frequency = 2;
   cleanup(full: boolean = false) {
     full && genericCleanup(this.tag);
   }

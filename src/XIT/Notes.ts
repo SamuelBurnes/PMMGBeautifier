@@ -4,8 +4,9 @@ import {
 	createTextSpan,
 	getLocalStoragePromise,
 	setLocalStoragePromise,
-	showWarningDialog, showBuffer
+	showWarningDialog, showBuffer, Popup
 } from "../util";
+import {Style} from "../Style";
 
 
 export class Notes {
@@ -167,6 +168,24 @@ function generateNotesTable(notesStorage: {[p: string]: any}, tile: HTMLDivEleme
 	});
 
 	tile.append(notesTable);
+	
+	const newButton = document.createElement("button");
+	newButton.classList.add(...Style.Button);
+	newButton.classList.add(...Style.ButtonPrimary);
+	newButton.style.margin = "5px";
+	
+	newButton.textContent = "NEW NOTE";
+	newButton.addEventListener("click", function() {
+		const popup = new Popup(tile, "New Note");
+		popup.addPopupRow("text", "Note Name", "", "The name of the note. The command to access will be XIT NOTE_{name}", function(){});
+		popup.addPopupRow("button", "CMD", "Create", undefined, function(){
+			const nameRow = popup.getRowByName("Note Name");
+			if(!nameRow || !nameRow.rowInput){return;}
+			showBuffer("XIT NOTE_" + (nameRow.rowInput.value.replace(" ", "_") || ""));
+			popup.destroy();
+		}); 
+	});
+	tile.appendChild(newButton);
 }
 
 async function saveNote(noteName: string, noteText: string | null): Promise<void> {

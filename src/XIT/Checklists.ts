@@ -1,4 +1,4 @@
-import {clearChildren, getLocalStorage, setSettings, createTextSpan, createTable, createLink, Popup, showWarningDialog, findCorrespondingPlanet, calculateBurn} from "../util";
+import {clearChildren, getLocalStorage, setSettings, createTextSpan, createTable, createLink, Popup, showWarningDialog, findCorrespondingPlanet, calculateBurn, showBuffer} from "../util";
 import {Style, TextColors} from "../Style";
 import {NonProductionBuildings} from "../GameProperties";
 
@@ -131,6 +131,25 @@ function generateCheckTable(result, tile)	// Create a list of all checklists
 	});
 	
 	tile.style.minHeight = "auto";
+	
+	const newButton = document.createElement("button");
+	newButton.classList.add(...Style.Button);
+	newButton.classList.add(...Style.ButtonPrimary);
+	newButton.style.margin = "5px";
+	
+	newButton.textContent = "NEW CHECKLIST";
+	newButton.addEventListener("click", function() {
+		const popup = new Popup(tile, "New Checklist");
+		popup.addPopupRow("text", "Checklist Name", "", "The name of the checklist. The command to access will be XIT CHECK_{name}", function(){});
+		popup.addPopupRow("button", "CMD", "Create", undefined, function(){
+			const nameRow = popup.getRowByName("Checklist Name");
+			if(!nameRow || !nameRow.rowInput){return;}
+			showBuffer("XIT CHECK_" + (nameRow.rowInput.value.replace(" ", "_") || ""));
+			popup.destroy();
+		}); 
+	});
+	tile.appendChild(newButton);
+	
 	return;
 }
 

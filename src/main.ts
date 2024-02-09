@@ -26,6 +26,8 @@ import { AdvancedMode } from "./AdvancedMode";
 import { CXOBHighlighter } from "./CXOBHighlighter";
 import { CXPOOrderBook } from "./CXPOOrderBook";
 import { ChatDeleteButton } from "./ChatDeleteButton";
+import { IconMarkers } from "./IconMarkers";
+import { InsetFixer } from "./InsetFixer";
 
 // Inject page_script.js directly into the webpage.
 
@@ -47,11 +49,11 @@ try
 {
 	// Try and get stored settings using FireFox syntax
 	browser.storage.local.get("PMMGExtended").then(mainRun, onError);
-	console.log("FireFox detected");
+	console.log("PMMG: FireFox detected");
 } catch(ex)
 {
 	// Method throws an error if not on FF, so then try and get stored settings using Chromium syntax
-	console.log("Chromium detected");
+	console.log("PMMG: Chromium detected");
 	chrome.storage.local.get(["PMMGExtended"], function(result)
 	{
 		mainRun(result, "chromium");
@@ -137,7 +139,6 @@ function mainRun(result, browser?)
 	{
 		window.setTimeout(() => calculateFinancials(webData, userInfo, result, true), 1000);
 	}
-	
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
 		  new ShippingAds(),
@@ -163,7 +164,9 @@ function mainRun(result, browser?)
 		  new FormulaReplacer(),
 		  new CXOBHighlighter(userInfo),
 		  new CXPOOrderBook(userInfo),
-		  new ChatDeleteButton(result)
+		  new ChatDeleteButton(result),
+		  new IconMarkers(),
+		  new InsetFixer(),	// Remove when this PrUN bug is fixed for real
 	], result, webData, userInfo, browser);
 	
 	// Start the loop

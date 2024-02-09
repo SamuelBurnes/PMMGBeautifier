@@ -90,9 +90,9 @@ export function parseDuration(duration) {
 	text = text.replace(/(\d)\s+(?=[a-zA-Z])/, '$1');	// Clear space between system and planet
 	text = text.replace(/.*\s-\s/, '');	// Clear system name in named systems
 	
-	if(Stations[text.slice(0, -1)])
+	if(Stations[text])
 	{
-		text = Stations[text.slice(0, -1)];
+		text = Stations[text];
 	}
 	return text;
  }
