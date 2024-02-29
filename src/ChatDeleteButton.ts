@@ -1,7 +1,7 @@
 import { Module } from "./ModuleRunner";
 import { getBuffersFromList, setSettings } from "./util";
 import { Selector } from "./Selector";
-import { Style, ChatDeleteStyle } from "./Style";
+import { Style, ChatDeleteStyle, JoinLeaveStyle } from "./Style";
 
 export class ChatDeleteButton implements Module {
     private tag = "pb-chat-delete";
@@ -43,17 +43,30 @@ function addChatDeleteToggle(buffer, pmmgSettings, tag)
 	channelControls.classList.add(tag);
 	
 	var chatToggle = document.createElement("div");
-	channelControls.appendChild(chatToggle);
 	chatToggle.innerHTML = `<div class="SelectButton__container___vjN14Xf"><span class="RadioItem__container___CSczqmG"><div class="RadioItem__indicator___QzQtjhA"></div><div class="RadioItem__value___Yd1Gt1T fonts__font-regular___Sxp1xjo type__type-small___pMQhMQO">disable delete</div></span></div>`;
+	
+	var joinToggle = document.createElement("div");
+	joinToggle.innerHTML = `<div class="SelectButton__container___vjN14Xf"><span class="RadioItem__container___CSczqmG"><div class="RadioItem__indicator___QzQtjhA"></div><div class="RadioItem__value___Yd1Gt1T fonts__font-regular___Sxp1xjo type__type-small___pMQhMQO">hide join</div></span></div>`;
+	joinToggle = joinToggle.firstChild as HTMLDivElement;
+	if(!joinToggle){return;}
 	
 	chatToggle = chatToggle.firstChild as HTMLDivElement;
 	if(!chatToggle){return;}
 	
 	channelControls.appendChild(chatToggle)
+	channelControls.appendChild(joinToggle)
 	
 	if(pmmgSettings["PMMGExtended"]["chat_delete_hidden"])
 	{
 		const chatIndicator = chatToggle.querySelector(Selector.RadioIndicator) as HTMLElement;
+		if(!chatIndicator){return;}
+		
+		chatIndicator.classList.add(...Style.RadioButtonToggled);
+	}
+	
+	if(pmmgSettings["PMMGExtended"]["join_leave_hidden"])
+	{
+		const chatIndicator = joinToggle.querySelector(Selector.RadioIndicator) as HTMLElement;
 		if(!chatIndicator){return;}
 		
 		chatIndicator.classList.add(...Style.RadioButtonToggled);
@@ -87,6 +100,44 @@ function addChatDeleteToggle(buffer, pmmgSettings, tag)
 			chatIndicator.classList.remove(...Style.RadioButtonToggled);
 			chatIndicator.classList.add(...Style.RadioButtonUnToggled);
 			const chatStyle = document.getElementById("pmmg-chat-delete-style");
+			if(chatStyle)
+			{
+				// Style exists: Remove it.
+				chatStyle.remove();
+			}
+		}
+		
+		setSettings(pmmgSettings);
+	});
+	
+	joinToggle.addEventListener("click", function() {
+		pmmgSettings["PMMGExtended"]["join_leave_hidden"] = !pmmgSettings["PMMGExtended"]["join_leave_hidden"];
+
+		const chatIndicator = joinToggle.querySelector(Selector.RadioIndicator) as HTMLElement;
+		if(!chatIndicator){return;}
+
+		if(pmmgSettings["PMMGExtended"]["join_leave_hidden"])
+		{
+			chatIndicator.classList.remove(...Style.RadioButtonUnToggled);
+			chatIndicator.classList.add(...Style.RadioButtonToggled);
+			
+			if(!document.getElementById("pmmg-chat-join-style"))
+			{
+				// Style doesn't exist: Add it.
+				const chatDelete = document.createElement("style");
+				chatDelete.type = "text/css";
+				chatDelete.id = "pmmg-chat-join-style";
+				chatDelete.textContent = JoinLeaveStyle;
+				
+				const doc = document.querySelector("html");
+				if(doc){doc.appendChild(chatDelete);}
+			}
+		}
+		else
+		{
+			chatIndicator.classList.remove(...Style.RadioButtonToggled);
+			chatIndicator.classList.add(...Style.RadioButtonUnToggled);
+			const chatStyle = document.getElementById("pmmg-chat-join-style");
 			if(chatStyle)
 			{
 				// Style exists: Remove it.

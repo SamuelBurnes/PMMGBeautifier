@@ -586,6 +586,11 @@ div.Message__controls___b3BAWCW {
 }
 `
 
+// The style used to hide the join/leave messages
+export const JoinLeaveStyle = `
+.Message__message___JRbMogR:not(:has(> .Message__name___w2xfkHs > div)) {display:none;}
+`
+
 // The enhanced colors style that improves color contrast
 export const EnhancedColors = `/* consumables (luxury) */
 div[title="Stellar Pale Ale"],

@@ -1,4 +1,4 @@
-import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile, findCorrespondingPlanet, createSmallButton} from "../util";
+import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile, findCorrespondingPlanet, createSmallButton, dateYearFormatter, hourFormatter} from "../util";
 import {Style, TextColors} from "../Style";
 import {CurrencySymbols, Consumption} from "../GameProperties";
 
@@ -426,7 +426,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			tbody.appendChild(row);
 			
 			const dateColumn = document.createElement("td");
-			dateColumn.appendChild(createTextSpan((new Date(finResult["History"][i][0])).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) + " on " + (new Date(finResult["History"][i][0])).toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"})));
+			dateColumn.appendChild(createTextSpan(hourFormatter.format(new Date(finResult["History"][i][0])) + " on " + dateYearFormatter.format(new Date(finResult["History"][i][0]))));
 			row.appendChild(dateColumn);
 			
 			const equityColumn = document.createElement("td");
@@ -569,13 +569,13 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		if(finResult["History"])
 		{
 			const oldestDate = new Date(finResult["History"][0][0]);
-			const oldestDateElem = createTextSpan("Oldest data recorded on " + oldestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit", year:"numeric"}));
+			const oldestDateElem = createTextSpan("Oldest data recorded on " + dateYearFormatter.format(oldestDate));
 			infoDiv.appendChild(oldestDateElem);
 			oldestDateElem.style.marginTop = "5px";
 			oldestDateElem.style.display = "block";
 			
 			const newestDate = new Date(finResult["History"][finResult["History"].length - 1][0]);
-			const newestDateElem = createTextSpan("Latest data recorded at " + newestDate.toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"}) + " on " + newestDate.toLocaleDateString(undefined, {month: "2-digit", day: "2-digit", year: "numeric"}));
+			const newestDateElem = createTextSpan("Latest data recorded at " + hourFormatter.format(newestDate) + " on " + dateYearFormatter.format(newestDate));
 			infoDiv.appendChild(newestDateElem);
 			newestDateElem.style.marginTop = "5px";
 			newestDateElem.style.display = "block";

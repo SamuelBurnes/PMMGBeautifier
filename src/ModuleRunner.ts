@@ -103,7 +103,7 @@ export class ModuleRunner {
     });
 	
 	this.iteration++;
-
+	
     // @TODO: Vary the interval based on module performance
     window.setTimeout(() => this.loop(), 250);
   }

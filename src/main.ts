@@ -9,7 +9,7 @@ import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getCXPrices} from "./BackgroundRunner";
-import { PMMGStyle, EnhancedColors, IconStyle, AdvancedStyle, ChatDeleteStyle } from "./Style";
+import { PMMGStyle, EnhancedColors, IconStyle, AdvancedStyle, ChatDeleteStyle, JoinLeaveStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
@@ -120,6 +120,16 @@ function mainRun(result, browser?)
 		chatDelete.id = "pmmg-chat-delete-style";
 		chatDelete.textContent = ChatDeleteStyle;
 		if(doc){doc.appendChild(chatDelete);}
+	}
+	
+	// Apply hiding join/leave messages if enabled
+	if(result["PMMGExtended"]["join_leave_hidden"])
+	{
+		const joinLeave = document.createElement("style");
+		joinLeave.type = "text/css";
+		joinLeave.id = "pmmg-chat-join-style";
+		joinLeave.textContent = JoinLeaveStyle;
+		if(doc){doc.appendChild(joinLeave);}
 	}
 	
 	// Introduce an object that will hold and be periodically updated with latest info harvested from server traffic

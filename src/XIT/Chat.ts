@@ -1,4 +1,4 @@
-import {clearChildren, XITWebRequest} from "../util";
+import {clearChildren, XITWebRequest, hourFormatter, dateFormatter} from "../util";
 
 
 export class FIOChat {
@@ -62,12 +62,12 @@ function Chat_post(chatDiv, parameters, jsondata)
 		
 		const dateDiv = document.createElement("div");
 		timeDateDiv.appendChild(dateDiv);
-		dateDiv.textContent = (new Date(chat["MessageTimestamp"])).toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"});
+		dateDiv.textContent = dateFormatter.format(new Date(chat["MessageTimestamp"]));
 		dateDiv.classList.add("time-date");
 		
 		const timeDiv = document.createElement("div");
 		timeDateDiv.appendChild(timeDiv);
-		timeDiv.textContent = (new Date(chat["MessageTimestamp"])).toLocaleTimeString(undefined, {hour: "2-digit", minute: "2-digit"});
+		timeDiv.textContent = hourFormatter.format(new Date(chat["MessageTimestamp"]));
 		timeDiv.classList.add("time-date");
 		timeDiv.style.color = "#999999";
 		

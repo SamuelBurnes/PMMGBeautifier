@@ -1,4 +1,4 @@
-import {clearChildren, getLocalStorage, setSettings, createTextSpan, createTable, createLink, Popup, showWarningDialog, findCorrespondingPlanet, calculateBurn, showBuffer} from "../util";
+import {clearChildren, getLocalStorage, setSettings, createTextSpan, createTable, createLink, Popup, showWarningDialog, findCorrespondingPlanet, calculateBurn, showBuffer, dateYearFormatter} from "../util";
 import {Style, TextColors} from "../Style";
 import {NonProductionBuildings} from "../GameProperties";
 
@@ -107,7 +107,7 @@ function generateCheckTable(result, tile)	// Create a list of all checklists
 		row.appendChild(incompleteElem);
 		
 		const duedateElem = document.createElement("td");
-		duedateElem.appendChild(createTextSpan(duedate ? (new Date(duedate)).toLocaleDateString() : "--")); // -- or -? Best way to signify no value?
+		duedateElem.appendChild(createTextSpan(duedate ? dateYearFormatter.format(new Date(duedate)) : "--")); // -- or -? Best way to signify no value?
 		if(duedate && duedate < Date.now()){duedateElem.style.color = TextColors.Failure;}
 		row.appendChild(duedateElem);
 		
@@ -692,7 +692,7 @@ class CheckItem	// Individual checklist item. Held within a checklist.
 		
 		if(checkInfo.duedate)	// The due date under the name
 		{
-			var dateText = (new Date(checkInfo.duedate)).toLocaleDateString();
+			var dateText = dateYearFormatter.format(new Date(checkInfo.duedate));
 			if(checkInfo.recurring)
 			{
 				dateText += " (every " + (checkInfo.recurring).toLocaleString(undefined, {maximumFractionDigits: 1}) + " day" + (checkInfo.recurring == 1 ? ")" : "s)")

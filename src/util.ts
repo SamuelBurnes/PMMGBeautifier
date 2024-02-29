@@ -2,6 +2,12 @@ import {Selector} from "./Selector";
 import {MaterialNames, PlanetNames, SystemNames, Stations} from "./GameProperties";
 import {Style, CategoryColors, WithStyles, DefaultColors} from "./Style";
 
+export const hourFormatter = new Intl.DateTimeFormat(undefined, {hour: '2-digit', minute: '2-digit'})
+
+export const dateFormatter = new Intl.DateTimeFormat(undefined, {month: "2-digit", day: "2-digit"})
+
+export const dateYearFormatter = new Intl.DateTimeFormat(undefined, {month: "2-digit", day: "2-digit", year: "numeric"})
+
 // Download a file containing fileData with fileName
 export function downloadFile(fileData, fileName, isJSON: boolean = true)
 {
@@ -46,7 +52,7 @@ export function convertDurationToETA(parsedSeconds) {
   const diffTime = Math.abs(eta.getTime() - now.getTime());
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  let ret = eta.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+  let ret = hourFormatter.format(eta);
   if (diffDays > 0) {
     ret += ` +${diffDays}d`;
   }
@@ -979,7 +985,7 @@ export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, line
 	// Draw data labels
 	for(i = 0; i < 10; i++)
 	{
-		const text = isDates ? (new Date((maxX - minX) * i / 10 + minX)).toLocaleDateString(undefined, {month: "2-digit", day: "2-digit"}) : ((maxX - minX) * i / 10 + minX).toLocaleString(undefined, {maximumFractionDigits: 2});
+		const text = isDates ? dateFormatter.format(new Date((maxX - minX) * i / 10 + minX)) : ((maxX - minX) * i / 10 + minX).toLocaleString(undefined, {maximumFractionDigits: 2});
 		context.font = "10px Droid Sans";
 		context.fillStyle = "#999";
 		context.fillText(text, (xSize - zeroX) * i / 10 + zeroX, ySize - 12);
