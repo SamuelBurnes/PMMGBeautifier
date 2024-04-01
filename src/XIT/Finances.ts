@@ -1,6 +1,7 @@
-import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, drawPieChart, drawLineChart, showBuffer, downloadFile, findCorrespondingPlanet, createSmallButton, dateYearFormatter, hourFormatter} from "../util";
+import {clearChildren, createFinancialTextBox, createTextSpan, setSettings, getLocalStorage, createToolTip, createSelectOption, showWarningDialog, createTable, showBuffer, downloadFile, findCorrespondingPlanet, createSmallButton, dateYearFormatter, hourFormatter, dateYearFormatter2} from "../util";
 import {Style, TextColors} from "../Style";
 import {CurrencySymbols, Consumption} from "../GameProperties";
+import {generateLineGraph, generatePieChart} from "../PlotlyHandler";
 
 export class Finances {
 	private tile: HTMLElement;
@@ -621,6 +622,18 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		const tbody = createTable(tile, ["Name", "Fixed Assets", "Current Assets", "Total Assets"]);
 		
+		const table = tbody.parentElement;
+		if(table)
+		{
+			const topRow = table.querySelector("thead > tr")
+			if(topRow)
+			{
+				for(var i = 1; i < topRow.children.length; i++)
+				{
+					(topRow.children[i] as HTMLElement).style.textAlign = "right";
+				}
+			}
+		}
 		
 		locationsArray.forEach(inv => {
 			const row = document.createElement("tr");
@@ -636,6 +649,7 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 				const tableElem = document.createElement("td");
 				row.appendChild(tableElem);
 				tableElem.appendChild(createTextSpan(point.toLocaleString(undefined, {maximumFractionDigits: 0})));
+				tableElem.style.textAlign = "right";
 			}
 		});
 	}
@@ -645,8 +659,11 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		{
 			const graphDiv = document.createElement("div");
 			graphDiv.style.margin = "5px";
+			const tileDims = tile.getBoundingClientRect();
+			const width = tileDims.width > 10 ? tileDims.width - 10 : 10;
+			const height = tileDims.height > 10 ? tileDims.height - 10 : 10;
 			tile.appendChild(graphDiv);
-			const graph = generateGraph(parameters[2], finResult, locationsArray, currency);
+			const graph = generateGraph(parameters[2], finResult, locationsArray, currency, width, height);
 			if(!graph)
 			{
 				graphDiv.appendChild(createTextSpan("Error! Not a valid graph type!"));
@@ -813,6 +830,19 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 		
 		const tbody = createTable(tile, ["Name", "Produced", "Consumed", "Profit"]);
 		
+		const table = tbody.parentElement;
+		if(table)
+		{
+			const topRow = table.querySelector("thead > tr")
+			if(topRow)
+			{
+				for(var i = 1; i < topRow.children.length; i++)
+				{
+					(topRow.children[i] as HTMLElement).style.textAlign = "right";
+				}
+			}
+		}
+		
 		burnFinances.sort(burnProductionSort);
 		
 		burnFinances.forEach(inv => {
@@ -827,15 +857,18 @@ function chooseScreen(finResult, params)	// Params consists of [tile, parameters
 			const producedElem = document.createElement("td");
 			row.appendChild(producedElem);
 			producedElem.appendChild(createTextSpan(inv[1].toLocaleString(undefined, {maximumFractionDigits: 0})));
+			producedElem.style.textAlign = "right";
 			
 			const consumedElem = document.createElement("td");
 			row.appendChild(consumedElem);
 			consumedElem.appendChild(createTextSpan(inv[2].toLocaleString(undefined, {maximumFractionDigits: 0})));
+			consumedElem.style.textAlign = "right";
 			
 			const profitElem = document.createElement("td");
 			row.appendChild(profitElem);
 			profitElem.appendChild(createTextSpan((inv[1] - inv[2]).toLocaleString(undefined, {maximumFractionDigits: 0})));
 			profitElem.style.color = inv[1] - inv[2] > 0 ? TextColors.Success : TextColors.Failure;
+			profitElem.style.textAlign = "right";
 		});
 	}
 }
@@ -881,7 +914,7 @@ function drawGSTable(resultDiv, prices)
 	
 }
 
-function generateGraph(graphType, finResult, locationsArray, currency)
+function generateGraph(graphType, finResult, locationsArray, currency, width = 400, height = 200)
 {
 	switch(graphType.toLowerCase())
 	{
@@ -892,15 +925,16 @@ function generateGraph(graphType, finResult, locationsArray, currency)
 			finResult["History"].forEach(entry => {
 				if(entry[1] + entry[2] + entry[3] - entry[4] == 0){return;}
 				
-				dateData.push(entry[0]);
-				finData.push(entry[1] + entry[2] + entry[3] - entry[4]);
+				dateData.push(new Date(entry[0]).toISOString());
+				finData.push(Number((entry[1] + entry[2] + entry[3] - entry[4]).toPrecision(4)));
 			});
-			
-			const linePlot = drawLineChart(dateData, finData, 400, 200, "Date", "Equity", "#f7a600", true, currency);
+			var formattedDate = dateYearFormatter2.format(1729566792000);
+			formattedDate = formattedDate.replace("10", "%m").replace("21", "%d").replace("22", "%d").replace("24", "%y");
+			const linePlot = generateLineGraph(dateData, finData, "Date", "Equity", width, height, "date", "linear", "", currency, formattedDate);
 			return linePlot;
 		case "assetpie":
 			const latestReport = finResult["History"][finResult["History"].length - 1];
-			const pieCanvas = drawPieChart([latestReport[1], latestReport[2], latestReport[3]], 180, ["Fixed", "Current", "Liquid"]);
+			const pieCanvas = generatePieChart(["Fixed", "Current", "Liquid"], [latestReport[1], latestReport[2], latestReport[3]], width, height);
 			return pieCanvas;
 		case "locationspie":
 			const locationNames = [] as any[];
@@ -910,7 +944,7 @@ function generateGraph(graphType, finResult, locationsArray, currency)
 				locationValue.push(location[1] + location[2] + location[3]);
 			});
 			
-			const locPieCanvas = drawPieChart(locationValue, 180, locationNames);
+			const locPieCanvas = generatePieChart(locationNames, locationValue, width, height);
 			return locPieCanvas;
 	}
 	return null;

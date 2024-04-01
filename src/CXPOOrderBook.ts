@@ -76,6 +76,11 @@ function addOrderBook(buffer, userInfo, tag)
 		label.style.minWidth = "95px";
 	});
 	
+	// Format tooltips
+	Array.from(form.querySelectorAll(Selector.FormTooltip) as HTMLSpanElement[]).forEach(span => {
+		span.setAttribute("data-tooltip-position", "right");
+	});;
+	
 	// Create order book table
 	const orderTable = document.createElement("table");
 	orderBook.appendChild(orderTable)

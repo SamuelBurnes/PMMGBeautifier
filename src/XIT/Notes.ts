@@ -181,7 +181,7 @@ function generateNotesTable(notesStorage: {[p: string]: any}, tile: HTMLDivEleme
 		popup.addPopupRow("button", "CMD", "Create", undefined, function(){
 			const nameRow = popup.getRowByName("Note Name");
 			if(!nameRow || !nameRow.rowInput){return;}
-			showBuffer("XIT NOTE_" + (nameRow.rowInput.value.replace(" ", "_") || ""));
+			showBuffer("XIT NOTE_" + (nameRow.rowInput.value || ""));
 			popup.destroy();
 		}); 
 	});

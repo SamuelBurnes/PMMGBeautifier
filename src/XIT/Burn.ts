@@ -276,7 +276,7 @@ export class Burn {
 			
 			const needColumn = document.createElement("td");
 			const needAmt = burn > (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] || planetBurn[material]["DailyAmount"] > 0 ? 0 : (burn - (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1]) * planetBurn[material]["DailyAmount"];
-			needColumn.appendChild(createTextSpan(needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
+			needColumn.appendChild(createTextSpan(isNaN(needAmt) ? "0" : needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
 			
 			row.appendChild(needColumn);
 			row.appendChild(burnColumn);

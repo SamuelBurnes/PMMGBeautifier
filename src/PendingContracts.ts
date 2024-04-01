@@ -35,7 +35,7 @@ export class PendingContracts implements Module {
 				if(contractdict[contractID] && contractdict[contractID].partner.name)	// If the contract ID is in FIO
 				{
 					var partnercode = contractdict[contractID].partner.name	// Label with partner's name
-					if(partnercode.length > 19)	// Unless unknown or too long, then use company code
+					if(partnercode.length > 17)	// Unless unknown or too long, then use company code
 					{
 						partnercode = contractdict[contractID].partner.code || contractdict[contractID].partner.name.split(" ")[0];
 					}

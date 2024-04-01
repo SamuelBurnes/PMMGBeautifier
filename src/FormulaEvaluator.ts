@@ -1,5 +1,6 @@
 import {Module} from "./ModuleRunner";
 import {getBuffersFromList, changeValue} from "./util";
+import {MaterialNames, Materials} from "./GameProperties";
 
 export class FormulaReplacer implements Module {
 	private tag = "pb-formulas";
@@ -63,7 +64,45 @@ function addListeners(buffer, tag)
 			
 			if(input.value && input.value.charAt(0) == "=")
 			{
-				const expression = input.value.substring(1);
+				var expression = input.value.substring(1);
+				// Preprocess expression
+				// Replace MAT.t with tonnage
+				var matches = expression.match(/\b[a-zA-Z0-9]{1,3}\.t\b/gi);
+				if(matches)
+				{
+					matches.forEach(match => {
+						const ticker = match.split(".")[0].toUpperCase();
+						if(MaterialNames[ticker])
+						{
+							expression = expression.replace(match, (Materials[MaterialNames[ticker][0]][1]).toLocaleString(undefined, {maximumFractionDigits: 2}));
+						}
+					});
+				}
+				// Replace MAT.v, MAT.m, MAT.m3
+				matches = expression.match(/\b([a-zA-Z0-9]{1,3})\.(?:v|m|m3)\b/gi);
+				if(matches)
+				{
+					matches.forEach(match => {
+						const ticker = match.split(".")[0].toUpperCase();
+						if(MaterialNames[ticker])
+						{
+							expression = expression.replace(match, (Materials[MaterialNames[ticker][0]][2]).toLocaleString(undefined, {maximumFractionDigits: 2}));
+						}
+					});
+				}
+				// Replace MAT.max
+				matches = expression.match(/\b([a-zA-Z0-9]{1,3})\.(?:max)\b/gi);
+				if(matches)
+				{
+					matches.forEach(match => {
+						const ticker = match.split(".")[0].toUpperCase();
+						if(MaterialNames[ticker])
+						{
+							expression = expression.replace(match, Math.max(Materials[MaterialNames[ticker][0]][1], Materials[MaterialNames[ticker][0]][2]).toLocaleString(undefined, {maximumFractionDigits: 2}));
+						}
+					});
+				}
+				expression = expression.replace(/(?<![0-9])[.]/g, "0.");	// Replace .2 with 0.2
 				var simplifiedExpression = evaluateMath(expression);
 				
 				simplifiedExpression = parseFloat(simplifiedExpression).toLocaleString(undefined, {useGrouping: false});
@@ -84,7 +123,7 @@ export function evaluateMath(expression, depth?: number)
 	expression = expression.replace(/,/g, ".");
 	
 	// If any invalid characters exist, do not evaluate it.
-	if(/[^0-9.+\-\/*\^\(\)]/.test(expression))
+	if(/[^0-9.,+\-\/*\^\(\)]/.test(expression))
 	{
 		return null;
 	}

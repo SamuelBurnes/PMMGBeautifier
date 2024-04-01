@@ -62,5 +62,6 @@ export const Selector = {
   FormLabels: ".forms__form-component___yTgP_Qa label",
   ChannelControls: "div[class~='Channel__controls___JnQCa9m']",
   RadioIndicator: "div[class~='RadioItem__indicator___QzQtjhA']",
-  InventoryContainer: "div[class~='StoreView__container___RrvYu52']"
+  InventoryContainer: "div[class~='StoreView__container___RrvYu52']",
+  FormTooltip: "span[class~='Tooltip__container___O8IKVEa']" 
 }

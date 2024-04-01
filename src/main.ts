@@ -9,12 +9,12 @@ import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getCXPrices} from "./BackgroundRunner";
-import { PMMGStyle, EnhancedColors, IconStyle, AdvancedStyle, ChatDeleteStyle, JoinLeaveStyle } from "./Style";
+import { getSpecial} from "./util";
+import { PMMGStyle, EnhancedColors, OldColors, IconStyle, AdvancedStyle, ChatDeleteStyle, JoinLeaveStyle } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
 import { CalculatorButton } from "./CalculatorButton";
-//import { ContractDrafts } from "./ContractDrafts";
 import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
 import { HeaderMinimizer } from "./HeaderMinimizer";
@@ -63,6 +63,8 @@ try
 // The main function that initializes everything
 function mainRun(result, browser?)
 {
+	// Detect what date it is for... no reason.
+	const specialTime = getSpecial() && !result["PMMGExtended"]["surprises_opt_out"];
 	// If no stored data, make it blank so it can be written to
 	if(!result["PMMGExtended"]){result["PMMGExtended"] = {};}
 	
@@ -78,8 +80,8 @@ function mainRun(result, browser?)
 	style.id = "pmmg-style";
 	style.textContent = PMMGStyle;
 	const doc = document.querySelector("html");
+	if(!doc){return;}
 	if(doc){doc.appendChild(style);}
-	
 	
 	// If no module states are specified, disable screen unpack by default
 	if(!result["PMMGExtended"]["disabled"]){result["PMMGExtended"]["disabled"] = ["ScreenUnpack"];}
@@ -89,8 +91,18 @@ function mainRun(result, browser?)
 	{
 		const colors = document.createElement("style");
 		colors.type = "text/css";
-		colors.id = "pmmg-enhanced-colors";
-		colors.textContent = EnhancedColors;
+		
+		if(specialTime)
+		{
+			colors.id = "pmmg-old-colors";
+			colors.textContent = OldColors;
+
+		}
+		else
+		{
+			colors.id = "pmmg-enhanced-colors";
+			colors.textContent = EnhancedColors;
+		}
 		if(doc){doc.appendChild(colors);}
 	}
 	// If the icons color scheme is selected, apply it
@@ -98,8 +110,16 @@ function mainRun(result, browser?)
 	{
 		const colors = document.createElement("style");
 		colors.type = "text/css";
-		colors.id = "pmmg-icon-colors";
-		colors.textContent = IconStyle;
+		if(specialTime)
+		{
+			colors.id = "pmmg-old-colors";
+			colors.textContent = OldColors;
+		}
+		else
+		{
+			colors.id = "pmmg-icon-colors";
+			colors.textContent = IconStyle;
+		}
 		if(doc){doc.appendChild(colors);}
 	}
 	

@@ -53,6 +53,7 @@ export class Debug {
 			XITWebRequest(tile, parameters, Debug_post, url, "GET", ["Authorization", pmmgSettings["PMMGExtended"]["apikey"]], null);
 		});
 		downloadButtons.appendChild(endpointButton);
+		
 		return;
 	}
 

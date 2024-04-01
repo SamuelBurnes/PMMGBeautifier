@@ -144,7 +144,7 @@ function generateCheckTable(result, tile)	// Create a list of all checklists
 		popup.addPopupRow("button", "CMD", "Create", undefined, function(){
 			const nameRow = popup.getRowByName("Checklist Name");
 			if(!nameRow || !nameRow.rowInput){return;}
-			showBuffer("XIT CHECK_" + (nameRow.rowInput.value.replace(" ", "_") || ""));
+			showBuffer("XIT CHECK_" + (nameRow.rowInput.value || ""));
 			popup.destroy();
 		}); 
 	});

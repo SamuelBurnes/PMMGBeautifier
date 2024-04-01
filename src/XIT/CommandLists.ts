@@ -114,7 +114,7 @@ function generateListTable(result, tile)
 		popup.addPopupRow("button", "CMD", "Create", undefined, function(){
 			const nameRow = popup.getRowByName("List Name");
 			if(!nameRow || !nameRow.rowInput){return;}
-			showBuffer("XIT LIST_" + (nameRow.rowInput.value.replace(" ", "_") || ""));
+			showBuffer("XIT LIST_" + (nameRow.rowInput.value || ""));
 			popup.destroy();
 		}); 
 	});

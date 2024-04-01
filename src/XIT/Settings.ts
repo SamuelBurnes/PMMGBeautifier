@@ -1,4 +1,4 @@
-import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings, getLocalStorage, createToolTip} from "../util";
+import {clearChildren, createTextSpan, downloadFile, createSelectOption, setSettings, getSpecial, getLocalStorage, createToolTip} from "../util";
 import {Style, WithStyles} from "../Style";
 
 export class Settings {
@@ -44,7 +44,28 @@ export class Settings {
 		websiteLink.classList.add("link");
 		websiteLink.textContent = "PMMG's Website";
 		helpDiv.appendChild(websiteLink);
-
+		
+		if(getSpecial())
+		{
+		const specialDiv = document.createElement("div");
+		const specialLabel = document.createElement('h3');
+		specialLabel.appendChild(createTextSpan("Opt Out of Future Surprises"));
+		specialLabel.appendChild(createToolTip("No fun! Embrace the chaos. Will disable any further April 1st or other shenanigans.", "right"));
+		specialLabel.classList.add(...Style.SidebarSectionHead);
+		specialLabel.style.marginBottom = "4px";
+		specialDiv.appendChild(specialLabel);
+		
+		const specialCheckbox = document.createElement("input");
+		specialCheckbox.type = "checkbox";
+		specialCheckbox.checked = pmmgSettings["PMMGExtended"]["surprises_opt_out"]
+		specialDiv.appendChild(specialCheckbox);
+		tile.appendChild(specialDiv);
+		specialCheckbox.addEventListener("click", function() {
+			pmmgSettings["PMMGExtended"]["surprises_opt_out"] = specialCheckbox.checked;
+			setSettings(pmmgSettings);
+		});
+		}
+		
 		const enhancedColorHeader = document.createElement('h3');
 		enhancedColorHeader.appendChild(document.createTextNode("Color Scheme"));
 		enhancedColorHeader.appendChild(createToolTip("Select a color scheme to customize material icons.", "right"));

@@ -1,7 +1,8 @@
 const path = require('path')
 
 module.exports = {
-  devtool: 'inline-sourcemap',
+  devtool: 'source-map',
+  //devtool: false,
   entry: {
     main: path.resolve(__dirname, 'src', 'main.ts'),
   },
@@ -20,7 +21,8 @@ module.exports = {
   },
   resolve: {
     modules: [
-      path.resolve(__dirname, 'src')
+      path.resolve(__dirname, 'src'),
+      path.resolve(__dirname, 'node_modules')
     ],
     extensions: ['.js', '.ts']
   }
