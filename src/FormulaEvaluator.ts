@@ -74,7 +74,7 @@ function addListeners(buffer, tag)
 						const ticker = match.split(".")[0].toUpperCase();
 						if(MaterialNames[ticker])
 						{
-							expression = expression.replace(match, (Materials[MaterialNames[ticker][0]][1]).toLocaleString(undefined, {maximumFractionDigits: 2}));
+							expression = expression.replace(match, (Materials[MaterialNames[ticker][0]][1]).toLocaleString(undefined, {maximumFractionDigits: 3}));
 						}
 					});
 				}
@@ -86,7 +86,7 @@ function addListeners(buffer, tag)
 						const ticker = match.split(".")[0].toUpperCase();
 						if(MaterialNames[ticker])
 						{
-							expression = expression.replace(match, (Materials[MaterialNames[ticker][0]][2]).toLocaleString(undefined, {maximumFractionDigits: 2}));
+							expression = expression.replace(match, (Materials[MaterialNames[ticker][0]][2]).toLocaleString(undefined, {maximumFractionDigits: 3}));
 						}
 					});
 				}
@@ -98,7 +98,7 @@ function addListeners(buffer, tag)
 						const ticker = match.split(".")[0].toUpperCase();
 						if(MaterialNames[ticker])
 						{
-							expression = expression.replace(match, Math.max(Materials[MaterialNames[ticker][0]][1], Materials[MaterialNames[ticker][0]][2]).toLocaleString(undefined, {maximumFractionDigits: 2}));
+							expression = expression.replace(match, Math.max(Materials[MaterialNames[ticker][0]][1], Materials[MaterialNames[ticker][0]][2]).toLocaleString(undefined, {maximumFractionDigits: 3}));
 						}
 					});
 				}

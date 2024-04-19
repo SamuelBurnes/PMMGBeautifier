@@ -286,7 +286,6 @@ export const PMMGStyle = `
     top: 20px;
     left: 0;
     overflow-y: scroll;
-	//white-space: wrap; <- Broke on FF for some reason. Doesn't appear to be needed
 	font-family: "Droid Sans",sans-serif;
 	font-size: 13.333px;
     line-height: 1.5;

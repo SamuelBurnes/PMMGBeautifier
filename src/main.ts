@@ -63,11 +63,11 @@ try
 // The main function that initializes everything
 function mainRun(result, browser?)
 {
-	// Detect what date it is for... no reason.
-	const specialTime = getSpecial() && !result["PMMGExtended"]["surprises_opt_out"];
 	// If no stored data, make it blank so it can be written to
 	if(!result["PMMGExtended"]){result["PMMGExtended"] = {};}
 	
+	// Detect what date it is for... no reason.
+	const specialTime = getSpecial() && !result["PMMGExtended"]["surprises_opt_out"];
 	// Log if is the first time the user loads PMMG Extended
 	if(!result["PMMGExtended"]["loaded_before"])
 	{

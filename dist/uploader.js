@@ -26,7 +26,7 @@ if(browser.storage.session && typeof(browser.storage.session) !== "undefined")
 	storage_location = browser.storage.session;
 }
 
-const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA"];
+const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA", "SHIP_SHIPS"];
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
@@ -39,8 +39,8 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	{
 		console.log(eventdata.messageType);
 		console.log(eventdata);
-	}
-	*/
+	}*/
+	
 	
 	
 	// Detect bad events
@@ -155,6 +155,8 @@ async function logEvent(result, eventdata)
 	if(!result["PMMG-User-Info"]["cxos"]){result["PMMG-User-Info"]["cxos"] = [];}
 	if(!result["PMMG-User-Info"]["fxos"]){result["PMMG-User-Info"]["fxos"] = [];}
 	if(!result["PMMG-User-Info"]["cxob"]){result["PMMG-User-Info"]["cxob"] = {};}
+	if(!result["PMMG-User-Info"]["ships"]){result["PMMG-User-Info"]["ships"] = {};}
+	
 	
 	switch(eventdata.messageType)
 	{
@@ -447,6 +449,9 @@ async function logEvent(result, eventdata)
 					delete result["PMMG-User-Info"]["cxob"][ticker];
 				}
 			});
+			break;
+		case "SHIP_SHIPS":	// ships
+			result["PMMG-User-Info"]["ships"] = eventdata.payload.ships;
 			break;
 	}
 	
