@@ -63,5 +63,12 @@ export const Selector = {
   ChannelControls: "div[class~='Channel__controls___JnQCa9m']",
   RadioIndicator: "div[class~='RadioItem__indicator___QzQtjhA']",
   InventoryContainer: "div[class~='StoreView__container___RrvYu52']",
-  FormTooltip: "span[class~='Tooltip__container___O8IKVEa']" 
+  FormTooltip: "span[class~='Tooltip__container___O8IKVEa']",
+  ButtonSuccess: "button[class~='Button__success___bCiIVXw']",
+  ActionFeedback: "span[class~='ActionFeedback__message___G2Sz4bw']",
+  ActionFeedbackMain: "span[class~='ActionFeedback__message___G2Sz4bw'] > span",
+  ActionSuccess: "div[class~='ActionFeedback__success___nVa5scG']",
+  ActionDismiss: "span[class~='ActionFeedback__dismiss___x5Ln7y1']",
+  ActionConfirmation: "span[class~='ActionConfirmationOverlay__text___qkKzVK0']",
+  ActionConfirmationMessage: "span[class~='ActionConfirmationOverlay__message___OajoGeh']"
 }

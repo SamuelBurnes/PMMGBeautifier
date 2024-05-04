@@ -516,13 +516,12 @@ export function changeValue(input, value) {
 }
 
 // Wait for a new buffer to be created
-function monitorOnElementCreated(selector, callback, onlyOnce = true) {
+export function monitorOnElementCreated(selector, callback, onlyOnce = true) {
     const getElementsFromNodes = (nodes) => (Array.from(nodes)).flatMap(node => (node as Node).nodeType === 3 ? null : Array.from((node as HTMLElement).querySelectorAll(selector))).filter(item => item !== null);
     let onMutationsObserved = function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.addedNodes.length) {
                 var elements = getElementsFromNodes(mutation.addedNodes);
-				
                 for (var i = 0, len = elements.length; i < len; i++) {
                     callback(elements[i]);
                     if (onlyOnce) observer.disconnect();
@@ -592,6 +591,20 @@ export function getBuffersFromList(bufferCode: string, buffers: any[]): any[] {
     .map(([, secondElement]) => secondElement);
 
   return matchingBuffers;
+}
+
+export function createEmptyTableRow( colspan, text )
+{
+	var line = document.createElement( "tr" );
+	
+	const textColumn = document.createElement( "td" );
+	textColumn.setAttribute( 'colspan', `${colspan}` );
+	textColumn.textContent = text;
+	textColumn.style.textAlign = "center";
+	
+	line.appendChild( textColumn );
+	
+	return line;
 }
 
 // Get elements that match an XPath
@@ -930,6 +943,34 @@ export function showWarningDialog(tile, message: string="Are you sure?", confirm
 	return;
 }
 
+// Create a success dialog with a dismiss button
+export function showSuccessDialog(tile, message: string="Action succeeded!")
+{
+	const displayTile = tile.parentElement.parentElement.parentElement;
+	
+	const overlay = document.createElement("div");	// Main striped overlay
+	displayTile.appendChild(overlay);
+	overlay.classList.add(...Style.ActionSuccess);
+	
+	const centerInterface = document.createElement("span");	// Center green block with message
+	overlay.appendChild(centerInterface);
+	centerInterface.classList.add(...Style.ActionMessage);
+	centerInterface.textContent = message;
+	
+	const dismissMessage = document.createElement("span");	// Dismiss message
+	centerInterface.appendChild(dismissMessage);
+	dismissMessage.textContent = "(click to dismiss)";
+	dismissMessage.classList.add(...Style.ActionDismiss);
+	
+	overlay.addEventListener("click", function()	// Just remove the overlay to dismiss
+	{
+		displayTile.removeChild(overlay);
+		return;
+	});
+	
+	return;
+}
+
 export function drawLineChart(xData, yData, xSize, ySize, xLabel?, yLabel?, lineColor?, isDates?, currencySymbol?)
 {
 	const canvas = document.createElement("canvas");
@@ -1125,11 +1166,11 @@ export function setLocalStoragePromise(items: {[p: string]: any}) {
 export class Popup
 {
 	private overlapDiv;	// The popup element
-	private form;	// The form element to which all rows are added
+	public form;	// The form element to which all rows are added
 	private tile;
 	public rows: PopupRow[];	// All the popup rows
 	
-	constructor(tile, name)
+	constructor(tile, name, zindex?)
 	{
 		this.rows = [] as PopupRow[];
 		this.tile = tile;
@@ -1139,6 +1180,10 @@ export class Popup
 		const greyStripes = document.createElement("div");
 		greyStripes.classList.add(...Style.GreyStripes);
 		this.overlapDiv.appendChild(greyStripes);
+		if(zindex)
+		{
+			this.overlapDiv.style.zIndex = zindex;
+		}
 		tile.insertBefore(this.overlapDiv, tile.firstChild);
 		
 		greyStripes.appendChild(makePopupSpacer(tile, this.overlapDiv));
@@ -1167,6 +1212,7 @@ export class Popup
 		const newRow = new PopupRow(rowType, label, inputText, tooltip, callback, params);
 		this.rows.push(newRow);
 		this.form.appendChild(newRow.row);
+		return newRow;
 	}
 	
 	removePopupRow(rowIndex)
@@ -1222,7 +1268,7 @@ class PopupRow
 		this.rowType = rowType;
 		this.rowLabel = label;
 		
-		if(rowType == "text" || rowType == "date" || rowType == "number")
+		if(rowType == "text" || rowType == "date" || rowType == "number" || rowType == "checkbox")
 		{
 			this.row = document.createElement("div");
 			this.row.classList.add(...Style.FormRow);
@@ -1235,6 +1281,7 @@ class PopupRow
 			inputInputDiv.classList.add(...Style.FormInput);
 			this.row.appendChild(inputInputDiv);
 			this.rowInput = document.createElement("input");
+			this.rowInput.style.textAlign = "left";
 			
 			inputInputDiv.appendChild(this.rowInput);
 			
@@ -1251,8 +1298,13 @@ class PopupRow
 			{
 				this.rowInput.type = "number";
 			}
+			else if(rowType == "checkbox")
+			{
+				this.rowInput.type = "checkbox";
+				this.rowInput.checked = inputText;
+			}
 			
-			this.rowInput.style.width = "80%";
+			if(rowType != "checkbox"){this.rowInput.style.width = "80%";}
 			
 			if(callback)
 			{
@@ -1277,7 +1329,7 @@ class PopupRow
 			this.rowInput = document.createElement("select");
 			this.rowInput.classList.add("select");
 			this.rowInput.style.width = "80%";
-			this.rowInput.style.textAlignLast = "right";
+			this.rowInput.style.textAlignLast = "left";
 			
 			this.rowInput.name = "popup-dropdown" + Math.floor(Math.random() * 10000).toString();
 			this.rowInput.id = "popup-dropdown" + Math.floor(Math.random() * 10000).toString();

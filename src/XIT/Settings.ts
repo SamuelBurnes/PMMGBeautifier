@@ -440,6 +440,24 @@ export class Settings {
 			getLocalStorage("PMMG-Finance", parseFinThenDownload);
 		}));
 		
+		// Import/export actions
+		tile.appendChild(createImportExportButton("Actions", function(e, errorTextBox) {
+			if(!e || !e.target){return;}
+			try
+			{
+				const fileOutput = JSON.parse(e.target.result as string);
+				setSettings(fileOutput);
+				errorTextBox.style.display = "none";
+			} catch(ex)
+			{
+				console.log("PMMG: Error encountered processing file!");
+				errorTextBox.style.display = "inline-block";
+			}
+			
+		}, function() {
+			getLocalStorage("PMMG-Action", downloadFile, "pmmg-action" + Date.now().toString() + ".json");
+		}));
+		
 		return;
 	}
 	

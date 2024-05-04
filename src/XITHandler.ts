@@ -34,6 +34,7 @@ import {Sort} from "./XIT/Sort";
 import {Start} from "./XIT/Start";
 import {PrUN, Prosperity, Sheets, Wiki, PrunPlanner, FIO} from "./XIT/Web";
 import {Checklists} from "./XIT/Checklists";
+import {Execute} from "./XIT/Execute";
 import {Notes} from "./XIT/Notes";
 
 // This is the structure all classes should follow. For some reason extending classes in other files shows XITModule as undefined.
@@ -79,7 +80,9 @@ const XITClasses: {[key: string]: new(...args: any[]) => XITModule} = {
 	"CHECKLIST": Checklists,
 	"CHECKLISTS": Checklists,
 	"NOTE": Notes,
-	"NOTES": Notes
+	"NOTES": Notes,
+	"ACT": Execute,
+	"ACTION": Execute
 }
 
 

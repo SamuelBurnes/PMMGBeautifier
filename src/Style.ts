@@ -21,6 +21,7 @@ export const Style = {
   ContractLine: ["y84EUI8gCP-SV91X7vIihQ==", "fVd3aYJhFY-uuaH+QTByhA=="],
   ContractName: ["zhixp408YF082IzA5KPvfA=="],
   ContractView: ["kq5BrGKnTUTqCDYMpLQ90g=="],
+  DraftName: ["Draft__name___gADQF2n", "Draft__heading___GbdKCJx", "fonts__font-headers___eDKxf8h", "type__type-very-large____Hxqf3q"],
 
   // More misc styles
   RadioButton:           ["RadioItem__container___CSczqmG"],
@@ -33,6 +34,10 @@ export const Style = {
   SettingsText:          ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO", "RadioItem__valueHorizontal___D5AXJ9P"],
   ScreenUnderlineUntoggled: ["HeadItem__indicatorPrimary___rx46qOB", "HeadItem__indicator___A_wijoE"],
   ScreenUnderlineToggled: ["HeadItem__indicatorPrimary___rx46qOB", "HeadItem__indicator___A_wijoE", "ScreenControls__indicatorActive___cnKagZ4", "effects__shadowPrimary___EbXJQor"],
+
+  // Action bar stuff
+  ActionBarContainer: ["ActionBar__container___p760bSs"],
+  ActionBarElement: ["ActionBar__element___WJlsFch"],
 
   // Styles coloring overlays
   OverlappingDiv: ["Overlay__overlay___NA9HV8y"],
@@ -53,6 +58,10 @@ export const Style = {
   FormSaveRow:   ["FormComponent__containerCommand___B4XLERf", "forms__cmd___IMzt7Ug", "forms__form-component___yTgP_Qa"],
   FormSaveLabel: ["FormComponent__label___aQB15eB", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
   FormSaveInput: ["FormComponent__input___ZnI8mYi", "forms__input___A92_N4J"],
+  Form: ["forms__form___agLA3i_"],
+  FormInputDiv: ["DynamicInput__dynamic___Cd4Gkbz", "forms__dynamic___FHDMFtf"],
+  FormError: ["FormComponent__containerError___pN__L1Q", "forms__error___nWVhbAS"],
+  FormPassiveLabel: ["StaticInput__static___Vpn1u0n", "forms__static___a4biDi4"],
   
   // Styles coloring confirmation overlays
   ActionOverlay: ["ActionConfirmationOverlay__container___A05Ts1g", "ActionFeedback__overlay___NNDPRrV"],
@@ -60,6 +69,9 @@ export const Style = {
   ActionConfirm: ["ActionConfirmationOverlay__message___OajoGeh", "ActionFeedback__message___G2Sz4bw", "fonts__font-regular___Sxp1xjo", "type__type-larger___VdpJIb1"],
   ActionConfirmMessage: ["ActionConfirmationOverlay__text___qkKzVK0", "ActionFeedback__text___YQjjibG", "fonts__font-regular___Sxp1xjo", "type__type-regular___k8nHUfI"],
   ActionButtons: ["ActionConfirmationOverlay__buttons___sE7CNVe"],
+  ActionSuccess: ["ActionFeedback__success___nVa5scG", "ActionFeedback__overlay___NNDPRrV"],
+  ActionMessage: ["ActionFeedback__message___G2Sz4bw", "fonts__font-regular___Sxp1xjo", "type__type-larger___VdpJIb1"],
+  ActionDismiss: ["ActionFeedback__dismiss___x5Ln7y1", "type__type-small___pMQhMQO"],
   
   // Styles coloring material icons
   MatText:         ["ColoredIcon__label___OU1I4oP"],
@@ -312,8 +324,31 @@ export const PMMGStyle = `
 .pb-note-link:hover {
 	color: #f7a600 !important;
 }
-
-
+.pb-read-textarea {
+	margin: 5px;
+	resize: none;
+	overflow-y: scroll;
+	font-family: "Droid Sans",sans-serif;
+	font-size: 11px;
+    line-height: 1.5;
+    tab-size: 4;
+	width: calc(100% - 10px);
+	height: 86px;
+	background-color: #23282b;
+	color: #bbbbbb;
+	border-color: #2b485a;
+	border-width: 1px;
+	border-style: solid;
+}
+.pb-read-textarea:focus {
+	outline: none;
+}
+.pb-read-textarea::-webkit-scrollbar {
+	width: 0;
+}
+.pb-read-textarea::-moz-scrollbar {
+	width: 0;
+}
 
 .check-wrapper {
 	margin: 5px;
