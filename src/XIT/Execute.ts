@@ -1188,7 +1188,7 @@ function parseActionPackage(rawActionPackage, userInfo, messageBox)
 						error = true;
 						return;
 					}
-					if(isNaN(action.priceLimits[mat]))
+					if(action.priceLimits && isNaN(action.priceLimits[mat]))
 					{
 						addMessage(messageBox, "Error: Non-numerical price limit on " + cxTicker);
 						error = true;
