@@ -1143,9 +1143,16 @@ function parseActionPackage(rawActionPackage, userInfo, messageBox)
 				{
 					if(userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders.length == 0)	// No orders
 					{
-						addMessage(messageBox, "Error: No orders on " + cxTicker);
-						error = true;
-						return;
+						if(action.buyPartial)
+						{
+							return;	// Just ignore this one if we're fine with buying partial
+						}
+						else
+						{
+							addMessage(messageBox, "Error: No orders on " + cxTicker);
+							error = true;
+							return;
+						}
 					}
 					
 					var remaining = parsedGroup[mat];
@@ -1153,14 +1160,14 @@ function parseActionPackage(rawActionPackage, userInfo, messageBox)
 					// Iterate through the orders to find the price to set to to buy it all
 					for(var i = 0; i < userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders.length; i++)
 					{
-						if(userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].amount > remaining)	// This order will be the filling one
+						if((!action.priceLimits || !action.priceLimits[mat] || action.priceLimits[mat] > userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].limit.amount) && userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].amount > remaining)	// This order will be the filling one
 						{
 							price = userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].limit.amount;
 							break;
 						}
 						else
 						{
-							if(!userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].amount)	// Only MMs will not have an amount attached
+							if((!action.priceLimits || !action.priceLimits[mat] || action.priceLimits[mat] > userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].limit.amount) && !userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].amount)	// Only MMs will not have an amount attached
 							{
 								price = userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[i].limit.amount;
 								break;
@@ -1169,30 +1176,34 @@ function parseActionPackage(rawActionPackage, userInfo, messageBox)
 						}
 					}
 					
+					// Check against price limit
+					if(action.priceLimits && action.priceLimits[mat] && price > action.priceLimits[mat] && !action.buyPartial)
+					{
+						addMessage(messageBox, "Error: Price above limit on " + cxTicker);
+						error = true;
+						return;
+					}
+					if(action.priceLimits && action.priceLimits[mat] && isNaN(action.priceLimits[mat]))
+					{
+						addMessage(messageBox, "Error: Non-numerical price limit on " + cxTicker);
+						error = true;
+						return;
+					}
+					
 					if(!price && !action.buyPartial)	// Not enough to buy it all
 					{
 						addMessage(messageBox, "Error: Not enough materials on " + cxTicker);
 						error = true;
 						return;
 					}
-					else if(!price)	// If fine with buying partial, buy the entire stock
+					else if(!price && (!action.priceLimits || !action.priceLimits[mat]) && userInfo["PMMG-User-Info"]["cxob"][cxTicker].supply > 0)	// If fine with buying partial, buy the entire stock
 					{
 						price = userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders[userInfo["PMMG-User-Info"]["cxob"][cxTicker].sellingOrders.length - 1].limit.amount;
 						amount = userInfo["PMMG-User-Info"]["cxob"][cxTicker].supply;
 					}
-					
-					// Check against price limit
-					if(action.priceLimits && action.priceLimits[mat] && price > action.priceLimits[mat])
+					else if(!price && action.priceLimits && action.priceLimits[mat])
 					{
-						addMessage(messageBox, "Error: Price above limit on " + cxTicker);
-						error = true;
-						return;
-					}
-					if(action.priceLimits && isNaN(action.priceLimits[mat]))
-					{
-						addMessage(messageBox, "Error: Non-numerical price limit on " + cxTicker);
-						error = true;
-						return;
+						return;	// If there is no price, but buying partial, don't care and exit
 					}
 					
 					// Now create action item
@@ -1353,6 +1364,11 @@ async function createExecuteScreen(tile, packageName, userInfo)
 		actionPackage.forEach(action => {
 			addMessage(messageBox, generatePrettyName(action));
 		});
+		
+		if(actionPackage.length == 0)
+		{
+			addMessage(messageBox, "Error: No actions generated");
+		}
 	});
 	
 	// Add action listener for validation
