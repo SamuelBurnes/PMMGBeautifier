@@ -574,6 +574,7 @@ class GenerateScreen {
 				
 				popup.addPopupRow("dropdown", "Planet", possiblePlanets, undefined, undefined);
 				popup.addPopupRow("number", "Days", group.days || 10, "The number of days of supplies to refill the planet with.", undefined);
+				popup.addPopupRow("text", "Material Exclusions", (group.exclusions || []).join(", "), "Materials to be excluded from the group. List material tickers separated by commas.", undefined);
 				popup.addPopupRow("checkbox", "Use Base Inv", group.useBaseInv == undefined ? true : group.useBaseInv, "Whether to count the materials currently in the base towards the totals.", undefined);
 				break;
 				
@@ -619,6 +620,11 @@ class GenerateScreen {
 						group.planet = popup.getRowByName("Planet").rowInput.value;
 						group.days = parseFloat(popup.getRowByName("Days").rowInput.value || 0);
 						group.useBaseInv = popup.getRowByName("Use Base Inv").rowInput.checked;
+						const exclusions = popup.getRowByName("Material Exclusions").rowInput.value
+						if(exclusions && exclusions != "")
+						{
+							group.exclusions = exclusions.replace(/ /g, "").split(",");
+						}
 						break;
 						
 					case "Manual":
@@ -1255,6 +1261,9 @@ function parseGroup(group, messageBox, userInfo, errorFlag)
 			return parsedGroup;
 		}
 		
+		// Array of tickers to exclude
+		const exclusions = group.exclusions || [];
+		
 		const planetProduction = findCorrespondingPlanet(group.planet, userInfo["PMMG-User-Info"]["production"]);
 		const planetWorkforce = findCorrespondingPlanet(group.planet, userInfo["PMMG-User-Info"]["workforce"]);
 		const planetInv = findCorrespondingPlanet(group.planet, userInfo["PMMG-User-Info"]["storage"], true);
@@ -1274,7 +1283,11 @@ function parseGroup(group, messageBox, userInfo, errorFlag)
 					
 					if(amount > 0)	// If we still need that material...
 					{
-						parsedGroup[mat] = amount;	// Assign it to the parsed material group
+						// Check material Exclusions
+						if(!exclusions.includes(mat))
+						{
+							parsedGroup[mat] = amount;	// Assign it to the parsed material group
+						}
 					}
 				}
 			});
@@ -1540,7 +1553,7 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 	
 	// Move button
 	button.style.position = "fixed";
-	button.style.zIndex = "1200";
+	button.style.zIndex = "12000";
 	buffer.style.isolation = "auto";
 	const rect = cancelButton.getBoundingClientRect();
 	button.style.left = (rect.left + window.scrollX + button.offsetWidth + 27).toString() + "px";
