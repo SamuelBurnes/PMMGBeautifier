@@ -73,6 +73,19 @@ export class ModuleRunner {
 		buffers.push([parameters, buffer]);
 	});
 	
+	// Action testing
+	/*
+	const mtra = getBuffers("MTRA");
+    if(mtra && mtra[0])
+    {
+        const x = (mtra[0].getElementsByClassName("MaterialSelector__suggestionsContainer___ugUNHkA")[0].children[0]);
+        if(x)
+        {
+            console.log(x.children[0]);
+            x.children[0].click();
+        }
+    }*/
+	
 	// Render all XIT buffers
 	this.xit.run(buffers);
 	

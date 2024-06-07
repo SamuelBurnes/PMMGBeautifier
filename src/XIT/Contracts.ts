@@ -53,8 +53,8 @@ export class Contracts {
 				contract[ "IsFaction" ] = false;
 				contract[ "materialConditions" ] = [];
 
-				let selfConditions = [] as any[];
-				let partnerConditions = [] as any[];
+				let selfConditions = [] as any;
+				let partnerConditions = [] as any;
 				
 				contract.conditions.map(
 					( condition ) =>
@@ -65,7 +65,43 @@ export class Contracts {
 
 						if ( condition[ "quantity" ] !== null && materialFulfilmentType.includes( condition[ "type" ] ) )
 							contract[ "materialConditions" ].push( condition );
-
+						
+						// Clump loan repayments together
+						if(condition.type == "LOAN_INSTALLMENT")
+						{
+							if ( condition[ "party" ] === contract[ "party" ] )
+							{
+								if(selfConditions.loanInstallment)
+								{
+									selfConditions.loanInstallment.total += 1;
+									if(condition.status == "FULFILLED")
+									{
+										selfConditions.loanInstallment.filled += 1;
+									}
+								}
+								else
+								{
+									selfConditions.loanInstallment = {"filled": condition.status == "FULFILLED" ? 1 : 0, "total": 1, "type": "GROUPED_LOAN"}
+								}
+							}
+							else
+							{
+								if(partnerConditions.loanInstallment)
+								{
+									partnerConditions.loanInstallment.total += 1;
+									if(condition.status == "FULFILLED")
+									{
+										partnerConditions.loanInstallment.filled += 1;
+									}
+								}
+								else
+								{
+									partnerConditions.loanInstallment = {"filled": condition.status == "FULFILLED" ? 1 : 0, "total": 1, "type": "GROUPED_LOAN"}
+								}
+							}
+							return;
+						}
+						
 						// Categorize conditions by who fulfills it
 						if ( condition[ "party" ] === contract[ "party" ] )
 							selfConditions.push( condition );
@@ -211,6 +247,13 @@ function createContractRow(contract)
 
 	for ( let condition of contract.FilteredConditions["partner"] )
 		partnerColumn.appendChild( conditionStatus( condition ) );
+		
+	// Display grouped loan repayments
+	if(contract.FilteredConditions["partner"].loanInstallment)
+	{
+		partnerColumn.appendChild(conditionStatus(contract.FilteredConditions["partner"].loanInstallment));
+	}
+	
 
 	row.appendChild( partnerColumn );
 
@@ -219,6 +262,12 @@ function createContractRow(contract)
 
 	for ( let condition of contract.FilteredConditions[ "self" ] )
 		selfColumn.appendChild( conditionStatus( condition ) );
+		
+	// Display grouped loan repayments
+	if(contract.FilteredConditions["self"].loanInstallment)
+	{
+		selfColumn.appendChild(conditionStatus(contract.FilteredConditions["self"].loanInstallment));
+	}
 
 	row.appendChild( selfColumn );
 
@@ -270,13 +319,26 @@ function conditionStatus( condition )
 {
 	let conditionDiv = createTextDiv( "" );
 
-	let marker = createTextSpan( condition[ "status" ] === "FULFILLED" ? "✓" : "X" );
-	marker.style.color = condition[ "status" ] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
-	marker.style.fontWeight = "bold";
+	if(condition.type == "GROUPED_LOAN")
+	{
+		const marker = createTextSpan(condition.filled.toLocaleString(undefined, {maximumFractionDigits: 0}) + "/" + condition.total.toLocaleString(undefined, {maximumFractionDigits: 0}));
+		
+		marker.style.fontWeight = "bold";
+		conditionDiv.appendChild( marker );
+	}
+	else
+	{
+		let marker = createTextSpan( condition[ "status" ] === "FULFILLED" ? "✓" : "X" );
+		marker.style.color = condition[ "status" ] === "FULFILLED" ? TextColors.Success : TextColors.Failure;
+		marker.style.fontWeight = "bold";
+		
+		conditionDiv.appendChild( marker );
+	}
+	
 	let text = friendlyConditionText[ condition.type ] ? friendlyConditionText[condition.type ] : condition.type;
 	let textSpan = createTextSpan( " " + text );
 
-	conditionDiv.appendChild( marker );
+	
 	conditionDiv.appendChild( textSpan );
 
 	return conditionDiv;
@@ -295,7 +357,8 @@ const friendlyConditionText =
 	PROVISION: "Provision",
 	LOAN_PAYOUT: "Loan Payout",
 	LOAN_INSTALLMENT: "Loan Installment",
-	POWER: "Become Governor"
+	POWER: "Become Governor",
+	GROUPED_LOAN: "Loan Installment"
 }
 
 const materialFulfilmentType = 

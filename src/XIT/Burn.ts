@@ -38,7 +38,7 @@ export class Burn {
 		clearChildren(this.tile);
 		if(!this.parameters[1])
 		{
-			this.tile.textContent = "Error! Enter a planet name after XIT BURN (XIT BURN_UV-351a)";
+			this.tile.textContent = "Error! Enter planet name(s) after XIT BURN (XIT BURN_UV-351a)";
 			return;
 		}
 		
@@ -52,88 +52,80 @@ export class Burn {
 		// Burn data is non-empty
 		this.tile.id = "pmmg-load-success";
 		
-		var planetBurn;
-		var settings;
+		const planetBurn = [] as any[];
 		
-		var production = {lines:[] as any};
-		var workforce = {workforce:[] as any};
-		var inv = {items:[] as any};
-		// To do multiple planets, just create artificial planetProduction etc. Can generalize for one, many, and all planets.
+		// To do multiple planets, multiple planetBurns need to be created
+		
 		
 		if(this.parameters[1].toLowerCase() == "all")
 		{
 			this.userInfo["PMMG-User-Info"]["workforce"].forEach(planetWorkforce => {
 				if(!planetWorkforce.PlanetName){return;}
-				const planetProduction = findCorrespondingPlanet(planetWorkforce.PlanetName, this.userInfo["PMMG-User-Info"]["production"]);
-				const planetInv = findCorrespondingPlanet(planetWorkforce.PlanetName, this.userInfo["PMMG-User-Info"]["storage"], true);
 				
-				if(planetProduction && planetProduction.lines)
-				{
-					planetProduction.lines.forEach(line => {
-						production.lines.push(line);
-					});
-				}
-				if(planetWorkforce && planetWorkforce.workforce)
-				{
-					planetWorkforce.workforce.forEach(worker => {
-						workforce.workforce.push(worker);
-					});
-				}
-				if(planetInv && planetInv.items)
-				{
-					planetInv.items.forEach(item => {
-						inv.items.push(item);
-					});
-				}
+				// Calculate burn for each planet
+				const production = findCorrespondingPlanet(planetWorkforce.PlanetName, this.userInfo["PMMG-User-Info"]["production"]);
+				const workforce = findCorrespondingPlanet(planetWorkforce.PlanetName, this.userInfo["PMMG-User-Info"]["workforce"]);
+				const inv = findCorrespondingPlanet(planetWorkforce.PlanetName, this.userInfo["PMMG-User-Info"]["storage"], true);
+				
+				planetBurn.push({"burn": calculateBurn(production, workforce, inv), "planetName": planetWorkforce.PlanetName});
 			});
-		}
-		else if(!this.parameters[2])
-		{
-			production = findCorrespondingPlanet(this.parameters[1], this.userInfo["PMMG-User-Info"]["production"]);
-			workforce = findCorrespondingPlanet(this.parameters[1], this.userInfo["PMMG-User-Info"]["workforce"]);
-			inv = findCorrespondingPlanet(this.parameters[1], this.userInfo["PMMG-User-Info"]["storage"], true);
 		}
 		else
 		{
-			const planets = [...parameters];
-			planets.shift();
-			planets.forEach(planet => {
-				const planetProduction = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["production"]);
-				const planetWorkforce = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["workforce"]);
-				const planetInv = findCorrespondingPlanet(planet, this.userInfo["PMMG-User-Info"]["storage"], true);
+			for(var i = 1; i < this.parameters.length; i++)
+			{
+				// Calculate burn for each planet
+				const production = findCorrespondingPlanet(this.parameters[i], this.userInfo["PMMG-User-Info"]["production"]);
+				const workforce = findCorrespondingPlanet(this.parameters[i], this.userInfo["PMMG-User-Info"]["workforce"]);
+				const inv = findCorrespondingPlanet(this.parameters[i], this.userInfo["PMMG-User-Info"]["storage"], true);
 				
-				if(planetProduction && planetProduction.lines)
+				planetBurn.push({"burn": calculateBurn(production, workforce, inv), "planetName": this.parameters[i]});
+			}
+		}
+		
+		// If more than 1 planet, make "overall" category
+		if(planetBurn.length > 1)
+		{
+			const overallBurn = {};
+			planetBurn.forEach(burn => {
+				Object.keys(burn.burn).forEach(mat => {
+					if(overallBurn[mat])
+					{
+						overallBurn[mat].DailyAmount += burn.burn[mat].DailyAmount;
+						overallBurn[mat].Inventory += burn.burn[mat].Inventory;
+					}
+					else
+					{
+						overallBurn[mat] = {};
+						overallBurn[mat].DailyAmount = burn.burn[mat].DailyAmount;
+						overallBurn[mat].Inventory = burn.burn[mat].Inventory;
+					}
+				});
+			});
+			
+			Object.keys(overallBurn).forEach(mat => {
+				if(overallBurn[mat].DailyAmount >= 0)
 				{
-					planetProduction.lines.forEach(line => {
-						production.lines.push(line);
-					});
+					overallBurn[mat].DaysLeft = 1000;
 				}
-				if(planetWorkforce && planetWorkforce.workforce)
+				else
 				{
-					planetWorkforce.workforce.forEach(worker => {
-						workforce.workforce.push(worker);
-					});
-				}
-				if(planetInv && planetInv.items)
-				{
-					planetInv.items.forEach(item => {
-						inv.items.push(item);
-					});
+					overallBurn[mat].DaysLeft = -overallBurn[mat].Inventory / overallBurn[mat].DailyAmount;
 				}
 			});
+			
+			planetBurn.push({"burn": overallBurn, "planetName": "Overall"});
 		}
-	
-		planetBurn = calculateBurn(production, workforce, inv);	// The planet burn data
-		
-		if(!planetBurn){return;}
 		
 		// Start creating burn buffer
 		
 		const screenNameElem = document.querySelector(Selector.ScreenName);
 		const screenName = screenNameElem ? screenNameElem.textContent : "";
-		if(!this.pmmgSettings["PMMGExtended"]["burn_display_settings"]){this.pmmgSettings["PMMGExtended"]["burn_display_settings"] = [];}
-		var settingsIndex = FindBurnSettings(this.pmmgSettings["PMMGExtended"]["burn_display_settings"], screenName + this.parameters[1]);
-		const dispSettings = settingsIndex == -1 ? [1, 1, 1, 1] : this.pmmgSettings["PMMGExtended"]["burn_display_settings"][settingsIndex][1];
+		
+		const bufferName = screenName + this.parameters.join("");
+		
+		if(!this.pmmgSettings["PMMGExtended"]["burn_settings"]){this.pmmgSettings["PMMGExtended"]["burn_settings"] = {};}
+		const dispSettings = this.pmmgSettings["PMMGExtended"]["burn_settings"][bufferName] || {red: true, yellow: true, green: true, inf: true, minimized: {}};
 		
 		const table = document.createElement("table");
 		const bufferHeader = document.createElement("div");
@@ -142,60 +134,34 @@ export class Burn {
 		const settingsDiv = document.createElement("div");
 		settingsDiv.style.display = "flex";
 		bufferHeader.appendChild(settingsDiv);
-		settingsDiv.appendChild(createSettingsButton("RED", 22.025, dispSettings[0], function(){
-			dispSettings[0] = dispSettings[0] ? 0 : 1;
+		
+		// Create settings behavior
+		settingsDiv.appendChild(createSettingsButton("RED", 22.025, dispSettings.red, function(){
+			dispSettings.red = !dispSettings.red;
 			UpdateBurn(table, dispSettings);
-			if(settingsIndex == -1)
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
-				settingsIndex = pmmgSettings["PMMGExtended"]["burn_display_settings"].length - 1;
-			}
-			else
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
-			}
+			pmmgSettings["PMMGExtended"]["burn_settings"][bufferName] = dispSettings;
+			
 			setSettings(pmmgSettings);
 		}));
-		settingsDiv.appendChild(createSettingsButton("YELLOW", 40.483, dispSettings[1], function(){
-			dispSettings[1] = dispSettings[1] ? 0 : 1;
+		settingsDiv.appendChild(createSettingsButton("YELLOW", 40.483, dispSettings.yellow, function(){
+			dispSettings.yellow = !dispSettings.yellow;
 			UpdateBurn(table, dispSettings);
-			if(settingsIndex == -1)
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
-				settingsIndex = pmmgSettings["PMMGExtended"]["burn_display_settings"].length - 1;
-			}
-			else
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
-			}
+			pmmgSettings["PMMGExtended"]["burn_settings"][bufferName] = dispSettings;
+			
 			setSettings(pmmgSettings);
 		}));
-		settingsDiv.appendChild(createSettingsButton("GREEN", 34.65, dispSettings[2], function(){
-			dispSettings[2] = dispSettings[2] ? 0 : 1;
+		settingsDiv.appendChild(createSettingsButton("GREEN", 34.65, dispSettings.green, function(){
+			dispSettings.green = !dispSettings.green;
 			UpdateBurn(table, dispSettings);
-			if(settingsIndex == -1)
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
-				settingsIndex = pmmgSettings["PMMGExtended"]["burn_display_settings"].length - 1;
-			}
-			else
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
-			}
+			pmmgSettings["PMMGExtended"]["burn_settings"][bufferName] = dispSettings;
+			
 			setSettings(pmmgSettings);
 		}));
-		settingsDiv.appendChild(createSettingsButton("INF", 19.6, dispSettings[3], function(){
-			dispSettings[3] = dispSettings[3] ? 0 : 1;
+		settingsDiv.appendChild(createSettingsButton("INF", 19.6, dispSettings.inf, function(){
+			dispSettings.inf = !dispSettings.inf;
 			UpdateBurn(table, dispSettings);
-			if(settingsIndex == -1)
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"].push([screenName + parameters[1], dispSettings]);
-				settingsIndex = pmmgSettings["PMMGExtended"]["burn_display_settings"].length - 1;
-			}
-			else
-			{
-				pmmgSettings["PMMGExtended"]["burn_display_settings"][settingsIndex][1] = dispSettings;
-			}
+			pmmgSettings["PMMGExtended"]["burn_settings"][bufferName] = dispSettings;
+			
 			setSettings(pmmgSettings);
 		}));
 		
@@ -203,6 +169,9 @@ export class Burn {
 		const headRow = document.createElement("tr");
 		head.appendChild(headRow);
 		table.appendChild(head);
+		
+		const isMultiplanet = parameters[2] || parameters[1].toLowerCase() == "all";
+		
 		for(let title of ["Needs", "Production", "Inv", "Amt. Needed", "Burn"])
 		{
 			const header = document.createElement("th");
@@ -212,80 +181,147 @@ export class Burn {
 		}
 		(headRow.firstChild as HTMLTableCellElement).colSpan = 2;
 		
-		const body = document.createElement("tbody");
-		table.appendChild(body);
+		planetBurn.forEach(burn => {
 		
-		var burnMaterials = Object.keys(planetBurn);
-		burnMaterials.sort(CategorySort);
-		for(let material of burnMaterials)
-		{
-			var included = true;
-			if(settings != undefined && this.parameters[1].toLowerCase() != "group")
+			const body = document.createElement("tbody");
+			table.appendChild(body);
+			
+			if(isMultiplanet)
 			{
-				settings["MaterialExclusions"].forEach((mat) => {
-					if(mat["MaterialTicker"] == material){included = false;return;}
-					return;
+				const nameRow = document.createElement("tr");
+				const nameRowColumn = document.createElement("td");
+				
+				const isMinimized = dispSettings.minimized && dispSettings.minimized[burn.planetName];
+				const minimizeButton = document.createElement("div");
+				minimizeButton.textContent = isMinimized ? "+" : "-";
+				minimizeButton.classList.add("pb-burn-minimize");
+				nameRowColumn.appendChild(minimizeButton);
+				
+				minimizeButton.addEventListener("click", function() {
+					if(!dispSettings.minimized){dispSettings.minimized = {};}
+					
+					if(dispSettings.minimized[burn.planetName])
+					{
+						delete dispSettings.minimized[burn.planetName];
+						minimizeButton.textContent = "-";
+					}
+					else
+					{
+						dispSettings.minimized[burn.planetName] = true;
+						minimizeButton.textContent = "+";
+					}
+					UpdateBurn(table, dispSettings);
+					pmmgSettings["PMMGExtended"]["burn_settings"][bufferName] = dispSettings;
+					
+					setSettings(pmmgSettings);
 				});
-			}
-			if(!included){continue;}
-			
-			const row = document.createElement("tr");
-			body.appendChild(row);
-			const materialColumn = document.createElement("td");
-			materialColumn.style.width = "32px";
-			materialColumn.style.paddingRight = "0px";
-			materialColumn.style.paddingLeft = "0px";
-			const matElem = createMaterialElement(material, "prun-remove-js", "none", false, true);
-			if(matElem){materialColumn.appendChild(matElem);}
-			row.appendChild(materialColumn);
-			const nameSpan = createTextSpan(MaterialNames[material][0]);
-			nameSpan.style.fontWeight = "bold";
-			const nameColumn = document.createElement("td");
-			nameColumn.appendChild(nameSpan);
-			row.appendChild(nameColumn);
-			
-			const consColumn = document.createElement("td");
-			consColumn.appendChild(createTextSpan(planetBurn[material]["DailyAmount"].toLocaleString(undefined, {maximumFractionDigits: Math.abs(planetBurn[material]["DailyAmount"]) < 1 ? 2 : 1, minimumFractionDigits: Math.abs(planetBurn[material]["DailyAmount"]) < 1 ? 2 : undefined}) + " / Day"));
-			row.appendChild(consColumn);
-			
-			const invColumn = document.createElement("td");
-			const invAmount = planetBurn[material]["Inventory"] == undefined ? 0 : planetBurn[material]["Inventory"];
-			invColumn.appendChild(createTextSpan(invAmount.toLocaleString(undefined)));
-			row.appendChild(invColumn);
-			
-			const burn = planetBurn[material]["DaysLeft"];
-			const burnColumn = document.createElement("td");
-			burnColumn.appendChild(createTextSpan(((burn != "∞" && burn < 500 && planetBurn[material]["DailyAmount"] < 0) ? Math.floor(burn).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
-			if(planetBurn[material]["DailyAmount"] >= 0)
-			{
-				burnColumn.classList.add("burn-green");
-				burnColumn.classList.add("burn-infinite");
-			}
-			else if(burn <= (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[0])
-			{
-				burnColumn.classList.add("burn-red");
-			}
-			else if(burn <= (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1])
-			{
-				burnColumn.classList.add("burn-yellow");
-			}
-			else
-			{
-				burnColumn.classList.add("burn-green");
+				
+				nameRowColumn.colSpan = 5;
+				nameRowColumn.appendChild(createTextSpan(burn.planetName));
+				nameRowColumn.classList.add("title");
+				nameRowColumn.style.display = "table-cell";
+				nameRowColumn.style.backgroundColor = "rgba(1, 1, 1, 0)";
+				nameRow.appendChild(nameRowColumn);
+				body.appendChild(nameRow);
+				
+				// Add column for burn days for planet
+				var minDaysLeft = 1000;
+				Object.keys(burn.burn).forEach(mat => {
+					if(!isNaN(burn.burn[mat]["DailyAmount"]) && burn.burn[mat]["DailyAmount"] < 0 && burn.burn[mat]["DaysLeft"] < minDaysLeft)
+					{
+						minDaysLeft = burn.burn[mat]["DaysLeft"];
+					}
+				});
+				
+				const burnColumn = document.createElement("td");
+				burnColumn.appendChild(createTextSpan(((minDaysLeft < 500) ? Math.floor(minDaysLeft).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
+				if(minDaysLeft >= 500)
+				{
+					burnColumn.classList.add("burn-green-no-hover");
+					burnColumn.classList.add("burn-infinite");
+				}
+				else if(minDaysLeft <= (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[0])
+				{
+					burnColumn.classList.add("burn-red-no-hover");
+				}
+				else if(minDaysLeft <= (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1])
+				{
+					burnColumn.classList.add("burn-yellow-no-hover");
+				}
+				else
+				{
+					burnColumn.classList.add("burn-green-no-hover");
+				}
+				
+				nameRow.appendChild(burnColumn);
+				nameRow.style.borderBottom = "1px solid #2b485a";
 			}
 			
-			const needColumn = document.createElement("td");
-			const needAmt = burn > (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] || planetBurn[material]["DailyAmount"] > 0 ? 0 : (burn - (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1]) * planetBurn[material]["DailyAmount"];
-			needColumn.appendChild(createTextSpan(isNaN(needAmt) ? "0" : needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
+			var burnMaterials = Object.keys(burn.burn);
+			burnMaterials.sort(CategorySort);
 			
-			row.appendChild(needColumn);
-			row.appendChild(burnColumn);
 			
-		}
+			for(let material of burnMaterials)
+			{	
+				const row = document.createElement("tr");
+				body.appendChild(row);
+				const materialColumn = document.createElement("td");
+				materialColumn.style.width = "32px";
+				materialColumn.style.paddingRight = "0px";
+				materialColumn.style.paddingLeft = isMultiplanet ? "32px" : "0px";
+				const matElem = createMaterialElement(material, "prun-remove-js", "none", false, true);
+				if(matElem){materialColumn.appendChild(matElem);}
+				row.appendChild(materialColumn);
+				const nameSpan = createTextSpan(MaterialNames[material][0]);
+				nameSpan.style.fontWeight = "bold";
+				const nameColumn = document.createElement("td");
+				nameColumn.appendChild(nameSpan);
+				row.appendChild(nameColumn);
+				
+				const consColumn = document.createElement("td");
+				consColumn.appendChild(createTextSpan(burn.burn[material]["DailyAmount"].toLocaleString(undefined, {maximumFractionDigits: Math.abs(burn.burn[material]["DailyAmount"]) < 1 ? 2 : 1, minimumFractionDigits: Math.abs(burn.burn[material]["DailyAmount"]) < 1 ? 2 : undefined}) + " / Day"));
+				row.appendChild(consColumn);
+				
+				const invColumn = document.createElement("td");
+				const invAmount = burn.burn[material]["Inventory"] == undefined ? 0 : burn.burn[material]["Inventory"];
+				invColumn.appendChild(createTextSpan(invAmount.toLocaleString(undefined)));
+				row.appendChild(invColumn);
+				
+				const burnDays = burn.burn[material]["DaysLeft"];
+				const burnColumn = document.createElement("td");
+				burnColumn.appendChild(createTextSpan(((burnDays != "∞" && burnDays < 500 && burn.burn[material]["DailyAmount"] < 0) ? Math.floor(burnDays).toLocaleString(undefined, {maximumFractionDigits: 0}) : "∞") + " Days"));
+				if(burn.burn[material]["DailyAmount"] >= 0)
+				{
+					burnColumn.classList.add("burn-green");
+					burnColumn.classList.add("burn-infinite");
+				}
+				else if(burnDays <= (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[0])
+				{
+					burnColumn.classList.add("burn-red");
+				}
+				else if(burnDays <= (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1])
+				{
+					burnColumn.classList.add("burn-yellow");
+				}
+				else
+				{
+					burnColumn.classList.add("burn-green");
+				}
+				
+				const needColumn = document.createElement("td");
+				const needAmt = burnDays > (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] || burn.burn[material]["DailyAmount"] > 0 ? 0 : (burnDays - (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1]) * burn.burn[material]["DailyAmount"];
+				needColumn.appendChild(createTextSpan(isNaN(needAmt) ? "0" : needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
+				
+				row.appendChild(needColumn);
+				row.appendChild(burnColumn);
+				
+			}
+		});
+		
 		UpdateBurn(table, dispSettings);
 		this.tile.appendChild(table);
 		
-		this.update_buffer();
+		//this.update_buffer();
 		return;
 	}
 	
@@ -303,50 +339,64 @@ export class Burn {
 	}
 }
 
-function FindBurnSettings(array, matchString)
-{
-	for(var i = 0; i < array.length; i++)
-	{
-		if(matchString == array[i][0])
-		{
-			return i;
-		}
-	}
-	return -1;
-}
-
 function UpdateBurn(table, dispSettings)
 {
-	(Array.from(table.children[1].children) as HTMLElement[]).forEach(row => {
-		if(row.children[5].classList.contains("burn-infinite"))
+	(Array.from(table.children) as HTMLElement[]).forEach(child => {
+		if(!child.children){return;}
+		
+		// Hide further elements if minimized
+		if(child && child.children[0] && !child.children[0].children[5])	// Is header row
 		{
-			row.style.display = dispSettings[3] ? "table-row" :"none";
-			row.style.visibility = dispSettings[3] ? "visible" : "hidden";
-			row.style.width = dispSettings[3] ? "auto" : "0px";
-			row.style.height = dispSettings[3] ? "auto" : "0px";
+			const planetSpan = child.children[0].querySelector("span");
+			if(planetSpan)
+			{
+				const planet = planetSpan.textContent;
+				const minimized = planet && dispSettings.minimized && dispSettings.minimized[planet];
+				for(var i = 1; i < child.children.length; i++)
+				{
+					const row = child.children[i] as HTMLElement;
+					row.style.display = !minimized ? "table-row" :"none";
+					row.style.visibility = !minimized ? "visible" : "hidden";
+					row.style.width = !minimized ? "auto" : "0px";
+					row.style.height = !minimized ? "auto" : "0px";
+				}
+				
+				if(minimized){return;}
+			}
 		}
-		else if(row.children[5].classList.contains("burn-green"))
-		{
-			row.style.display = dispSettings[2] ? "table-row" :"none";
-			row.style.visibility = dispSettings[2] ? "visible" : "hidden";
-			row.style.width = dispSettings[2] ? "auto" : "0px";
-			row.style.height = dispSettings[2] ? "auto" : "0px";
-		}
-		else if(row.children[5].classList.contains("burn-yellow"))
-		{
-			row.style.display = dispSettings[1] ? "table-row" :"none";
-			row.style.visibility = dispSettings[1] ? "visible" : "hidden";
-			row.style.width = dispSettings[1] ? "auto" : "0px";
-			row.style.height = dispSettings[1] ? "auto" : "0px";
-		}
-		else if(row.children[5].classList.contains("burn-red"))
-		{
-			row.style.display = dispSettings[0] ? "table-row" :"none";
-			row.style.visibility = dispSettings[0] ? "visible" : "hidden";
-			row.style.width = dispSettings[0] ? "auto" : "0px";
-			row.style.height = dispSettings[0] ? "auto" : "0px";
-		}
-		return;
+		
+		(Array.from(child.children) as HTMLElement[]).forEach(row => {
+			if(!row.children || !row.children[5]){return;}
+			
+			if(row.children[5].classList.contains("burn-infinite"))
+			{
+				row.style.display = dispSettings.inf ? "table-row" :"none";
+				row.style.visibility = dispSettings.inf ? "visible" : "hidden";
+				row.style.width = dispSettings.inf ? "auto" : "0px";
+				row.style.height = dispSettings.inf ? "auto" : "0px";
+			}
+			else if(row.children[5].classList.contains("burn-green"))
+			{
+				row.style.display = dispSettings.green ? "table-row" :"none";
+				row.style.visibility = dispSettings.green ? "visible" : "hidden";
+				row.style.width = dispSettings.green ? "auto" : "0px";
+				row.style.height = dispSettings.green ? "auto" : "0px";
+			}
+			else if(row.children[5].classList.contains("burn-yellow"))
+			{
+				row.style.display = dispSettings.yellow ? "table-row" :"none";
+				row.style.visibility = dispSettings.yellow ? "visible" : "hidden";
+				row.style.width = dispSettings.yellow ? "auto" : "0px";
+				row.style.height = dispSettings.yellow ? "auto" : "0px";
+			}
+			else if(row.children[5].classList.contains("burn-red"))
+			{
+				row.style.display = dispSettings.red ? "table-row" :"none";
+				row.style.visibility = dispSettings.red ? "visible" : "hidden";
+				row.style.width = dispSettings.red ? "auto" : "0px";
+				row.style.height = dispSettings.red ? "auto" : "0px";
+			}
+		});
 	});
 	return;
 }

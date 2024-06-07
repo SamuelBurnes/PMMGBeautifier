@@ -141,6 +141,11 @@ export class XITHandler implements Module {
 			parameters[i] = parameters[i].trim()
 		}
 		
+		if(parameters[0] && parameters[0].toUpperCase() == "FIO")	// Exception for FIO to use XIT
+		{
+			return;
+		}
+		
 		tile.classList.add("xit-tile");
 		if(tile.firstChild)
 		{

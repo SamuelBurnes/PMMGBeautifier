@@ -625,6 +625,10 @@ class GenerateScreen {
 						{
 							group.exclusions = exclusions.replace(/ /g, "").split(",");
 						}
+						else
+						{
+							delete group.exclusions;
+						}
 						break;
 						
 					case "Manual":
@@ -1433,6 +1437,7 @@ async function createExecuteScreen(tile, packageName, userInfo)
 		// Begin executing actions
 		executionIndex = 0;
 		
+		// [{"type": "transferMaterialSet", "buffer": "MTRA", "parameters": {"source": "Base - Antares II - Deimos", "target": "Warehouse - Antares II - Deimos"}}]
 		executeAction(actionPackage, executionIndex, messageBox, executionInfo, tile, skipButton, cancelButton, currentAction);
 		
 	});
@@ -1537,10 +1542,20 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 	
 	// Find button to move
 	var button;
+	var buttonOffset = 0;
+	var resetStyles = function(elem){return elem;};	// Function to reset any extra styles on the element besides the ones used in moving it
 	switch(action.type)
 	{
 		case "CXBuy":
 			button = buffer.querySelector(Selector.ButtonSuccess);
+			buttonOffset = 27;
+			break;
+		case "transferMaterialSet":
+			button = buffer.querySelector(Selector.MaterialSelector);	// The text box the user must click before the material is auto-selected
+			buttonOffset = -104;
+			
+			// Format textbox to obfuscate what it is and make clicking it clear
+			
 			break;
 	}
 	
@@ -1556,7 +1571,7 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 	button.style.zIndex = "12000";
 	buffer.style.isolation = "auto";
 	const rect = cancelButton.getBoundingClientRect();
-	button.style.left = (rect.left + window.scrollX + button.offsetWidth + 27).toString() + "px";
+	button.style.left = (rect.left + window.scrollX + button.offsetWidth + buttonOffset).toString() + "px";
 	button.style.top = (rect.top + window.scrollY).toString() + "px";
 	
 	// Fill in fields/modify buffer
@@ -1570,13 +1585,60 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 			
 			if(!quantityInput || !priceInput)
 			{
-				undoButtonMove(button);
+				undoButtonMove(button, resetStyles);
 				addMessage(messageBox, "Error: Missing fields executing: " + actionName);
+				tile.removeChild(executionInfo);
+				return;
+			}
+			if(!action.parameters.amount || !action.parameters.priceLimit)
+			{
+				undoButtonMove(button, resetStyles);
+				addMessage(messageBox, "Error: Missing parameters executing: " + actionName);
 				tile.removeChild(executionInfo);
 				return;
 			}
 			changeValue(quantityInput, action.parameters.amount.toString());
 			changeValue(priceInput, action.parameters.priceLimit.toString());
+			break;
+		case "transferMaterialSet":
+			// Get and set relevant inputs on the buffer
+			const sourceSelect = buffer.querySelector(Selector.StoreSelect) as HTMLSelectElement;
+			
+			if(!sourceSelect)
+			{
+				undoButtonMove(button, resetStyles);
+				addMessage(messageBox, "Error: Missing fields executing: " + actionName);
+				tile.removeChild(executionInfo);
+				return;
+			}
+			if(!action.parameters.source || !action.parameters.target)
+			{
+				undoButtonMove(button, resetStyles);
+				addMessage(messageBox, "Error: Missing parameters executing: " + actionName);
+				tile.removeChild(executionInfo);
+				return;
+			}
+			
+			// Select correct source inventory
+			sourceSelect.click();
+			var sourceID;
+			(Array.from(sourceSelect.children) as HTMLOptionElement[]).forEach(child => {
+				if(child.textContent == action.parameters.source)
+				{
+					sourceID = child.value;
+					child.click()
+				}
+			});
+			
+			if(!sourceID)	// Source not found
+			{
+				undoButtonMove(button, resetStyles);
+				addMessage(messageBox, "Error: Source inventory not found executing: " + actionName);
+				tile.removeChild(executionInfo);
+				return;
+			}
+			
+			//changeSelectValue(sourceSelect, sourceID);
 			break;
 	}
 	
@@ -1605,7 +1667,7 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 				button.removeEventListener("click", buttonListener);
 				skipButton.removeEventListener("click", skipButtonListener);
 				cancelButton.removeEventListener("click", cancelButtonListener);
-				undoButtonMove(button);
+				undoButtonMove(button, resetStyles);
 				dismissButton.click();
 				addMessage(messageBox, "Successfully executed: " + actionName);
 				
@@ -1646,7 +1708,7 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 		button.removeEventListener("click", buttonListener);	// Remove previous listeners
 		skipButton.removeEventListener("click", skipButtonListener);
 		cancelButton.removeEventListener("click", cancelButtonListener);
-		undoButtonMove(button);
+		undoButtonMove(button, resetStyles);
 		addMessage(messageBox, "Skipped: " + actionName);
 		
 		// If at end of list, don't repeat
@@ -1671,7 +1733,7 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 		button.removeEventListener("click", buttonListener);	// Remove previous listeners
 		skipButton.removeEventListener("click", skipButtonListener);
 		cancelButton.removeEventListener("click", cancelButtonListener);
-		undoButtonMove(button);
+		undoButtonMove(button, resetStyles);
 		addMessage(messageBox, "Canceled action package");
 		tile.removeChild(executionInfo);
 	};
@@ -1679,12 +1741,13 @@ function executeAction(actionPackage, executionIndex, messageBox, executionInfo,
 	cancelButton.addEventListener("click", cancelButtonListener);
 }
 
-function undoButtonMove(button)
+function undoButtonMove(button, resetStyles)
 {
 	button.style.position = "relative";
 	button.style.left = "auto";
 	button.style.top = "auto";
 	button.style.zIndex = "auto";
+	resetStyles(button);
 }
 
 // Monitor for success/failure in action

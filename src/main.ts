@@ -86,6 +86,8 @@ function mainRun(result, browser?)
 	// If no module states are specified, disable screen unpack by default
 	if(!result["PMMGExtended"]["disabled"]){result["PMMGExtended"]["disabled"] = ["ScreenUnpack"];}
 	
+	if(result["PMMGExtended"]["burn_display_settings"]){delete result["PMMGExtended"]["burn_display_settings"];}
+	
 	// If enhanced color scheme is selected or no color scheme is selected, appy the enhanced color scheme
 	if(result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"])
 	{

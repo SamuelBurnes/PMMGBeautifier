@@ -65,10 +65,14 @@ export const Selector = {
   InventoryContainer: "div[class~='StoreView__container___RrvYu52']",
   FormTooltip: "span[class~='Tooltip__container___O8IKVEa']",
   ButtonSuccess: "button[class~='Button__success___bCiIVXw']",
+  ButtonPrimary: "button[class~='Button__primary____lObPiw']",
+  ButtonDisabled: "button[class~='Button__disabled____x8i7XF']",
   ActionFeedback: "span[class~='ActionFeedback__message___G2Sz4bw']",
   ActionFeedbackMain: "span[class~='ActionFeedback__message___G2Sz4bw'] > span",
   ActionSuccess: "div[class~='ActionFeedback__success___nVa5scG']",
   ActionDismiss: "span[class~='ActionFeedback__dismiss___x5Ln7y1']",
   ActionConfirmation: "span[class~='ActionConfirmationOverlay__text___qkKzVK0']",
-  ActionConfirmationMessage: "span[class~='ActionConfirmationOverlay__message___OajoGeh']"
+  ActionConfirmationMessage: "span[class~='ActionConfirmationOverlay__message___OajoGeh']",
+  StoreSelect: "select[class~='StoreSelect__container___tDwUv6W']",
+  MaterialSelector: "input[class~='MaterialSelector__input___tyJaKPm']"
 }

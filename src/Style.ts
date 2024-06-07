@@ -253,8 +253,12 @@ export const PMMGStyle = `
 .delete-button:hover {
 	color: #222;
 }
-
-
+.pb-burn-minimize {
+	display: inline-block;
+	width: 26px;
+	text-align: center;
+	cursor: pointer;
+}
 
 .notes-wrapper .title.note-title {
     padding-top: 5px;
@@ -458,6 +462,20 @@ td.burn-red {
 tr:hover td.burn-red {
 	background-color: #764d4c !important;
 }
+
+td.burn-green-no-hover {
+	background-color: #345034 !important;
+	color: #9fbb9f;
+}
+td.burn-yellow-no-hover {
+	background-color: #836e24 !important;
+	color: #f6df94;
+}
+td.burn-red-no-hover {
+	background-color: #5a3130 !important;
+	color: #c59c9b;
+}
+
 .inv-header {
 	display: inline;
 	padding: 2px 8px;
