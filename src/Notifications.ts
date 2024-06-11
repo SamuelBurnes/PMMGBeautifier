@@ -5,12 +5,22 @@ import {Materials} from "./GameProperties";
 
 export class Notifications implements Module {
   private tag = "pb-nots";
+  private userInfo;
+  
   cleanup(full: boolean = false) {
 	  full && genericCleanup(this.tag);
 	  return;
   }
+  
+  constructor(userInfo)
+  {
+	this.userInfo = userInfo;
+  }
+  
   run() {
     const elements = document.querySelectorAll(Selector.Notification);
+	if(!this.userInfo || !this.userInfo["PMMG-User-Info"] || !this.userInfo["PMMG-User-Info"].ships){return;}
+	
     elements.forEach(element => {
 	  if(element.firstChild && (element.firstChild as HTMLElement).classList.contains(this.tag))
 	  {
@@ -37,7 +47,7 @@ export class Notifications implements Module {
 			var matches;
 			var notText = (element.children[1] as HTMLElement).textContent;
 			
-			if(notText == null){return;}
+			if(!notText){return;}
 			
 			notText = notText.replace(/Chamber of Global Commerce/, "COGC");
 			switch(search[0])
@@ -76,6 +86,16 @@ export class Notifications implements Module {
 					break;
 				case "arrived at":
 					notText = notText.replace(/its destination /, "");
+					const match = notText.match(/AVI-[0-9A-Z]{5}/);
+					if(match && match[0])
+					{
+						this.userInfo["PMMG-User-Info"].ships.forEach(ship => {
+							if(ship.registration == match[0] && ship.name)
+							{
+								notText = (notText || "").replace(match[0], ship.name);
+							}
+						});
+					}
 					break;
 				case "cogc":
 				case "chamber of global commerce":

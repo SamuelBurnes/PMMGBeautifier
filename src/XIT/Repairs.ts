@@ -63,7 +63,7 @@ export class Repairs {
 			
 			const offsetInput = document.createElement("input");
 			offsetInput.classList.add("input-text");
-			const offsetText = createTextSpan("Days Until Repair:");
+			const offsetText = createTextSpan("Time Offset:");
 			offsetText.style.paddingLeft = "5px";
 			offsetInput.type = "number";
 			offsetInput.value = this.pmmgSettings["PMMGExtended"]["repair_offset"] ? this.pmmgSettings["PMMGExtended"]["repair_offset"] : "0";
@@ -169,7 +169,7 @@ export class Repairs {
 			
 			const offsetInput = document.createElement("input");
 			offsetInput.classList.add("input-text");
-			const offsetText = createTextSpan("Days Until Repair:");
+			const offsetText = createTextSpan("Time Offset:");
 			offsetText.style.paddingLeft = "5px";
 			offsetInput.type = "number";
 			offsetInput.value = this.pmmgSettings["PMMGExtended"]["repair_offset"] ? this.pmmgSettings["PMMGExtended"]["repair_offset"] : "0";

@@ -108,7 +108,7 @@ function addOrderBook(buffer, userInfo, tag)
 	const orderInfo = userInfo["PMMG-User-Info"]["cxob"][ticker];
 	if(orderInfo.sellingOrders.length > 0)	// Build ask table. Add own name highlighting at some point
 	{
-		const sortedOrders = orderInfo.sellingOrders.reverse();
+		const sortedOrders = orderInfo.sellingOrders.slice().reverse();
 		sortedOrders.forEach(order => {
 			const orderRow = document.createElement("tr");
 			offerBody.appendChild(orderRow);

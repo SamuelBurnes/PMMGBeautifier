@@ -183,7 +183,7 @@ function mainRun(result, browser?)
 		  new QueueLoad(),
 		  new ConsumableTimers(result["PMMGExtended"]["burn_thresholds"], userInfo),
 		  new InventoryOrganizer(userInfo, result),
-		  new Notifications(),
+		  new Notifications(userInfo),
 		  new ImageCreator(),
 		  new ScreenUnpack(result["PMMGExtended"]["unpack_exceptions"]),
 		  new HeaderMinimizer(result["PMMGExtended"]["minimize_by_default"]),

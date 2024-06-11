@@ -321,7 +321,7 @@ export class Burn {
 		UpdateBurn(table, dispSettings);
 		this.tile.appendChild(table);
 		
-		//this.update_buffer();
+		this.update_buffer();
 		return;
 	}
 	

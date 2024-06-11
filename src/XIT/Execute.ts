@@ -20,7 +20,7 @@ import {
 } from "../util";
 import {Style} from "../Style";
 import {Selector} from "../Selector";
-import {ExchangeTickersReverse} from "../GameProperties";
+import {ExchangeTickersReverse, NonProductionBuildings} from "../GameProperties";
 
 export class Execute {
 	private tile: HTMLElement;
@@ -411,14 +411,6 @@ class GenerateScreen {
 		title.style.marginLeft = "4px";
 		this.globalSection.appendChild(title);
 		
-		/*
-		const sectionTitle = document.createElement("h3");
-		sectionTitle.classList.add(...Style.SidebarSectionHead);
-		sectionTitle.textContent = "Global Attributes";
-		this.globalSection.appendChild(sectionTitle);
-		
-		this.nameInput = this.createFormRow(this.globalSection, "text", "active", "Name", "name", this.globalAttributes.name);
-		this.nameRow = this.globalSection.children[0] as HTMLElement;*/
 	}
 	
 	// Generate the form for groups
@@ -486,7 +478,18 @@ class GenerateScreen {
 				case "Resupply":
 					if(group.planet && group.days)
 					{
-						var contentText = "Resupply " + group.planet + " with " + group.days + " day" + (group.days == 1 ? "" : "s") + " of supplies"
+						var contentText = "Resupply " + group.planet + " with " + group.days + " day" + (group.days == 1 ? "" : "s") + " of supplies";
+						contentColumn.appendChild(createTextSpan(contentText));
+					}
+					else
+					{
+						contentColumn.appendChild(createTextSpan("--"));
+					}
+					break;
+				case "Repair":
+					if(group.planet)
+					{
+						var contentText = "Repair buildings on " + group.planet + (group.days && group.days != 0 && group.days != "" ? (" older than " + group.days + " day" + (group.days == 1 ? " " : "s ")) : "") + " in " + (group.advanceDays || 0) + " day" + ((group.advanceDays || 0) == 1 ? "" : "s");
 						contentColumn.appendChild(createTextSpan(contentText));
 					}
 					else
@@ -527,7 +530,7 @@ class GenerateScreen {
 		
 		
 		// Dropdown for adding new groups
-		const newGroupDropdown = this.createFormRow(this.groupSection, "select", "active", "Group Type", "groupType", undefined, ["Resupply", "Manual"]);
+		const newGroupDropdown = this.createFormRow(this.groupSection, "select", "active", "Group Type", "groupType", undefined, ["Resupply", "Repair", "Manual"]);
 		const newGroupAdd = this.createFormRow(this.groupSection, "button", "command", "Add Group", "addGroup", "ADD");
 		
 		// Add method for adding a new group with default values
@@ -554,7 +557,7 @@ class GenerateScreen {
 		{
 			case "Resupply":
 				// Get list of planets
-				const possiblePlanets = [] as any[];
+				var possiblePlanets = [] as any[];
 				this.userInfo["PMMG-User-Info"].workforce.forEach(planet => {
 					if(planet.PlanetName)
 					{
@@ -577,7 +580,29 @@ class GenerateScreen {
 				popup.addPopupRow("text", "Material Exclusions", (group.exclusions || []).join(", "), "Materials to be excluded from the group. List material tickers separated by commas.", undefined);
 				popup.addPopupRow("checkbox", "Use Base Inv", group.useBaseInv == undefined ? true : group.useBaseInv, "Whether to count the materials currently in the base towards the totals.", undefined);
 				break;
+			case "Repair":
+				// Get list of planets
+				possiblePlanets = [] as any[];
+				this.userInfo["PMMG-User-Info"].sites.forEach(planet => {
+					if(planet.PlanetName && planet.type == "BASE")
+					{
+						possiblePlanets.push(planet.PlanetName);
+					}
+				});
 				
+				// Add index of selected option to end of list because of poor design decisions in popup class
+				if(group.planet && possiblePlanets.indexOf(group.planet))
+				{
+					possiblePlanets.push(possiblePlanets.indexOf(group.planet));
+				}
+				else
+				{
+					possiblePlanets.push(0);
+				}
+				popup.addPopupRow("dropdown", "Planet", possiblePlanets, undefined, undefined);
+				popup.addPopupRow("number", "Day Threshold", group.days || "", "All buildings older than this threshold will be repaired. If no number is provided all buildings are repaired.", undefined);
+				popup.addPopupRow("number", "Time Offset", group.advanceDays || 0, "The numer of days in the future this repair will be conducted.", undefined);
+				break;
 			case "Manual":
 				// Create rows corresponding to current materials stored in group
 				var numMaterials = 0;	// Stores how many materials there are listed
@@ -630,7 +655,11 @@ class GenerateScreen {
 							delete group.exclusions;
 						}
 						break;
-						
+					case "Repair":
+						group.planet = popup.getRowByName("Planet").rowInput.value;
+						group.days = popup.getRowByName("Day Threshold").rowInput.value;
+						group.advanceDays = popup.getRowByName("Time Offset").rowInput.value;
+						break;
 					case "Manual":
 						group.materials = {};
 						
@@ -1087,6 +1116,21 @@ function parseActionPackage(rawActionPackage, userInfo, messageBox)
 		return actionPackage;
 	}
 	var error = false;
+	
+	// Generate arrays of CX inventories so nothing is double counted later on
+	const CXInvs = {};
+	["AI1", "CI1", "CI2", "IC1", "NC1", "NC2"].forEach(ticker => {
+		CXInvs[ticker] = {};
+		const inv = findCorrespondingPlanet(ExchangeTickersReverse[ticker], userInfo["PMMG-User-Info"]["storage"], false);
+		
+		if(inv)
+		{
+			inv.items.forEach(mat => {
+				CXInvs[ticker][mat.MaterialTicker] = mat.Amount;
+			});
+		}
+	});
+	
 	rawActionPackage.actions.forEach(action => {
 		if(action.type == "CX Buy")
 		{
@@ -1117,29 +1161,26 @@ function parseActionPackage(rawActionPackage, userInfo, messageBox)
 			// Take out materials in CX inventory if requested
 			if(action.useCXInv)
 			{
-				const CXInv = findCorrespondingPlanet(ExchangeTickersReverse[action.exchange], userInfo["PMMG-User-Info"]["storage"], false);
-				
-				if(CXInv)
-				{
-					Object.keys(parsedGroup).forEach(mat => {
-						CXInv.items.forEach(CXMat => {
-							if(CXMat.MaterialTicker == mat)
-							{
-								parsedGroup[mat] -= CXMat.Amount;
-							}
-						});
-						
-						if(parsedGroup[mat] <= 0)	// Remove material from list if you already have enough on the CX
+
+				Object.keys(parsedGroup).forEach(mat => {
+					Object.keys(CXInvs[action.exchange]).forEach(CXMat => {
+						if(CXMat == mat)
 						{
-							delete parsedGroup[mat];
+							const used = Math.min(parsedGroup[mat], CXInvs[action.exchange][CXMat]);	// Amount of material used (minimum of needed and had on hand)
+							parsedGroup[mat] -= used;
+							CXInvs[action.exchange][CXMat] -= used;
+							if(CXInvs[action.exchange][mat] <= 0)	// Remove material from CX Inv is already allocated
+							{
+								delete CXInvs[action.exchange][CXMat];
+							}
 						}
 					});
-				}
-				else
-				{
-					error = true;
-					addMessage(messageBox, "Error: No CX inventory detected");
-				}
+					if(parsedGroup[mat] <= 0)	// Remove material from list if you already have enough on the CX
+					{
+						delete parsedGroup[mat];
+					}
+					
+				});
 			}
 			
 			
@@ -1301,6 +1342,76 @@ function parseGroup(group, messageBox, userInfo, errorFlag)
 			addMessage(messageBox, "Error: Missing burn data");
 			errorFlag[0] = true;
 			return parsedGroup;
+		}
+	}
+	else if(group.type == "Repair")
+	{
+		if(!group.planet)
+		{
+			addMessage(messageBox, "Error: Missing resupply planet");
+			errorFlag[0] = true;
+			return parsedGroup;
+		}
+		const threshold = isNaN(parseFloat(group.days)) ? 0 : parseFloat(group.days);	// The threshold to start repairing buildings [days]
+		const advanceDays = isNaN(parseFloat(group.advanceDays)) ? 0 : parseFloat(group.advanceDays);	// The number of days forward looking
+		
+		const planetSite = findCorrespondingPlanet(group.planet, userInfo["PMMG-User-Info"]["sites"], true);
+		
+		if(planetSite && planetSite.buildings)
+		{
+			planetSite.buildings.forEach(building => {
+				if(NonProductionBuildings.includes(building["buildingTicker"])){return;}
+				
+				const date = (((new Date()).getTime() - building.lastRepair) / 86400000);
+				
+				if((date + advanceDays) < threshold){return;}	// Parse out too new of buildings
+				
+				// Calculate total building cost
+				const buildingMaterials = {};
+				building.reclaimableMaterials.forEach(mat => {
+					const amount = mat.amount;
+					const ticker = mat.material.ticker;
+					if(buildingMaterials[ticker])
+					{
+						buildingMaterials[ticker] += amount;
+					}
+					else
+					{
+						buildingMaterials[ticker] = amount;
+					}
+				});
+				building.repairMaterials.forEach(mat => {
+					const amount = mat.amount;
+					const ticker = mat.material.ticker;
+					if(buildingMaterials[ticker])
+					{
+						buildingMaterials[ticker] += amount;
+					}
+					else
+					{
+						buildingMaterials[ticker] = amount;
+					}
+				});
+				
+				const adjustedDate = date + advanceDays;
+				Object.keys(buildingMaterials).forEach(ticker => {
+					const amount = adjustedDate > 180 ? buildingMaterials[ticker] : Math.ceil(buildingMaterials[ticker] * adjustedDate / 180);	// This isn't quite right, but will be off by only 1 MCG at most
+					
+					if(parsedGroup[ticker])
+					{
+						parsedGroup[ticker] += amount;
+					}
+					else
+					{
+						parsedGroup[ticker] = amount;
+					}
+				});
+			});
+		}
+		else
+		{
+			addMessage(messageBox, "Error: Missing data on repair planet");
+			errorFlag[0] = true;
 		}
 	}
 	else if(group.type == "Manual")
