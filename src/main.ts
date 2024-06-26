@@ -1,11 +1,7 @@
 import { FlightETAs } from "./FlightETAs";
-import { LocalMarketAds } from './LocalMarketAds';
 import { ModuleRunner } from "./ModuleRunner";
 import { OrderETAs } from "./OrderETAs";
-import { ConsumableTimers } from "./ConsumableTimers";
 import { FleetETAs } from "./FleetETAs";
-import { PostLM } from "./PostLM";
-import { ShippingAds } from "./ShippingAds";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
 import { getPrices, getCXPrices} from "./BackgroundRunner";
@@ -173,15 +169,10 @@ function mainRun(result, browser?)
 	}
 	// Create the object that will run all the modules in a loop
 	const runner = new ModuleRunner([
-		  new ShippingAds(),
-		  new LocalMarketAds(),
-		  new PostLM(webData),
-		  //new ContractDrafts(webData),
 		  new OrderETAs(),
 		  new FlightETAs(),
 		  new FleetETAs(),
 		  new QueueLoad(),
-		  new ConsumableTimers(result["PMMGExtended"]["burn_thresholds"], userInfo),
 		  new InventoryOrganizer(userInfo, result),
 		  new Notifications(userInfo),
 		  new ImageCreator(),
