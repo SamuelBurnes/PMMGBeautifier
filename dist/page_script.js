@@ -37,10 +37,26 @@ else
         wsAddListener(ws, 'message', function(event)
         {
             //console.debug("Websocket message occurred");
+            var url = window.location.href;
+            var match = url.match(/.*context=(?<Context>[0-9a-fA-F]{32})/);
+            
+            var currentContext = null;
+            if (match && match.groups && Object.hasOwn(match.groups, "Context"))
+            {
+                currentContext = "\"" + match.groups["Context"] + "\"";
+            }
+            else
+            {
+                currentContext = "null";
+            }
+
+            var lhs = event.data.slice(0, event.data.length-2);
+            var rhs = event.data.slice(event.data.length-2, event.data.length);
+            var newEventData = lhs + ", \"pmmg_context\": " + currentContext + rhs;
             window.postMessage(
                 { 
                     message: "pmmg_websocket_update",
-                    payload: event.data,
+                    payload: newEventData,
                 }
             );
         });

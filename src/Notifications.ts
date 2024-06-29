@@ -101,7 +101,9 @@ export class Notifications implements Module {
 				case "chamber of global commerce":
 					notText = notText.replace(/ a new economic program/, "");
 					notText = notText.replace(/ Advertising Campaign:/, "");
-					
+					break;
+				case "population infrastructure project":
+					notText = notText.replace(/population infrastructure/, "POPI");
 					break;
 			}
 			(element.children[1] as HTMLElement).textContent = notText;
@@ -116,6 +118,7 @@ export class Notifications implements Module {
 // Words to search for, their types, and colors courtesy of Ray K
 // Searches must be lower case
 const Searchers = [
+	["a new motion", "motion", "#ffda94"],
 	["contract", "contract", "rgb(247, 166, 0)"],
 	["our corporation", "corp", "#8f52cc"],
 	["accepted our invitation", "corp", "#8f52cc"],
@@ -126,16 +129,17 @@ const Searchers = [
 	["order filled", "order", "#cc2929"],
 	["arrived at", "arrival", "#b336b3"],
 	["report", "report", "#00aa77"],
-	["election", "election", "#8f52cc"],
-	["governor", "governor", "#8f52cc"],
-	["rules", "rules", "#8f52cc"],
+	["election", "election", "#ffda94"],
+	["government", "parliment", "#ffda94"],
+	["rules", "rules", "#ffda94"],
 	["cogc", "COGC", "#8f52cc"],
 	["chamber of global commerce", "COGC", "#8f52cc"],
 	["expert", "expert", "#ff8a00"],
 	["population infrastructure project", "POPI", "#8f52cc"],
+	["POPI project", "POPI", "#8f52cc"],
 	["apex", "update", "#00aa77"],
 	["warehous", "war", "#cc2929"],
 	["shipbuilding project", "ship", "#8f52cc"],
 	["planetary project", "infra", "#8f52cc"],
-	["consumable supplies", "supplies", "#b37b32"]
+	["consumable supplies", "supplies", "#b37b32"],
 ]

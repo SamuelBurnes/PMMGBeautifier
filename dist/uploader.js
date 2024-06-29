@@ -9,6 +9,15 @@ if(typeof browser === "undefined") {
 var eventQueue = [];
 var processingqueue = false;
 
+var companyContext
+
+getLocalStorage("PMMGContext", function(result){
+	if(result["PMMGContext"])
+	{
+		companyContext = result["PMMGContext"];
+	}
+});
+
 // Send a message object to the content script.
 async function sendContentMessage(msgObject)
 {
@@ -30,9 +39,7 @@ const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
-	//console.log("Processing Event");
-	// Testing code
-	
+	// Log everything
 	/*
 	const badTypes = ["ACTION_COMPLETED", "DATA_DATA", "CHANNEL_DATA", "CHANNEL_USER_LIST", "CHANNEL_UNSEEN_MESSAGES_COUNT"];
 	if(eventdata && !badTypes.includes(eventdata.messageType))
@@ -48,6 +55,30 @@ async function ProcessEvent(eventdata, event_list, full_event)
 	{
 		return;
 	}
+	
+	const isCompanyContext = eventdata.pmmg_context === undefined || eventdata.pmmg_context === null || companyContext === undefined || companyContext === null || eventdata.pmmg_context == companyContext;
+	if (!isCompanyContext)
+    {
+        // We're running under a non-company context
+        //console.log("Running under non-company context!");
+        return;
+    }
+	
+	// Handle determining the current context
+    if (eventdata.messageType == "ACTION_COMPLETED" && eventdata.payload && eventdata.payload.message && eventdata.payload.message.messageType == "USER_DATA" && eventdata.payload.message.payload && eventdata.payload.message.payload.contexts)
+    {
+        console.log("Found USER_DATA payload");
+        for (var context in eventdata.payload.message.payload.contexts)
+        {
+            if (eventdata.payload.message.payload.contexts[context].type == "COMPANY")
+            {
+                companyContext = eventdata.payload.message.payload.contexts[context].id;
+                setSettings({"PMMGContext": companyContext});
+                console.log("Found company context: " + companyContext);
+                break;
+            }
+        }
+    }
 	
 	//console.debug(eventdata);
 	
@@ -418,9 +449,12 @@ async function logEvent(result, eventdata)
 		case "COMPANY_DATA":	// Currency
 			result["PMMG-User-Info"]["currency"] = [];
 			
-			eventdata.payload.currencyAccounts.forEach(account => {
-				result["PMMG-User-Info"]["currency"].push(account.currencyBalance);
-			});
+			if(eventdata.payload.currencyAccounts)
+			{
+				eventdata.payload.currencyAccounts.forEach(account => {
+					result["PMMG-User-Info"]["currency"].push(account.currencyBalance);
+				});
+			}
 			
 			result["PMMG-User-Info"]["company-name"] = "";
 			

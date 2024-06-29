@@ -33,7 +33,7 @@ export const Style = {
   RadioButtonValue:      ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO"],
   SettingsText:          ["RadioItem__value___Yd1Gt1T", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO", "RadioItem__valueHorizontal___D5AXJ9P"],
   ScreenUnderlineUntoggled: ["HeadItem__indicatorPrimary___rx46qOB", "HeadItem__indicator___A_wijoE"],
-  ScreenUnderlineToggled: ["HeadItem__indicatorPrimary___rx46qOB", "HeadItem__indicator___A_wijoE", "ScreenControls__indicatorActive___cnKagZ4", "effects__shadowPrimary___EbXJQor"],
+  ScreenUnderlineToggled: ["HeadItem__indicatorPrimary___rx46qOB", "HeadItem__indicator___A_wijoE", "HeadItem__indicatorPrimaryActive___m718hwk", "effects__shadowPrimary___EbXJQor"],
 
   // Action bar stuff
   ActionBarContainer: ["ActionBar__container___p760bSs"],
@@ -525,8 +525,8 @@ td.burn-red-no-hover {
 }
 .notification {
 	display: inline-block;
-	min-width: 62px;
-	max-width: 62px;
+	min-width: 65px;
+	max-width: 65px;
 }
 .fin-box {
 	margin: 1px;
