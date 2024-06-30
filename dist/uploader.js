@@ -35,7 +35,7 @@ if(browser.storage.session && typeof(browser.storage.session) !== "undefined")
 	storage_location = browser.storage.session;
 }
 
-const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA", "SHIP_SHIPS"];
+const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA", "SHIP_SHIPS", "ACCOUNTING_CASH_BALANCES"];
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
@@ -446,16 +446,7 @@ async function logEvent(result, eventdata)
 				result["PMMG-User-Info"]["production"].push(siteInfo);
 			}
 			break;
-		case "COMPANY_DATA":	// Currency
-			result["PMMG-User-Info"]["currency"] = [];
-			
-			if(eventdata.payload.currencyAccounts)
-			{
-				eventdata.payload.currencyAccounts.forEach(account => {
-					result["PMMG-User-Info"]["currency"].push(account.currencyBalance);
-				});
-			}
-			
+		case "COMPANY_DATA":	// Company info
 			result["PMMG-User-Info"]["company-name"] = "";
 			
 			if(eventdata.payload.name)
@@ -467,6 +458,17 @@ async function logEvent(result, eventdata)
 				result["PMMG-User-Info"]["company-id"] = eventdata.payload.id;
 			}
 			break;
+		case "ACCOUNTING_CASH_BALANCES":
+			result["PMMG-User-Info"]["currency"] = [];
+			
+			console.log(eventdata.payload);
+			
+			if(eventdata.payload.currencyAccounts)
+			{
+				eventdata.payload.currencyAccounts.forEach(account => {
+					result["PMMG-User-Info"]["currency"].push(account.currencyBalance);
+				});
+			}
 		case "FOREX_TRADER_ORDERS":	// FX Orders
 			result["PMMG-User-Info"]["fxos"] = eventdata.payload.orders;
 			break;
