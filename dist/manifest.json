@@ -46,7 +46,8 @@
 			"resources": [
 				"page_script.js",
 				"uploader.js",
-				"css/*.css"
+				"css/*.css",
+				"*.js.map"
 			]
 		}
 	]
