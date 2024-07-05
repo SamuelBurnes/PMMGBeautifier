@@ -1,7 +1,7 @@
 import { Module } from "./ModuleRunner";
 import { getBuffersFromList, createTextSpan } from "./util";
 import { Selector } from "./Selector";
-import { WithStyles, Style } from "Style";
+import { WithStyles, Style } from "./Style";
 import { Exchanges } from "./GameProperties";
 
 
