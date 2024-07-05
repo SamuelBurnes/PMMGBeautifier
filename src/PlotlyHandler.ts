@@ -1,5 +1,5 @@
-import Plotly from "./plotly-2.30.0.min.js";
 import {DefaultColors} from "./Style";
+import { AxisType, Data, Layout, newPlot } from "plotly.js-dist-min";
 
 /*export function generateTestGraph()
 {
@@ -20,19 +20,19 @@ import {DefaultColors} from "./Style";
 	return plotTester;
 }*/
 
-export function generateLineGraph(xdata, ydata, xlabel, ylabel, plotWidth, plotHeight, xtype = "", ytype = "", xprefix = "", yprefix = "", xformat = "", yformat = "")
+export function generateLineGraph(xdata, ydata, xlabel, ylabel, plotWidth, plotHeight, xtype: AxisType = "-", ytype: AxisType = "-", xprefix = "", yprefix = "", xformat = "", yformat = "")
 {
 	const graph = document.createElement('div');
 	const data = [{x: xdata, y: ydata, line: {color: '#f7a600'}, mode: "lines"}];
 	
-	const layout = { 
+	const layout: Partial<Layout> = { 
 		margin: {t: 10, b:40, l:80, r:10}, width: plotWidth, height: plotHeight, plot_bgcolor: "rgba(0,0,0,0)", paper_bgcolor: "rgba(0,0,0,0)", hovermode: "closest", dragmode: "pan",
 			xaxis: {type: xtype, gridcolor: "#505050", tickfont: {color: "#999"}, tickformat: xformat == "" ? undefined : xformat, tickprefix: xprefix,
 				title: {text: xlabel, font: {family: '"Droid Sans", sans-serif', color: 'rgb(238, 238, 238)'}}},
 			yaxis: {type: ytype, gridcolor: "#505050", tickfont: {color: "#999"}, tickformat: yformat == "" ? undefined : yformat, tickprefix: yprefix,
 				title: {text: ylabel, font: {family: '"Droid Sans", sans-serif', color: 'rgb(238, 238, 238)'}}}}
 	
-	Plotly.newPlot(graph, data, layout, {displayModeBar: false, scrollZoom: true});
+	newPlot(graph, data, layout, {displayModeBar: false, scrollZoom: true});
 	
 	return graph;
 }
@@ -51,13 +51,14 @@ export function generatePieChart(labelData, numericalData, plotWidth, plotHeight
 	}
 	
 	const graph = document.createElement('div');
-	const data = [{values: numericalData,
+	const data: Data[] = [{values: numericalData,
 		labels: labelData,
 		type: "pie",
 		hoverinfo: 'label+percent',
 		textinfo: 'label',
 		marker: {colors: colorScheme},
 		insidetextorientation: "horizontal",
+		// @ts-ignore
 		textfont: {color: "#cccccc"},
 		automargin: true,
 		sort: false
@@ -72,7 +73,7 @@ export function generatePieChart(labelData, numericalData, plotWidth, plotHeight
 		showlegend: false
 	};
 	
-	Plotly.newPlot(graph, data, layout, {displayModeBar: false, scrollZoom: false});
+	newPlot(graph, data, layout, {displayModeBar: false, scrollZoom: false});
 	
 	return graph;
 }
