@@ -1,7 +1,7 @@
 import { Module } from "./ModuleRunner";
 import { getBuffersFromList, setSettings } from "./util";
 import { Selector } from "./Selector";
-import { Style, ChatDeleteStyle, JoinLeaveStyle } from "./Style";
+import { appendStyle, PmmgStylesheet, Style } from "./Style";
 
 export class ChatDeleteButton implements Module {
     private tag = "pb-chat-delete";
@@ -82,18 +82,7 @@ function addChatDeleteToggle(buffer, pmmgSettings, tag)
 		{
 			chatIndicator.classList.remove(...Style.RadioButtonUnToggled);
 			chatIndicator.classList.add(...Style.RadioButtonToggled);
-			
-			if(!document.getElementById("pmmg-chat-delete-style"))
-			{
-				// Style doesn't exist: Add it.
-				const chatDelete = document.createElement("style");
-				chatDelete.type = "text/css";
-				chatDelete.id = "pmmg-chat-delete-style";
-				chatDelete.textContent = ChatDeleteStyle;
-				
-				const doc = document.querySelector("html");
-				if(doc){doc.appendChild(chatDelete);}
-			}
+			appendStyle(PmmgStylesheet.hideChatDelete);
 		}
 		else
 		{
@@ -120,18 +109,7 @@ function addChatDeleteToggle(buffer, pmmgSettings, tag)
 		{
 			chatIndicator.classList.remove(...Style.RadioButtonUnToggled);
 			chatIndicator.classList.add(...Style.RadioButtonToggled);
-			
-			if(!document.getElementById("pmmg-chat-join-style"))
-			{
-				// Style doesn't exist: Add it.
-				const chatDelete = document.createElement("style");
-				chatDelete.type = "text/css";
-				chatDelete.id = "pmmg-chat-join-style";
-				chatDelete.textContent = JoinLeaveStyle;
-				
-				const doc = document.querySelector("html");
-				if(doc){doc.appendChild(chatDelete);}
-			}
+			appendStyle(PmmgStylesheet.hideChatJoinLeave);
 		}
 		else
 		{

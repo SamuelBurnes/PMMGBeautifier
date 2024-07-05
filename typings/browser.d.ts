@@ -4,4 +4,7 @@ declare namespace browser {
     function set(items: any);
     function remove(keys: any);
   }
+	namespace runtime {
+		function getURL(path: string): string;
+	}
 }
