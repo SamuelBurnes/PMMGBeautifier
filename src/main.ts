@@ -28,6 +28,7 @@ import { LocalMarketAds } from "./LocalMarketAds";
 import { ConsumableTimers } from "./ConsumableTimers";
 import { ShippingAds } from "./ShippingAds";
 import { PostLM } from "./PostLM";
+import { loadSettings, Settings } from './Settings';
 
 // Inject page_script.js directly into the webpage.
 
@@ -45,42 +46,26 @@ function AddScriptToDOM(script_name)
 
 AddScriptToDOM("page_script.js");
 
-try
-{
-	// Try and get stored settings using FireFox syntax
-	browser.storage.local.get("PMMGExtended").then(mainRun, onError);
-	console.log("PMMG: FireFox detected");
-} catch(ex)
-{
-	// Method throws an error if not on FF, so then try and get stored settings using Chromium syntax
-	console.log("PMMG: Chromium detected");
-	chrome.storage.local.get(["PMMGExtended"], function(result)
-	{
-		mainRun(result, "chromium");
-	});
-}
-
 // The main function that initializes everything
-function mainRun(result, browser?)
-{
-	// If no stored data, make it blank so it can be written to
-	if(!result["PMMGExtended"]){result["PMMGExtended"] = {};}
+async function mainRun() {
+	let result: Settings;
+	try {
+		result = await loadSettings();
+	} catch (e) {
+		console.error("PMMG: Failed to load settings");
+		throw e;
+	}
 	
 	// Detect what date it is for... no reason.
 	const specialTime = getSpecial() && !result["PMMGExtended"]["surprises_opt_out"];
 	// Log if is the first time the user loads PMMG Extended
-	if(!result["PMMGExtended"]["loaded_before"])
+	if(!result.PMMGExtended.loaded_before)
 	{
 		console.log("First Time Loading PMMG");
 	}
 	
 	const doc = document.querySelector("html");
 	if(!doc){return;}
-	
-	// If no module states are specified, disable screen unpack by default
-	if(!result["PMMGExtended"]["disabled"]){result["PMMGExtended"]["disabled"] = ["ScreenUnpack"];}
-	
-	if(result["PMMGExtended"]["burn_display_settings"]){delete result["PMMGExtended"]["burn_display_settings"];}
 	
 	// If enhanced color scheme is selected or no color scheme is selected, appy the enhanced color scheme
 	if(result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"])
@@ -160,7 +145,7 @@ function mainRun(result, browser?)
 		  new LocalMarketAds(),
 		  new PostLM(webData),
 		  new ConsumableTimers(result["PMMGExtended"]["burn_thresholds"], userInfo)
-	], result, webData, userInfo, browser);
+	], result, webData, userInfo);
 	
 	// Start the loop
 	(function () {
@@ -169,7 +154,4 @@ function mainRun(result, browser?)
 	})();
 }
 
-function onError(err)
-{
-	console.log(err);
-}
+mainRun();
