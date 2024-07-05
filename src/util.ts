@@ -1409,3 +1409,11 @@ class PopupRow
 		}
 	}
 }
+
+export function getExtensionResource(path: string): string {
+	if (chrome !== undefined) {
+		return chrome.runtime.getURL(path);
+	} else {
+		return browser.runtime.getURL(path);
+	}
+}

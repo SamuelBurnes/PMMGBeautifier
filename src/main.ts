@@ -4,9 +4,9 @@ import { OrderETAs } from "./OrderETAs";
 import { FleetETAs } from "./FleetETAs";
 import { QueueLoad } from "./QueueLoad";
 import { Notifications } from "./Notifications";
-import { getPrices, getCXPrices} from "./BackgroundRunner";
-import { getSpecial} from "./util";
-import { PMMGStyle, EnhancedColors, OldColors, IconStyle, AdvancedStyle, ChatDeleteStyle, JoinLeaveStyle } from "./Style";
+import { getCXPrices, getPrices } from "./BackgroundRunner";
+import { getSpecial } from "./util";
+import { appendStyle, PmmgStylesheet } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
@@ -24,7 +24,7 @@ import { CXPOOrderBook } from "./CXPOOrderBook";
 import { ChatDeleteButton } from "./ChatDeleteButton";
 import { IconMarkers } from "./IconMarkers";
 //import { InsetFixer } from "./InsetFixer";
-import { LocalMarketAds } from './LocalMarketAds';
+import { LocalMarketAds } from "./LocalMarketAds";
 import { ConsumableTimers } from "./ConsumableTimers";
 import { ShippingAds } from "./ShippingAds";
 import { PostLM } from "./PostLM";
@@ -74,14 +74,8 @@ function mainRun(result, browser?)
 		console.log("First Time Loading PMMG");
 	}
 	
-	// Apply the PMMG styles necessary for modules to function
-	const style = document.createElement("style");
-	style.type = "text/css";
-	style.id = "pmmg-style";
-	style.textContent = PMMGStyle;
 	const doc = document.querySelector("html");
 	if(!doc){return;}
-	if(doc){doc.appendChild(style);}
 	
 	// If no module states are specified, disable screen unpack by default
 	if(!result["PMMGExtended"]["disabled"]){result["PMMGExtended"]["disabled"] = ["ScreenUnpack"];}
@@ -91,67 +85,35 @@ function mainRun(result, browser?)
 	// If enhanced color scheme is selected or no color scheme is selected, appy the enhanced color scheme
 	if(result["PMMGExtended"]["color_scheme"] == "enhanced" || !result["PMMGExtended"]["color_scheme"])
 	{
-		const colors = document.createElement("style");
-		colors.type = "text/css";
-		
-		if(specialTime)
-		{
-			colors.id = "pmmg-old-colors";
-			colors.textContent = OldColors;
-
-		}
-		else
-		{
-			colors.id = "pmmg-enhanced-colors";
-			colors.textContent = EnhancedColors;
-		}
-		if(doc){doc.appendChild(colors);}
+		appendStyle(specialTime
+			? PmmgStylesheet.oldColors
+			: PmmgStylesheet.enhancedColors
+		);
 	}
 	// If the icons color scheme is selected, apply it
 	else if(result["PMMGExtended"]["color_scheme"] == "icons")	// Use allocater's icons
 	{
-		const colors = document.createElement("style");
-		colors.type = "text/css";
-		if(specialTime)
-		{
-			colors.id = "pmmg-old-colors";
-			colors.textContent = OldColors;
-		}
-		else
-		{
-			colors.id = "pmmg-icon-colors";
-			colors.textContent = IconStyle;
-		}
-		if(doc){doc.appendChild(colors);}
+		appendStyle(specialTime
+			? PmmgStylesheet.oldColors
+			: PmmgStylesheet.icons
+		);
 	}
 	
 	if(result["PMMGExtended"]["advanced_mode"] && doc)
 	{
-		const advancedStyle = document.createElement("style");
-		advancedStyle.type = "text/css";
-		advancedStyle.id = "pmmg-advanced";
-		advancedStyle.textContent = AdvancedStyle;
-		doc.appendChild(advancedStyle);
+		appendStyle(PmmgStylesheet.advanced);
 	}
 	
 	// Apply hiding chat delete button if enabled
 	if(result["PMMGExtended"]["chat_delete_hidden"])
 	{
-		const chatDelete = document.createElement("style");
-		chatDelete.type = "text/css";
-		chatDelete.id = "pmmg-chat-delete-style";
-		chatDelete.textContent = ChatDeleteStyle;
-		if(doc){doc.appendChild(chatDelete);}
+		appendStyle(PmmgStylesheet.hideChatDelete);
 	}
 	
 	// Apply hiding join/leave messages if enabled
 	if(result["PMMGExtended"]["join_leave_hidden"])
 	{
-		const joinLeave = document.createElement("style");
-		joinLeave.type = "text/css";
-		joinLeave.id = "pmmg-chat-join-style";
-		joinLeave.textContent = JoinLeaveStyle;
-		if(doc){doc.appendChild(joinLeave);}
+		appendStyle(PmmgStylesheet.hideChatJoinLeave);
 	}
 	
 	// Introduce an object that will hold and be periodically updated with latest info harvested from server traffic
