@@ -31,17 +31,15 @@ export async function saveSettings(settings: Settings) {
 		return await chrome.storage.local.set(settings);
 	}
 	else {
-		return await browser.storage.local.get(settings);
+		return await browser.storage.local.set(settings);
 	}
 }
 
 async function loadDataFromStorage() {
 	if (CHROME) {
-		console.log("PMMG: Chromium detected");
 		return await chrome.storage.local.get(settingsKey);
 	}
 	else {
-		console.log("PMMG: Firefox detected");
 		return await browser.storage.local.get(settingsKey);
 	}
 }

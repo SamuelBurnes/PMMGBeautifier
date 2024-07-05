@@ -203,13 +203,13 @@ export class Settings {
 		
 		tile.appendChild(burnDiv);
 
-		if(!pmmgSettings["PMMGExtended"]["burn_green_buffer"]){pmmgSettings["PMMGExtended"]["burn_green_buffer"] = 7;}
+		if(pmmgSettings["PMMGExtended"]["burn_green_buffer"] !== undefined){pmmgSettings["PMMGExtended"]["burn_green_buffer"] = 7;}
 		const greenDiv = document.createElement("div");
 		setDiv.appendChild(greenDiv);
 		greenDiv.appendChild(createTextSpan("Green Buffer: "));
 		const greenIn = document.createElement("input");
 		greenIn.type = "number";
-		greenIn.value = (pmmgSettings["PMMGExtended"]["burn_green_buffer"] || 7).toLocaleString(undefined, {maximumFractionDigits: 0});
+		greenIn.value = (pmmgSettings["PMMGExtended"]["burn_green_buffer"]).toLocaleString(undefined, {maximumFractionDigits: 0});
 		greenDiv.appendChild(greenIn);
 		greenIn.classList.add("input-text");
 		greenIn.style.width = "50px";
