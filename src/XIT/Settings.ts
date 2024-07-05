@@ -164,7 +164,7 @@ export class Settings {
 		const burnDiv = document.createElement("div");
 		const burnLabel = document.createElement('h3');
 		burnLabel.appendChild(createTextSpan("Burn Settings"));
-		burnLabel.appendChild(createToolTip("Set the thresholds for yellow and red consumable levels in burn tiles (in days).", "right"));
+		burnLabel.appendChild(createToolTip("Set the thresholds for yellow and red consumable levels in burn tiles (in days). The Green Buffer value (in days) will be added on top of amount needed to reach green threshold.", "right"));
 		burnLabel.classList.add(...Style.SidebarSectionHead);
 		burnLabel.style.marginBottom = "4px";
 		burnDiv.appendChild(burnLabel);
@@ -201,6 +201,23 @@ export class Settings {
 			setSettings(pmmgSettings);
 		});
 		
+		tile.appendChild(burnDiv);
+
+		if(!pmmgSettings["PMMGExtended"]["burn_green_buffer"]){pmmgSettings["PMMGExtended"]["burn_green_buffer"] = 7;}
+		const greenDiv = document.createElement("div");
+		setDiv.appendChild(greenDiv);
+		greenDiv.appendChild(createTextSpan("Green Buffer: "));
+		const greenIn = document.createElement("input");
+		greenIn.type = "number";
+		greenIn.value = (pmmgSettings["PMMGExtended"]["burn_green_buffer"] || 7).toLocaleString(undefined, {maximumFractionDigits: 0});
+		greenDiv.appendChild(greenIn);
+		greenIn.classList.add("input-text");
+		greenIn.style.width = "50px";
+		greenIn.addEventListener("input", function(){
+			pmmgSettings["PMMGExtended"]["burn_green_buffer"] = parseFloat(greenIn.value);
+			setSettings(pmmgSettings);
+		});
+
 		tile.appendChild(burnDiv);
 		
 		const hotkeyHeader = document.createElement('h3');
