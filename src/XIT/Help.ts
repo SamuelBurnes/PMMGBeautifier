@@ -1,4 +1,4 @@
-import {createTextSpan, clearChildren} from "../util";
+import { createTextSpan, clearChildren, createLink } from "../util";
 import {Style} from "../Style"
 
 export class Help {
@@ -93,28 +93,143 @@ export class Help {
 		body = document.createElement("tbody");
 		table.appendChild(body);
 		
-		createTableRow(body, ["Burn", "XIT BURN", "Planet", "Shows the number of days of consumables left."])
-		createTableRow(body, ["Repairs", "XIT REPAIRS", "Planet (optional)", "Shows the materials to repair buildings."])
-		createTableRow(body, ["Contracts", "XIT CONTRACTS", "None", "Shows pending contracts."])
-		createTableRow(body, ["Finances", "XIT FIN", "None", "Shows financial information."])
-		createTableRow(body, ["Action Packages", "XIT ACTION", "GEN and/or Action name (optional)", "Allows automation of certain tasks."])
-		createTableRow(body, ["FIO Inventory", "XIT INV", "Username, Planet", "Shows the inventory of another FIO user."])
-		createTableRow(body, ["Notes", "XIT NOTES", "Note Name (optional)", "Provides a text area to type a note in."])
-		createTableRow(body, ["Checklists", "XIT CHECKLIST", "Checklist Name (optional)", "Provides checklist you can add items to."])
-		createTableRow(body, ["Command Lists", "XIT LIST", "List Name (optional)", "Provides a customizable list of command links."])
-		createTableRow(body, ["Settings", "XIT SETTINGS", "None", "Open PMMG settings."])
-		createTableRow(body, ["Calculator", "XIT CALC", "None", "Provides an ingame calculator."])
-		createTableRow(body, ["Chat", "XIT CHAT", "Planet", "Provides read-only access to a planet chat."])
-		createTableRow(body, ["Data Health", "XIT HEALTH", "None", "Shows statistics on collected data."])
-		createTableRow(body, ["Debug", "XIT DEBUG", "None", "Debugging menu."])
-		createTableRow(body, ["Start", "XIT START", "None", "First time user popup."])
-		createTableRow(body, ["PrUN Planner", "XIT PLANNER", "Specific Page (optional)", "Links to PrUN Planner."])
-		createTableRow(body, ["Wiki", "XIT WIKI", "None", "Links PrUN wiki."])
-		createTableRow(body, ["FIO", "XIT FIO", "None", "Links to FIO Web."])
-		createTableRow(body, ["Discord", "XIT DISCORD", "Server ID/Name, Channel ID", "Allows you to chat in Discord."])
-		createTableRow(body, ["Sheets", "XIT SHEETS", "Sheet ID", "Connects to Google Sheets."])
-		createTableRow(body, ["Prosperity", "XIT PROSPERITY", "None", "Accesses the Prosperity map tool."])
-		createTableRow(body, ["PrUN", "XIT PRUN", "None", "Opens PrUN... in PrUN!"])
+		createCommandRow(body, {
+			name: "Burn",
+			command: "XIT BURN",
+			description: "Shows the number of days of consumables left.",
+			parameters: "Planet",
+			requiresParameter: true,
+			defaultParameter: "ALL"
+		});
+		createCommandRow(body, {
+			name: "Repairs",
+			command: "XIT REPAIRS",
+			description: "Shows the materials to repair buildings.",
+			parameters: "Planet (optional)",
+			requiresParameter: false,
+		});
+		createCommandRow(body, {
+			name: "Contracts",
+			command: "XIT CONTRACTS",
+			description: "Shows pending contracts.",
+		});
+		createCommandRow(body, {
+			name: "Finances",
+			command: "XIT FIN",
+			description: "Shows financial information.",
+		});
+		createCommandRow(body, {
+			name: "Action Packages",
+			command: "XIT ACTION",
+			description: "Allows automation of certain tasks.",
+			parameters: "GEN and/or Action name (optional)",
+			requiresParameter: false,
+		});
+		createCommandRow(body, {
+			name: "FIO Inventory",
+			command: "XIT INV",
+			description: "Shows the inventory of another FIO user.",
+			parameters: "Username, Planet",
+			requiresParameter: true,
+			parameterTemplate: "{Username}_{Planet}"
+		});
+		createCommandRow(body, {
+			name: "Notes",
+			command: "XIT NOTES",
+			description: "Provides a text area to type a note in.",
+			parameters: "Note Name (optional)",
+			requiresParameter: false,
+		});
+		createCommandRow(body, {
+			name: "Checklists",
+			command: "XIT CHECKLIST",
+			description: "Provides checklist you can add items to.",
+			parameters: "Checklist Name (optional)",
+			requiresParameter: false,
+		});
+		createCommandRow(body, {
+			name: "Command Lists",
+			command: "XIT LIST",
+			description: "Provides a customizable list of command links.",
+			parameters: "List Name (optional)",
+			requiresParameter: false,
+		});
+		createCommandRow(body, {
+			name: "Settings",
+			command: "XIT SETTINGS",
+			description: "Open PMMG settings.",
+		});
+		createCommandRow(body, {
+			name: "Calculator",
+			command: "XIT CALC",
+			description: "Provides an ingame calculator.",
+		});
+		createCommandRow(body, {
+			name: "Chat",
+			command: "XIT CHAT",
+			description: "Provides read-only access to a planet chat.",
+			parameters: "Planet",
+			requiresParameter: true,
+			parameterTemplate: "{Planet}"
+		});
+		createCommandRow(body, {
+			name: "Data Health",
+			command: "XIT HEALTH",
+			description: "Shows statistics on collected data.",
+		});
+		createCommandRow(body, {
+			name: "Debug",
+			command: "XIT DEBUG",
+			description: "Debugging menu.",
+		});
+		createCommandRow(body, {
+			name: "Start",
+			command: "XIT START",
+			description: "First time user popup.",
+		});
+		createCommandRow(body, {
+			name: "PrUN Planner",
+			command: "XIT PLANNER",
+			description: "Links to PrUN Planner.",
+			parameters: "Specific Page (optional)",
+			requiresParameter: false,
+		});
+		createCommandRow(body, {
+			name: "Wiki",
+			command: "XIT WIKI",
+			description: "Links PrUN wiki.",
+		});
+		createCommandRow(body, {
+			name: "FIO",
+			command: "XIT FIO",
+			description: "Links to FIO Web.",
+		});
+		createCommandRow(body, {
+			name: "Discord",
+			command: "XIT DISCORD",
+			description: "Allows you to chat in Discord.",
+			parameters: "Server ID/Name, Channel ID",
+			requiresParameter: true,
+			parameterTemplate: "{ServerID}_{ChannelID}"
+		});
+		createCommandRow(body, {
+			name: "Sheets",
+			command: "XIT SHEETS",
+			description: "Connects to Google Sheets.",
+			parameters: "Sheet ID",
+			requiresParameter: true,
+			parameterTemplate: "{SheetID}"
+		});
+		createCommandRow(body, {
+			name: "Prosperity",
+			command: "XIT PROSPERITY",
+			description: "Accesses the Prosperity map tool.",
+		});
+		createCommandRow(body, {
+			name: "PrUN",
+			command: "XIT PRUN",
+			description: "Opens PrUN... in PrUN!",
+		});
 		
 		const bugHeader = document.createElement('h3');
 		bugHeader.appendChild(document.createTextNode("Common Issues"));
@@ -167,6 +282,43 @@ function createTableRow(body, contents: string[])	// Text is an array of text va
 	});
 	body.appendChild(row);
 	return;
+}
+
+interface CommandDescriptor {
+	name: string;
+	command: string;
+	description: string;
+	parameters?: string;
+	requiresParameter?: boolean;
+	defaultParameter?: string;
+	parameterTemplate?: string;
+}
+
+function createCommandRow(body: HTMLElement, descriptor: CommandDescriptor)
+{
+	const row = document.createElement("tr");
+	function appendColumn(element: HTMLElement) {
+		const td = document.createElement("td");
+		td.appendChild(element);
+		row.appendChild(td);
+	}
+
+	appendColumn(createTextSpan(descriptor.name));
+	let command = descriptor.command;
+	let autoSubmit = true;
+	if (descriptor.parameters !== undefined && descriptor.requiresParameter) {
+		command += "_";
+		if (descriptor.defaultParameter !== undefined) {
+			command += descriptor.defaultParameter;
+		} else {
+			command += descriptor.parameterTemplate;
+			autoSubmit = false;
+		}
+	}
+	appendColumn(createLink(descriptor.command, command, autoSubmit));
+	appendColumn(createTextSpan(descriptor.parameters ?? "None"));
+	appendColumn(createTextSpan(descriptor.description));
+	body.appendChild(row);
 }
 
 function generateActionHelpScreen(tile)

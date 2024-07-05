@@ -461,11 +461,11 @@ export function createMaterialElement(ticker, className: string = "prun-remove-j
 	return outerLayer;
 }
 // Creates an element that links to a buffer with command "command"
-export function createLink(text, command)
+export function createLink(text, command, autoSubmit = true)
 {
 	const link = document.createElement("span");
 	link.textContent = text;
-	link.addEventListener("click", function(){showBuffer(command);});
+	link.addEventListener("click", function(){showBuffer(command, autoSubmit);});
 	
 	const linkDiv = document.createElement("div");
 	linkDiv.classList.add("link");
@@ -474,13 +474,15 @@ export function createLink(text, command)
 }
 
 // Shows a buffer with a specified command
-export function showBuffer(command) {
+export function showBuffer(command, autoSubmit = true) {
 	const button = document.getElementById(Selector.NewBFRButton);
 	if(button == null){return false;}
 
     const addSubmitCommand = (input, cmd) => {
         changeValue(input, cmd);
-        input.parentElement.parentElement.requestSubmit();
+		if (autoSubmit) {
+			input.parentElement.parentElement.requestSubmit();
+		}
     }
 
     // Watch for future buffer creation
