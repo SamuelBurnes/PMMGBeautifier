@@ -1,3 +1,7 @@
 node_modules
 src.zip
 dist/main.js
+.idea
+.vscode
+desktop.ini
+.DS_Store
