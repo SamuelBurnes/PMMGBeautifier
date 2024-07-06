@@ -26,6 +26,15 @@
 				"https://apex.prosperousuniverse.com/*"
 			],
 			"js": [
+				"document_start.js"
+			],
+			"run_at": "document_start"
+		},
+		{
+			"matches": [
+				"https://apex.prosperousuniverse.com/*"
+			],
+			"js": [
 				"main.js"
 			],
 			"css": [

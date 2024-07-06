@@ -30,22 +30,6 @@ import { ShippingAds } from "./ShippingAds";
 import { PostLM } from "./PostLM";
 import { loadSettings, Settings } from './Settings';
 
-// Inject page_script.js directly into the webpage.
-
-function AddScriptToDOM(script_name)
-{
-	var browser = typeof browser === "undefined" ? chrome : browser;
-	
-    var s = document.createElement('script');
-    s.src = browser.runtime.getURL(script_name);
-    s.onload = function() {
-        s.remove();
-    };
-    (document.head || document.documentElement).appendChild(s);
-}
-
-AddScriptToDOM("page_script.js");
-
 // The main function that initializes everything
 async function mainRun() {
 	let result: Settings;
