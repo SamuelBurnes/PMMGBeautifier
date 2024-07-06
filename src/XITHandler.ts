@@ -32,7 +32,7 @@ import {Repairs} from "./XIT/Repairs";
 import {Settings} from "./XIT/Settings";
 import {Sort} from "./XIT/Sort";
 import {Start} from "./XIT/Start";
-import {PrUN, Prosperity, Sheets, Wiki, PrunPlanner, FIO} from "./XIT/Web";
+import {PrUN, Prosperity, Sheets, Wiki, PrunPlanner, Map} from "./XIT/Web";
 import {Checklists} from "./XIT/Checklists";
 import {Execute} from "./XIT/Execute";
 import {Notes} from "./XIT/Notes";
@@ -76,14 +76,14 @@ const XITClasses: {[key: string]: new(...args: any[]) => XITModule} = {
 	"PLANNER": PrunPlanner,
 	"PLAN": PrunPlanner,
 	"PRUNPLANNER": PrunPlanner,
-	"FIO": FIO,
 	"CHECK": Checklists,
 	"CHECKLIST": Checklists,
 	"CHECKLISTS": Checklists,
 	"NOTE": Notes,
 	"NOTES": Notes,
 	"ACT": Execute,
-	"ACTION": Execute
+	"ACTION": Execute,
+	"MAP": Map
 }
 
 

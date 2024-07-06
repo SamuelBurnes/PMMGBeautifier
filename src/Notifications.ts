@@ -26,6 +26,12 @@ export class Notifications implements Module {
 	  {
 		return;
 	  }
+	  // Don't mess with loading notifications
+	  if(!element.textContent || element.textContent.includes("Loading…"))
+	  {
+		return;
+	  }
+	  
 	  const textContent = (element.children[0] as HTMLElement).textContent;
 	  if(textContent == null){return;}
 	  const text = textContent.toLowerCase();
@@ -41,7 +47,10 @@ export class Notifications implements Module {
 			typeSpan.classList.add(this.tag);
 			typeSpan.classList.add("notification");
 			typeSpan.style.color = search[2];
-			element.insertBefore(typeSpan, element.children[0]);
+			if(element.children[0])
+			{
+				element.insertBefore(typeSpan, element.children[0]);
+			}
 			
 			// Shorten notifications
 			var matches;
@@ -122,6 +131,7 @@ const Searchers = [
 	["contract", "contract", "rgb(247, 166, 0)"],
 	["our corporation", "corp", "#8f52cc"],
 	["accepted our invitation", "corp", "#8f52cc"],
+	["received an invitation", "corp", "#8f52cc"],
 	["produced", "produced", "#3fa2de"],
 	["accepted", "advert", "#449c57"],
 	["expired", "advert", "#449c57"],
@@ -143,4 +153,6 @@ const Searchers = [
 	["shipbuilding project", "ship", "#8f52cc"],
 	["planetary project", "infra", "#8f52cc"],
 	["consumable supplies", "supplies", "#b37b32"],
+	["motion", "motion", "#ffda94"],
+	
 ]

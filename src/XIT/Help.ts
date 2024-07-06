@@ -195,24 +195,6 @@ export class Help {
 			requiresParameter: false,
 		});
 		createCommandRow(body, {
-			name: "Wiki",
-			command: "XIT WIKI",
-			description: "Links PrUN wiki.",
-		});
-		createCommandRow(body, {
-			name: "FIO",
-			command: "XIT FIO",
-			description: "Links to FIO Web.",
-		});
-		createCommandRow(body, {
-			name: "Discord",
-			command: "XIT DISCORD",
-			description: "Allows you to chat in Discord.",
-			parameters: "Server ID/Name, Channel ID",
-			requiresParameter: true,
-			parameterTemplate: "{ServerID}_{ChannelID}"
-		});
-		createCommandRow(body, {
 			name: "Sheets",
 			command: "XIT SHEETS",
 			description: "Connects to Google Sheets.",

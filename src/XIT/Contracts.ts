@@ -236,7 +236,15 @@ function createContractRow(contract)
 
 	if ( !faction )
 	{
-		let partnerLink = createLink( contract.partner.name, "CO " + contract.partner.code );
+		var partnerLink;
+		if(contract.partner.code)
+		{
+			partnerLink = createLink( contract.partner.name, "CO " + contract.partner.code );
+		}
+		else
+		{
+			partnerLink = createTextSpan(contract.preamble);
+		}
 		partnerColumn.appendChild( partnerLink );
 	}
 	else

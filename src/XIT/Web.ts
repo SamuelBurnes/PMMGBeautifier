@@ -159,6 +159,9 @@ export function Discord_pre(tile, parameters)
 }
 */
 
+
+// Wiki iframe not working right now. Refuses to connect
+
 export class Wiki {
 	private tile: HTMLElement;
 	private parameters: string[];
@@ -230,9 +233,9 @@ export class PrunPlanner {
 	}
 }
 
-export class FIO {
+export class Map {
 	private tile: HTMLElement;
-	public name = "FIO";
+	public name = "Taiyi's Map";
 	
 	constructor(tile)
 	{
@@ -242,12 +245,13 @@ export class FIO {
 	create_buffer()
 	{
 		clearChildren(this.tile);
-		const frame = document.createElement("iframe");
-			frame.src = "https://fio.fnar.net/";
-			frame.style.borderWidth = "0";
-			frame.style.height = "100%";
-			frame.style.width = "100%";
-		this.tile.appendChild(frame);
+		const map = document.createElement("iframe");
+			map.src = "https://universemap.duckdns.org/";
+			map.width = "100%";
+			map.height = "100%";
+			map.style.borderWidth = "0";
+		this.tile.appendChild(map);
+		return;
 	}
 	
 	update_buffer()
