@@ -12,6 +12,12 @@ export const Style = {
   ButtonNeutral:   ["Button__neutral___OAFOaNs"],
   SmallButton:     ["Button__darkInline___z_YKa91", "Button__dark___vdJbcc8", "Button__btn___UJGZ1b7", "Button__inline___Ffw9bbn"],
   
+  // Context bar styles
+  ContextBar: ["ContextControls__container___dzDODeW"],
+  ContextButton: ["ContextControls__item____QDkFMH", "fonts__font-regular___Sxp1xjo", "type__type-small___pMQhMQO"],
+  ContextCommand: ["ContextControls__cmd___BXQDTL_"],
+  ContextLabel: ["ContextControls__label___xomE3De"],
+  
   // Misc styles
   SidebarSectionHead:    ["Sidebar__sectionHead____NHLKDT", "fonts__font-regular___Sxp1xjo"],
   SidebarSectionContent: ["Sidebar__sectionContent___wgGYFop", "fonts__font-regular___Sxp1xjo"],

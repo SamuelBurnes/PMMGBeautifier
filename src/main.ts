@@ -10,7 +10,7 @@ import { appendStyle, PmmgStylesheet } from "./Style";
 import { ScreenUnpack } from "./ScreenUnpack";
 import { Sidebar } from "./Sidebar";
 import { CommandCorrecter } from "./CommandCorrecter";
-import { CalculatorButton } from "./CalculatorButton";
+import { TopRightButtons } from "./TopRightButtons";
 import { ImageCreator } from "./ImageCreator";
 import { InventoryOrganizer } from "./InventoryOrganizer";
 import { HeaderMinimizer } from "./HeaderMinimizer";
@@ -28,17 +28,26 @@ import { LocalMarketAds } from "./LocalMarketAds";
 import { ConsumableTimers } from "./ConsumableTimers";
 import { ShippingAds } from "./ShippingAds";
 import { PostLM } from "./PostLM";
-import { loadSettings, Settings } from './Settings';
+import {ProdBurnLink} from "./ProdBurnLink";
+
+try
+{
+	// Try and get stored settings using FireFox syntax
+	browser.storage.local.get("PMMGExtended").then(mainRun, onError);
+	console.log("PMMG: FireFox detected");
+} catch(ex)
+{
+	// Method throws an error if not on FF, so then try and get stored settings using Chromium syntax
+	console.log("PMMG: Chromium detected");
+	chrome.storage.local.get(["PMMGExtended"], function(result)
+	{
+		mainRun(result, true);
+	});
+}
 
 // The main function that initializes everything
-async function mainRun() {
-	let result: Settings;
-	try {
-		result = await loadSettings();
-	} catch (e) {
-		console.error("PMMG: Failed to load settings");
-		throw e;
-	}
+function mainRun(result, isChrome?) {
+	if(!result["PMMGExtended"]){result["PMMGExtended"] = {}}
 	
 	// Detect what date it is for... no reason.
 	const specialTime = getSpecial() && !result["PMMGExtended"]["surprises_opt_out"];
@@ -115,7 +124,7 @@ async function mainRun() {
 		  new HeaderMinimizer(result["PMMGExtended"]["minimize_by_default"]),
 		  new AdvancedMode(result["PMMGExtended"]["advanced_mode"]),
 		  new CommandCorrecter(),
-		  new CalculatorButton(),
+		  new TopRightButtons(isChrome),
 		  new Sidebar(result["PMMGExtended"]["sidebar"]),
 		  new PendingContracts(userInfo),
 		  new CompactUI(result),
@@ -128,8 +137,9 @@ async function mainRun() {
 		  new ShippingAds(),
 		  new LocalMarketAds(),
 		  new PostLM(webData),
-		  new ConsumableTimers(result["PMMGExtended"]["burn_thresholds"], userInfo)
-	], result, webData, userInfo);
+		  new ConsumableTimers(result["PMMGExtended"]["burn_thresholds"], userInfo),
+		  new ProdBurnLink()
+	], result, webData, userInfo, isChrome);
 	
 	// Start the loop
 	(function () {
@@ -138,4 +148,7 @@ async function mainRun() {
 	})();
 }
 
-mainRun();
+function onError(err)
+{
+	console.log(err);
+}

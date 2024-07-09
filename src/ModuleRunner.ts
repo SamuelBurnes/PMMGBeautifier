@@ -1,8 +1,7 @@
 import {XITHandler} from "./XITHandler";
-import { showBuffer, getLocalStorage, getBuffers } from "./util";
+import { showBuffer, getLocalStorage, getBuffers, setSettings } from "./util";
 import { FriendlyNames } from "./GameProperties";
 import { Selector } from "./Selector";
-import { saveSettings, Settings } from './Settings';
 
 export interface Module {
   run(buffers: any[]);
@@ -24,13 +23,13 @@ export class ModuleRunner {
   private readonly modules: ModuleEntry[];	// The list of modules run by the extension
   private readonly xit: XITHandler;	// The XIT module, run separately
   private userInfo;
-  private result: Settings;	// The stored settings
+  private result;	// The stored settings
   private iteration;
-  constructor(modules: Module[], result: Settings, webData, userInfo) {
+  constructor(modules: Module[], result, webData, userInfo, isChrome) {
 	// Construct global variables
 	this.iteration = 0;
     this.modules = modules.map(m => this.moduleToME(m));
-	this.xit = new XITHandler(result, userInfo, webData, this.modules);
+	this.xit = new XITHandler(result, userInfo, webData, this.modules, isChrome);
 	this.result = result;
 	this.userInfo = userInfo;
 	
@@ -96,7 +95,7 @@ export class ModuleRunner {
 		this.result.PMMGExtended.loaded_before = showBuffer("XIT START");
 		if(this.result.PMMGExtended.loaded_before)
 		{
-			saveSettings(this.result);
+			setSettings(this.result);
 		}
 	}
 	

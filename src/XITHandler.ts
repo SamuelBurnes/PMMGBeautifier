@@ -36,7 +36,6 @@ import {PrUN, Prosperity, Sheets, Wiki, PrunPlanner, Map} from "./XIT/Web";
 import {Checklists} from "./XIT/Checklists";
 import {Execute} from "./XIT/Execute";
 import {Notes} from "./XIT/Notes";
-import { CHROME } from './env';
 
 // This is the structure all classes should follow. For some reason extending classes in other files shows XITModule as undefined.
 // Not the best solution, but it works. Be careful implementing new modules that they include these functions.
@@ -96,13 +95,15 @@ export class XITHandler implements Module {
   private modules;
   private pmmgSettings;
   private userInfo;
+  private isChrome;
   
-  constructor(pmmgSettings, userInfo, webData, modules)
+  constructor(pmmgSettings, userInfo, webData, modules, isChrome)
   {  
 	this.userInfo = userInfo;
 	this.webData = webData;
 	this.modules = modules;
 	this.pmmgSettings = pmmgSettings;
+	this.isChrome = isChrome;
   }
   cleanup() {
     //genericCleanup(this.tag);	// Don't clean up because causes flashing when doing asynchronous requests
@@ -159,8 +160,8 @@ export class XITHandler implements Module {
 					refreshButton.appendChild(createTextSpan("⟳"));
 					refreshButton.classList.add("button-upper-right");
 					refreshButton.classList.add(this.tag);
-					refreshButton.style.fontSize = "16px";
-					refreshButton.style.paddingTop = CHROME ? "12px" : "7px";
+					refreshButton.style.fontSize = this.isChrome ? "16px" : "18px";
+					refreshButton.style.paddingTop = this.isChrome ? "12px" : "6px";
 					refreshButton.classList.add("refresh");
 					(buffer.children[3] || buffer.children[2]).insertBefore(refreshButton, (buffer.children[3] || buffer.children[2]).firstChild);
 				}

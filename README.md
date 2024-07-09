@@ -10,6 +10,10 @@ In addition, thank you to our other contributors:
 * AGM-114 - Pending Contracts and Compact UI
 * allocater - Icons Style
 * Booers - Links in XIT NOTES
+* Razenpok - Code improvements
+
+Licensing:
+* SVG Icons by Pixelbazaar in CC Attribution License via SVG Repo
 
 Features and examples are listed on PMMG's website: https://sites.google.com/view/pmmgextended/features?authuser=0
 

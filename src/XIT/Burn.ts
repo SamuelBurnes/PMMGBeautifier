@@ -1,5 +1,4 @@
-import {clearChildren, createTextSpan, setSettings, CategorySort, findCorrespondingPlanet, createMaterialElement, calculateBurn} from "../util";
-import {Style} from "../Style";
+import {clearChildren, createTextSpan, setSettings, CategorySort, findCorrespondingPlanet, createMaterialElement, calculateBurn, createSettingsButton} from "../util";
 import {Selector} from "../Selector";
 import {MaterialNames} from "../GameProperties";
 
@@ -21,7 +20,7 @@ export class Burn {
 		
 		if(parameters[1] && !parameters[2])
 		{
-			this.name = "ENHANCED BURN" + (parameters[1] ? " - " + parameters[1].toUpperCase() : "");
+			this.name = "ENHANCED BURN - " + parameters[1].toUpperCase();
 		}
 		else
 		{
@@ -36,11 +35,6 @@ export class Burn {
 		const pmmgSettings = this.pmmgSettings;
 		
 		clearChildren(this.tile);
-		if(!this.parameters[1])
-		{
-			this.tile.textContent = "Error! Enter planet name(s) after XIT BURN (XIT BURN_UV-351a)";
-			return;
-		}
 		
 		if(!this.userInfo["PMMG-User-Info"] || !this.userInfo["PMMG-User-Info"]["workforce"])
 		{
@@ -57,7 +51,7 @@ export class Burn {
 		// To do multiple planets, multiple planetBurns need to be created
 		
 		
-		if(this.parameters[1].toLowerCase() == "all")
+		if(!this.parameters[1] || this.parameters[1].toLowerCase() == "all")
 		{
 			this.userInfo["PMMG-User-Info"]["workforce"].forEach(planetWorkforce => {
 				if(!planetWorkforce.PlanetName){return;}
@@ -399,43 +393,4 @@ function UpdateBurn(table, dispSettings)
 		});
 	});
 	return;
-}
-
-function createSettingsButton(text, width, toggled, f)
-{
-	const button = document.createElement("span");
-	const bar = document.createElement("div");
-	if(toggled)
-	{
-		bar.classList.add(...Style.SettingsBarToggled);
-	}
-	else
-	{
-		bar.classList.add(...Style.SettingsBarUntoggled);
-	}
-	const textBox = document.createElement("div");
-	textBox.classList.add(...Style.SettingsText);
-	textBox.textContent = text;
-	button.classList.add(...Style.SettingsButton);
-	bar.style.width = width + "px";
-	bar.style.maxWidth = width + "px";
-	bar.style.height = "2px";
-	button.appendChild(bar);
-	button.appendChild(textBox);
-	button.addEventListener("click", function() {
-		if(toggled)
-		{
-			bar.classList.remove(...Style.SettingsBarToggled);
-			bar.classList.add(...Style.SettingsBarUntoggled);
-			toggled = false;
-		}
-		else
-		{
-			bar.classList.remove(...Style.SettingsBarUntoggled);
-			bar.classList.add(...Style.SettingsBarToggled);
-			toggled = true;
-		}
-		f();
-	});
-	return button;
 }
