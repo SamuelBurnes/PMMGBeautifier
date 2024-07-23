@@ -61,6 +61,7 @@ export class ModuleRunner {
   }
 
   loop() {
+  
 	// Gets all buffers
 	const bufferDivs = getBuffers("");
 	const buffers = [] as any[];

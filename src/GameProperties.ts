@@ -1,3 +1,62 @@
+// A function to compare two planets (to be used in .sort() functions)
+export function comparePlanets(planetA, planetB)
+{
+	// Determine the planets' natural IDs (XX-###x)
+	const aNatural = /^[A-Za-z]{2}-\d{3}[A-Za-z]$/.test(planetA) ? planetA : PlanetNames[planetA.toUpperCase()];
+	const bNatural = /^[A-Za-z]{2}-\d{3}[A-Za-z]$/.test(planetB) ? planetB : PlanetNames[planetB.toUpperCase()];
+	
+	if(!aNatural)
+	{
+		return 1;
+	}
+	if(!bNatural)
+	{
+		return -1;
+	}
+	
+	// Determine if the systems are named
+	const aSystemName = ReverseSystemNames[aNatural.slice(0, -1)];
+	const bSystemName = ReverseSystemNames[bNatural.slice(0, -1)];
+	
+	if(aSystemName && !bSystemName)
+	{
+		return -1;
+	}
+	if(bSystemName && !aSystemName)
+	{
+		return 1;
+	}
+	if(aSystemName && bSystemName && aSystemName != bSystemName)
+	{
+		return aSystemName > bSystemName ? 1 : -1;
+	}
+	
+	// Neither named or in same system
+	
+	// Determine planet names
+	const aPlanetName = ReversePlanetNames[aNatural];
+	const bPlanetName = ReversePlanetNames[bNatural];
+	
+	if(aPlanetName && !bPlanetName)
+	{
+		return -1;
+	}
+	if(bPlanetName && !aPlanetName)
+	{
+		return 1;
+	}
+	
+	// Both named
+	if(aPlanetName && bPlanetName)
+	{
+		return aPlanetName > bPlanetName ? 1 : -1;
+	}
+	
+	// Neither named
+	return aNatural > bNatural ? 1 : -1;
+}
+
+
 /**
  * A list of the material names and their corresponding ticker, weight, and volume. Makes it easier to reference FIO data
  *
@@ -104,6 +163,7 @@ export const FriendlyNames = {
 	"CXOBHighlighter": "CXOB Name Highlighter",
 	"CXPOOrderBook": "CXPO Order Book",
 	"ChatDeleteButton": "Toggle Chat Delete (Master)",
+	"ProdBurnLink": "Production Line Burn Link"
 }
 
 export const SortingTriangleHTML = `
@@ -245,6 +305,151 @@ export const PlanetNames = {
 	"DEIMOS": "ZV-759c",
 	"HARMONIA": "ZV-896b",
 	"LIFE": "ZV-896c"
+}
+
+export const ReverseSystemNames = {
+	"AM-783": "Arclight",
+	"FK-371": "Forge-Keep",
+	"HM-049": "Mount Olympus",
+	"HM-223": "Gateway",
+	"JS-299": "Neo Eden",
+	"JS-952": "Ebisu",
+	"KW-020": "Bastablon",
+	"LG-418": "Dolzena",
+	"OF-259": "Trinity",
+	"OT-580": "Moria",
+	"PG-899": "Outer Heaven",
+	"QJ-684": "Acetares",
+	"TD-203": "Hubur",
+	"UV-135": "Hotei",
+	"UV-351": "Benten",
+	"UV-796": "Daikoku",
+	"VH-331": "Hortus",
+	"WB-675": "Midway",
+	"ZV-194": "Antares III",
+	"ZV-307": "Antares I",
+	"ZV-759": "Antares II"
+}
+
+export const ReversePlanetNames = {
+	"AJ-768a": "Lemuria",
+	"AM-783b": "Gallus",
+	"AM-783c": "Ementior",
+	"AU-522b": "Typhon",
+	"BS-788c": "Nova Honshu",
+	"CB-045b": "Tacotopia",
+	"CG-044c": "Jotu",
+	"CH-771a": "Pyrgos",
+	"DC-823b": "Talosia",
+	"DW-456g": "Orm",
+	"EL-179b": "Manifold",
+	"EZ-476b": "Nova Unalaska",
+	"FK-037f": "Toktu",
+	"FK-371b": "La Forge",
+	"FK-794b": "Boucher",
+	"FK-794c": "Epicier",
+	"GC-645b": "Vault",
+	"GY-110c": "Chu",
+	"HM-049b": "Poseidon",
+	"HM-301b": "Cadia",
+	"IA-603b": "Apothecary",
+	"IY-028c": "Electronica",
+	"JS-299a": "Nemesis",
+	"JS-570a": "Singren",
+	"JS-601c": "Brokkraf",
+	"JS-952c": "Gibson",
+	"KI-446a": "Australia",
+	"KI-446b": "Demeter",
+	"KI-448b": "Hermes",
+	"KQ-966b": "Rock",
+	"KW-020c": "Milliways",
+	"KW-358b": "Giedi Prime",
+	"KW-688c": "Etherwind",
+	"LG-418b": "Kinza",
+	"LG-913e": "Planet Mc Planetface",
+	"LS-231b": "Aratora",
+	"LS-300c": "Griffonstone",
+	"OF-259d": "Jura",
+	"OF-375b": "Berthier",
+	"OF-375c": "Adalina",
+	"OF-586b": "Akkala",
+	"OT-442b": "Danakil",
+	"OT-442h": "Manakil",
+	"OT-580a": "Iiron",
+	"OT-580b": "Montem",
+	"OT-580c": "Vallis",
+	"OT-580d": "Pallada",
+	"OT-580e": "Fresnel Beacon",
+	"OT-627c": "Polaris",
+	"OT-889a": "Prism",
+	"OT-889b": "Jeetiyu",
+	"OZ-189c": "Curie",
+	"PD-754d": "Ashland",
+	"PG-899b": "Saladin",
+	"QJ-149c": "Nascent",
+	"QJ-382g": "Romulus",
+	"QJ-382i": "Remus",
+	"QJ-650c": "Elon",
+	"QJ-684a": "Lom Palanka",
+	"QJ-684b": "Aceland",
+	"QQ-001a": "Circa",
+	"QQ-001b": "Circe",
+	"QQ-645b": "Celebdil",
+	"RC-040b": "Malahat",
+	"RC-040c": "Ironforge",
+	"SE-110c": "Ice Station Alpha",
+	"TD-203b": "Sheol",
+	"TD-228b": "Rhazes",
+	"TD-260f": "Tibet",
+	"TO-392d": "Sabaton",
+	"UB-402e": "Alyazkcalb",
+	"UV-072c": "Asbestos Lead Asbestos",
+	"UV-351a": "Katoa",
+	"UV-351b": "Yannick",
+	"UV-351c": "Umbra",
+	"UV-351d": "Biogenesis",
+	"UV-351e": "Tarvos",
+	"UV-796b": "Proxion",
+	"VH-043a": "Phantasm",
+	"VH-043c": "Nobelion",
+	"VH-331a": "Promitor",
+	"VH-331b": "Dreamerr Prime",
+	"VH-331d": "Helion Prime",
+	"VH-331e": "Shiptronia",
+	"VH-331f": "Odysseus",
+	"VH-331g": "Avalon",
+	"VH-331i": "Hydron",
+	"VH-778b": "Shesmu",
+	"WB-675c": "Sand",
+	"WB-675i": "Gasworld",
+	"WC-702b": "Mimar",
+	"XD-354b": "Magus",
+	"XG-326b": "Titan",
+	"XG-326c": "Nutaaq Nuuk",
+	"XG-326d": "Frost",
+	"XH-329a": "Uponor",
+	"XH-594a": "Libertas",
+	"XH-594b": "Kiruna",
+	"XH-594c": "Cortez",
+	"YI-059f": "Kub",
+	"YI-209h": "Harpina",
+	"YI-683c": "Arcadia",
+	"YI-715a": "Chrono",
+	"YI-715b": "Verdant",
+	"YK-005d": "Halcyon",
+	"YK-649b": "Norwick",
+	"YK-715c": "Tiezendor",
+	"ZK-357e": "Esmeralda",
+	"ZV-194a": "Nike",
+	"ZV-307a": "Eos",
+	"ZV-307b": "Bober",
+	"ZV-307c": "Hephaestus",
+	"ZV-307d": "Phobos",
+	"ZV-307e": "Astraeus",
+	"ZV-759b": "Vulcan",
+	"ZV-759c": "Deimos",
+	"ZV-896b": "Harmonia",
+	"ZV-896c": "Life"
 }
 
 export const MaterialNames = {

@@ -44,6 +44,13 @@ export class FormulaReplacer implements Module {
 		buffers.forEach(buffer => {
 			addListeners(buffer, this.tag);
 		});
+		
+		buffers = getBuffersFromList("MOTS ", allBuffers);
+		if(!buffers){return;}
+		
+		buffers.forEach(buffer => {
+			addListeners(buffer, this.tag);
+		});
 		return;
     }
   

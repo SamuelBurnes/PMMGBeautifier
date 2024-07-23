@@ -47,6 +47,7 @@ try
 
 // The main function that initializes everything
 function mainRun(result, isChrome?) {
+	
 	if(!result["PMMGExtended"]){result["PMMGExtended"] = {}}
 	
 	// Detect what date it is for... no reason.
