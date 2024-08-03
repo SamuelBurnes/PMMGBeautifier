@@ -6,3 +6,4 @@ dist/main.js.map
 .vscode
 desktop.ini
 .DS_Store
+dist/manifest.zip

@@ -203,7 +203,7 @@ export class Settings {
 		
 		tile.appendChild(burnDiv);
 
-		if(pmmgSettings["PMMGExtended"]["burn_green_buffer"] === undefined){pmmgSettings["PMMGExtended"]["burn_green_buffer"] = 3;}
+		if(pmmgSettings["PMMGExtended"]["burn_green_buffer"] === undefined){pmmgSettings["PMMGExtended"]["burn_green_buffer"] = 0;}
 		const greenDiv = document.createElement("div");
 		setDiv.appendChild(greenDiv);
 		greenDiv.appendChild(createTextSpan("Green Buffer: "));
