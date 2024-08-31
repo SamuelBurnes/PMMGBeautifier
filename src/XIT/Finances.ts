@@ -1213,11 +1213,11 @@ export function calculateFinancials(webData, userInfo, result, loop)
 			
 			if(order["type"] == "SELLING")
 			{
-				fxSellValue += order.initialAmount.amount;
+				fxSellValue += order.amount.amount;
 			}
 			else
 			{
-				fxBuyValue += order.limit.rate * order.initialAmount.amount;
+				fxBuyValue += order.limit.rate * order.amount.amount;
 			}
 		});
 	}

@@ -23,9 +23,6 @@ import { CXOBHighlighter } from "./CXOBHighlighter";
 import { CXPOOrderBook } from "./CXPOOrderBook";
 import { ChatDeleteButton } from "./ChatDeleteButton";
 import { IconMarkers } from "./IconMarkers";
-//import { InsetFixer } from "./InsetFixer";
-import { LocalMarketAds } from "./LocalMarketAds";
-import { ConsumableTimers } from "./ConsumableTimers";
 import { ShippingAds } from "./ShippingAds";
 import { PostLM } from "./PostLM";
 import {ProdBurnLink} from "./ProdBurnLink";
@@ -134,12 +131,9 @@ function mainRun(result, isChrome?) {
 		  new CXPOOrderBook(userInfo),
 		  new ChatDeleteButton(result),
 		  new IconMarkers(),
-		  //new InsetFixer(),	// Remove when this PrUN bug is fixed for real
 		  new ShippingAds(),
-		  new LocalMarketAds(),
 		  new PostLM(webData),
-		  new ConsumableTimers(result["PMMGExtended"]["burn_thresholds"], userInfo),
-		  new ProdBurnLink()
+		  new ProdBurnLink(),
 	], result, webData, userInfo, isChrome);
 	
 	// Start the loop

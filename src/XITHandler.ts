@@ -34,7 +34,7 @@ import {Sort} from "./XIT/Sort";
 import {Start} from "./XIT/Start";
 import {PrUN, Prosperity, Sheets, Wiki, PrunPlanner, Map} from "./XIT/Web";
 import {Checklists} from "./XIT/Checklists";
-import {Execute} from "./XIT/Execute";
+import {Execute} from "./XIT/Execute/ExecuteMain";
 import {Notes} from "./XIT/Notes";
 
 // This is the structure all classes should follow. For some reason extending classes in other files shows XITModule as undefined.
@@ -62,6 +62,7 @@ const XITClasses: {[key: string]: new(...args: any[]) => XITModule} = {
 	"FINANCE": Finances,
 	"FINANCES": Finances,
 	"HELP": Help,
+	"REPAIR": Repairs,
 	"REPAIRS": Repairs,
 	"SET": Settings,
 	"SETTINGS": Settings,
@@ -141,7 +142,7 @@ export class XITHandler implements Module {
 			parameters[i] = parameters[i].trim()
 		}
 		
-		if(parameters[0] && parameters[0].toUpperCase() == "FIO")	// Exception for FIO to use XIT
+		if(parameters[0] && (parameters[0].toUpperCase() == "FIO" || parameters[0].toUpperCase() == "COL"))	// Exception for FIO and PrUn-Collector to use XIT
 		{
 			return;
 		}

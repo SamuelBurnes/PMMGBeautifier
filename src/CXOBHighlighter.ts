@@ -18,7 +18,12 @@ export class CXOBHighlighter implements Module {
     run(allBuffers) {
 		if(this.userInfo["PMMG-User-Info"] && this.userInfo["PMMG-User-Info"]["company-name"])
 		{
-			const buffers = getBuffersFromList("CXOB ", allBuffers);
+			var buffers = getBuffersFromList("CXOB ", allBuffers);
+			buffers.forEach(buffer => {
+				highlightNames(buffer, this.userInfo, this.tag);
+			});
+			
+			buffers = getBuffersFromList("FXOB ", allBuffers);
 			buffers.forEach(buffer => {
 				highlightNames(buffer, this.userInfo, this.tag);
 			});

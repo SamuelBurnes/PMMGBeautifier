@@ -515,6 +515,17 @@ td.burn-red-no-hover {
 	margin: 1px;
 }
 
+.pb-hide-input {
+	width: 63.675px;
+	color: rgba(1,1,1,0) !important;
+	background-color: rgba(1,1,1,0) !important;
+	cursor: pointer !important;
+	border: none !important;
+}
+.pb-hide-input::placeholder {
+	color: rgba(1,1,1,0) !important;
+}
+
 div.Head__container___3ecBw0E > div:nth-child(2) {
 	flex-shrink: 0;
 }
@@ -523,10 +534,40 @@ div.TileControls__splitControls___fcU57en {
 	display: inline-flex;
 }
 
-/*
-  Fix PrUN Bugs
-  This one no longer works but needs to be done
-*/
 div.ScrollView__view___ovf59Tk {
 	inset: -1px !important;
+}
+
+.rc-slider-mark-text {
+	color: #999 !important;
+	font-size: 10px !important;
+	margin: 0px !important;
+}
+
+.rc-slider-mark-text-active {
+	color: #f7a600 !important;
+}
+
+.rc-slider-track {
+	height: 4px !important;
+	background-color: #f7a600 !important;
+}
+
+.rc-slider-dot {
+	display: block !important;
+}
+
+.rc-slider-handle {
+	width: 14px !important;
+	height: 14px !important;
+	margin-top: -5px !important;
+	background-color: rgb(38, 38, 38) !important;
+	border-color: rgb(251, 211, 128) !important;
+	border-style: solid !important;
+	border-width: 1.6px !important;
+}
+
+.rc-slider {
+	height: 4px !important;
+	background-color: rgb(38, 38, 38) !important;
 }

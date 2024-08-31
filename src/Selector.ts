@@ -67,6 +67,7 @@ export const Selector = {
   ButtonSuccess: "button[class~='Button__success___bCiIVXw']",
   ButtonPrimary: "button[class~='Button__primary____lObPiw']",
   ButtonDisabled: "button[class~='Button__disabled____x8i7XF']",
+  ButtonSmall: "button[class~='Button__darkInline___z_YKa91']",
   ActionFeedback: "span[class~='ActionFeedback__message___G2Sz4bw']",
   ActionFeedbackMain: "span[class~='ActionFeedback__message___G2Sz4bw'] > span",
   ActionSuccess: "div[class~='ActionFeedback__success___nVa5scG']",
@@ -77,5 +78,8 @@ export const Selector = {
   MaterialSelector: "input[class~='MaterialSelector__input___tyJaKPm']",
   ContextBar: "div[class~='ContextControls__container___dzDODeW']",
   TileControls: "div[class~='TileFrame__controls___g5J41WG']",
-  HiddenControls: "div[class~='TileControls__controls___biW6ray']"
+  HiddenControls: "div[class~='TileControls__controls___biW6ray']",
+  MaterialDropdownOption: "div[class~='MaterialSelector__suggestionEntry___n44M3FN']",
+  SliderTextLabel: "span[class~='rc-slider-mark-text']",
+  HorizontalScrollbar: "div[class~='ScrollView__thumb-horizontal___QIUMIda']",
 }

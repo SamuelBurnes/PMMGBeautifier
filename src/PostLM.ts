@@ -33,6 +33,8 @@ export class PostLM implements Module {
 			  break;
 		  }
 	  }
+	  
+	  if(!shipping){return;}	// PrUN implemented non-shipping PPU. Need to clean up file to remove code, but this will prevent it from running alongside PrUn's display.
 	
       const commodity = document.evaluate("div[label/span[text()='Commodity']]//input", form, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as HTMLInputElement;
 	  

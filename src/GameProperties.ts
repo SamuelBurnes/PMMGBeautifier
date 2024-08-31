@@ -1,3 +1,20 @@
+// A function to convert a planet name into the format used in MTRA
+export function mtraConvert(planet)
+{
+	if(Stations[planet])	// For station warehouses, just return the name of that station
+	{
+		return planet.toLowerCase();
+	}
+	
+	// Determine the planets' natural IDs (XX-###x)
+	const natural = /^[A-Za-z]{2}-\d{3}[A-Za-z]$/.test(planet) ? planet : PlanetNames[planet.toUpperCase()];
+	
+	// Get system name or ID
+	const system = ReverseSystemNames[natural.slice(0, -1)] || natural.slice(0, -1);
+	
+	return (system + " - " + planet).toLowerCase();
+}
+
 // A function to compare two planets (to be used in .sort() functions)
 export function comparePlanets(planetA, planetB)
 {
@@ -175,33 +192,25 @@ export const PlanetCommands = ["ADM", "BSC", "COGC", "COGCPEX", "COGCU", "FLTP",
 export const SystemNames = {
 	"ARCLIGHT": "AM-783",
 	"FORGE-KEEP": "FK-371",
-	"WET WATER": "FK-794",
-	"CAYMAN PLANETS": "GC-645",
 	"MOUNT OLYMPUS": "HM-049",
 	"GATEWAY": "HM-223",
 	"NEO EDEN": "JS-299",
 	"EBISU": "JS-952",
 	"BASTABLON": "KW-020",
 	"DOLZENA": "LG-418",
-	"ANTARES V": "LS-300",
 	"TRINITY": "OF-259",
-	"GUNDABAD": "OT-442",
 	"MORIA": "OT-580",
 	"OUTER HEAVEN": "PG-899",
-	"AURUM": "QJ-650",
 	"ACETARES": "QJ-684",
 	"HUBUR": "TD-203",
 	"HOTEI": "UV-135",
 	"BENTEN": "UV-351",
 	"DAIKOKU": "UV-796",
-	"RATHAR": "VH-043",
 	"HORTUS": "VH-331",
 	"MIDWAY": "WB-675",
-	"BASTION": "XG-326",
 	"ANTARES III": "ZV-194",
 	"ANTARES I": "ZV-307",
-	"ANTARES II": "ZV-759",
-	"ANTARES IV": "ZV-896"
+	"ANTARES II": "ZV-759"
 }
 
 export const PlanetNames = {
@@ -224,9 +233,12 @@ export const PlanetNames = {
 	"VAULT": "GC-645b",
 	"CHU": "GY-110c",
 	"POSEIDON": "HM-049b",
+	"CADIA": "HM-301b",
 	"APOTHECARY": "IA-603b",
 	"ELECTRONICA": "IY-028c",
 	"NEMESIS": "JS-299a",
+	"SINGREN": "JS-570a",
+	"BROKKRAF": "JS-601c",
 	"GIBSON": "JS-952c",
 	"AUSTRALIA": "KI-446a",
 	"DEMETER": "KI-446b",
@@ -249,11 +261,16 @@ export const PlanetNames = {
 	"MONTEM": "OT-580b",
 	"VALLIS": "OT-580c",
 	"PALLADA": "OT-580d",
+	"FRESNEL BEACON": "OT-580e",
+	"POLARIS": "OT-627c",
 	"PRISM": "OT-889a",
 	"JEETIYU": "OT-889b",
+	"CURIE": "OZ-189c",
 	"ASHLAND": "PD-754d",
 	"SALADIN": "PG-899b",
 	"NASCENT": "QJ-149c",
+	"ROMULUS": "QJ-382g",
+	"REMUS": "QJ-382i",
 	"ELON": "QJ-650c",
 	"LOM PALANKA": "QJ-684a",
 	"ACELAND": "QJ-684b",
@@ -265,6 +282,7 @@ export const PlanetNames = {
 	"ICE STATION ALPHA": "SE-110c",
 	"SHEOL": "TD-203b",
 	"RHAZES": "TD-228b",
+	"TIBET": "TD-260f",
 	"SABATON": "TO-392d",
 	"ALYAZKCALB": "UB-402e",
 	"ASBESTOS LEAD ASBESTOS": "UV-072c",
@@ -272,10 +290,13 @@ export const PlanetNames = {
 	"YANNICK": "UV-351b",
 	"UMBRA": "UV-351c",
 	"BIOGENESIS": "UV-351d",
+	"TARVOS": "UV-351e",
 	"PROXION": "UV-796b",
 	"PHANTASM": "VH-043a",
 	"NOBELION": "VH-043c",
 	"PROMITOR": "VH-331a",
+	"DREAMERR PRIME": "VH-331b",
+	"BEANIRONIA": "VH-331c",
 	"HELION PRIME": "VH-331d",
 	"SHIPTRONIA": "VH-331e",
 	"ODYSSEUS": "VH-331f",
@@ -285,8 +306,10 @@ export const PlanetNames = {
 	"SAND": "WB-675c",
 	"GASWORLD": "WB-675i",
 	"MIMAR": "WC-702b",
+	"HYALOS": "WU-070a",
 	"MAGUS": "XD-354b",
 	"TITAN": "XG-326b",
+	"NUTAAQ NUUK": "XG-326c",
 	"FROST": "XG-326d",
 	"UPONOR": "XH-329a",
 	"LIBERTAS": "XH-594a",
@@ -295,14 +318,21 @@ export const PlanetNames = {
 	"KUB": "YI-059f",
 	"HARPINA": "YI-209h",
 	"ARCADIA": "YI-683c",
+	"CHRONO": "YI-715a",
 	"VERDANT": "YI-715b",
+	"HALCYON": "YK-005d",
 	"NORWICK": "YK-649b",
+	"TIEZENDOR": "YK-715c",
+	"ESMERALDA": "ZK-357e",
 	"NIKE": "ZV-194a",
+	"EOS": "ZV-307a",
+	"BOBER": "ZV-307b",
 	"HEPHAESTUS": "ZV-307c",
 	"PHOBOS": "ZV-307d",
 	"ASTRAEUS": "ZV-307e",
 	"VULCAN": "ZV-759b",
 	"DEIMOS": "ZV-759c",
+	"AGAMEMNON": "ZV-759d",
 	"HARMONIA": "ZV-896b",
 	"LIFE": "ZV-896c"
 }
@@ -414,6 +444,7 @@ export const ReversePlanetNames = {
 	"VH-043c": "Nobelion",
 	"VH-331a": "Promitor",
 	"VH-331b": "Dreamerr Prime",
+	"VH-331c": "Beanironia",
 	"VH-331d": "Helion Prime",
 	"VH-331e": "Shiptronia",
 	"VH-331f": "Odysseus",
@@ -423,6 +454,7 @@ export const ReversePlanetNames = {
 	"WB-675c": "Sand",
 	"WB-675i": "Gasworld",
 	"WC-702b": "Mimar",
+	"WU-070a": "Hyalos",
 	"XD-354b": "Magus",
 	"XG-326b": "Titan",
 	"XG-326c": "Nutaaq Nuuk",
@@ -448,6 +480,7 @@ export const ReversePlanetNames = {
 	"ZV-307e": "Astraeus",
 	"ZV-759b": "Vulcan",
 	"ZV-759c": "Deimos",
+	"ZV-759d": "Agamemnon",
 	"ZV-896b": "Harmonia",
 	"ZV-896c": "Life"
 }

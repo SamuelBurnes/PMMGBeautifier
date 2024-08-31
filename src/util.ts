@@ -649,27 +649,16 @@ export function changeValue(input, value) {
 }
 
 // Change the value of a select box
-export function changeSelectValue(input, value) {
-    // Get the property descriptor for the input element's value property
-    var propDescriptor = Object.getOwnPropertyDescriptor(
-        window["HTMLSelectElement"].prototype,
-        "value"
-    );
-    // Return if the property descriptor is undefined
-    if (propDescriptor == undefined) { return; }
-    // Get the native input value setter
-    var nativeInputValueSetter = propDescriptor.set;
-    // Return if the native input value setter is undefined
-    if (nativeInputValueSetter == undefined) { return; }
-    // Call the native input value setter with the input element and the new value
-    nativeInputValueSetter.call(input, value);
-
-    // Create a new input event
-    var inputEvent = document.createEvent('Event');
-    // Initialize the event as an "input" event, bubbling and cancelable
-    inputEvent.initEvent('input', true, true);
-    // Dispatch the event to the input element
-    input.dispatchEvent(inputEvent);
+export function changeSelectValue(input, selectIndex) {
+	
+	input.selectedIndex = selectIndex;
+	
+    // Create a new change event
+    var changeEvent = document.createEvent('Event');
+    // Initialize the event as an "change" event, bubbling and cancelable
+    changeEvent.initEvent('change', true, true);
+    // Dispatch the event to the change element
+    input.dispatchEvent(changeEvent);
 }
 
 // Wait for a new buffer to be created
@@ -705,6 +694,11 @@ export function genericCleanup(className: string = "prun-remove-js") {
 	return;
   });
   return;
+}
+
+// Sleep for a number of ms. Don't use on main thread
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export function genericUnhide(className: string = "prun-remove-js") {
