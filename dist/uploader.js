@@ -228,9 +228,9 @@ async function logEvent(result, eventdata)
 			}
 			break;
 		case "STORAGE_STORAGES":
-			result["PMMG-User-Info"]["storage"] = [];
-			
 			eventdata["payload"]["stores"].forEach(store => {
+				const duplicateStoreIndex = result["PMMG-User-Info"]["storage"].findIndex(item => item.id === store["id"]);
+				
 				const givenItems = store["items"];
 				store["items"] = [];
 				givenItems.forEach(item => {
@@ -240,7 +240,14 @@ async function logEvent(result, eventdata)
 					}
 				});
 				
-				result["PMMG-User-Info"]["storage"].push(store);
+				if(duplicateStoreIndex != -1)
+				{
+					result["PMMG-User-Info"]["storage"][duplicateStoreIndex] = store;
+				}
+				else
+				{
+					result["PMMG-User-Info"]["storage"].push(store);
+				}
 			});
 			
 			// Assign planet names

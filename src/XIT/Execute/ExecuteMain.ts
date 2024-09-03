@@ -21,9 +21,9 @@ export class Execute {
 		{
 			this.name = "ACTION PACKAGES";
 		}
-		else if(parameters[1].toLowerCase() == "gen")
+		else if(parameters[1].toLowerCase() == "gen" || parameters[1].toLowerCase() == "edit")
 		{
-			this.name = "GENERATE ACTION PACKAGE";
+			this.name = "EDIT ACTION PACKAGE";
 		}
 		else
 		{
@@ -37,10 +37,10 @@ export class Execute {
 		
 		if(this.parameters.length == 1)
 		{
-			// Create table of all action packages with option to create more?
+			// Create table of all action packages with option to create more
 			createSummaryScreen(this.tile, this);
 		}
-		else if(this.parameters[1] && this.parameters[1].toLowerCase() == "gen")
+		else if(this.parameters[1] && (this.parameters[1].toLowerCase() == "gen" || this.parameters[1].toLowerCase() == "edit"))
 		{
 			// Generate the creation/edit screen
 			createGenerateScreen(this.tile, this.parameters.slice(2).join(" "), this.userInfo);

@@ -228,7 +228,7 @@ export async function createSummaryScreen(tile, parentBuffer)
 		editColumn.appendChild(editButton);
 		row.appendChild(editColumn);
 		editButton.addEventListener("click", function() {
-			showBuffer("XIT ACTION_GEN_" + paramName);
+			showBuffer("XIT ACTION_EDIT_" + paramName);
 		});
 		
 		// Other commands (delete, copy in the future?)

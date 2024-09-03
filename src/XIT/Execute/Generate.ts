@@ -731,7 +731,7 @@ class GenerateScreen {
 		});
 		
 		// Add open button
-		const openButton = this.createFormRow(this.saveSection, "button", "command", "Open", "openButton", "OPEN");
+		const openButton = this.createFormRow(this.saveSection, "button", "command", "Execute", "openButton", "EXECUTE");
 		openButton.addEventListener("click", function() {
 			showBuffer("XIT ACTION_" + thisObj.globalAttributes.name.split(" ").join("_"));
 		});

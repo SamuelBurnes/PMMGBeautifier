@@ -190,7 +190,7 @@ export function parseActionPackage(rawActionPackage, packageConfig, userInfo, me
 			
 			if(!groupNames.includes(action.group))
 			{
-				addMessage(messageBox, "Error: Unrecognized material group on CX buy");
+				addMessage(messageBox, "Error: Unrecognized material group on MTRA");
 				return actionPackage;
 			}
 			if(!action.origin)

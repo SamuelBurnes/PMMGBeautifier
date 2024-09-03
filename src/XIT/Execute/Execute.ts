@@ -346,7 +346,7 @@ async function executeAction(actionPackage, executionIndex, messageBox, executio
 		case "MTRA":	// Change amount and make transfer
 			// Determine how many can be transferred by reading the buffer
 			button.disabled = true;
-			await sleep(50);	// Need to wait for buffer to update
+			await sleep(75);	// Need to wait for buffer to update
 			const sliderNumbers = buffer.querySelectorAll(Selector.SliderTextLabel);
 			var maxAmount = 0;
 			sliderNumbers.forEach(sliderNumber => {
@@ -378,7 +378,7 @@ async function executeAction(actionPackage, executionIndex, messageBox, executio
 			amountInput.focus();	// Need to focus for some reason
 			changeButton.focus();
 			
-			await sleep(50);
+			await sleep(75);
 			
 			changeButton.click();
 			button.disabled = false;
