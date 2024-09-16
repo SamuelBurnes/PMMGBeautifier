@@ -266,7 +266,16 @@ export class Burn {
 				}
 				
 				const needColumn = document.createElement("td");
-				const needAmt = burnDays > (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] + (this.pmmgSettings["PMMGExtended"]["burn_green_buffer"] == undefined ? 0 : this.pmmgSettings["PMMGExtended"]["burn_green_buffer"]) || burn.burn[material]["DailyAmount"] > 0 ? 0 : (burnDays - (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] - (this.pmmgSettings["PMMGExtended"]["burn_green_buffer"] == undefined ? 0 : this.pmmgSettings["PMMGExtended"]["burn_green_buffer"])) * burn.burn[material]["DailyAmount"];
+				var needAmt;
+				const fillDays = (this.pmmgSettings["PMMGExtended"]["burn_thresholds"] || [3, 7])[1] + (this.pmmgSettings["PMMGExtended"]["burn_green_buffer"] == undefined ? 0 : this.pmmgSettings["PMMGExtended"]["burn_green_buffer"]);
+				if(burnDays > fillDays || burn.burn[material]["DailyAmount"] > 0)
+				{
+					needAmt = 0;
+				}
+				else
+				{
+					needAmt = (burnDays - fillDays) * burn.burn[material]["DailyAmount"];
+				}
 				needColumn.appendChild(createTextSpan(isNaN(needAmt) ? "0" : needAmt.toLocaleString(undefined, {maximumFractionDigits: 0})));
 				
 				row.appendChild(needColumn);

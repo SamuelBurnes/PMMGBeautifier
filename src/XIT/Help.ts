@@ -23,10 +23,10 @@ export class Help {
 			return;
 		}
 		
-		const featureHeader = document.createElement('h3');
-		featureHeader.appendChild(document.createTextNode("Features"));
-		featureHeader.classList.add(...Style.SidebarSectionHead);
-		this.tile.appendChild(featureHeader);
+		const majorFeaturesHeader = document.createElement('h3');
+		majorFeaturesHeader.appendChild(document.createTextNode("Biggest Features"));
+		majorFeaturesHeader.classList.add(...Style.SidebarSectionHead);
+		this.tile.appendChild(majorFeaturesHeader);
 		
 		var table = document.createElement("table");
 		this.tile.appendChild(table);
@@ -46,18 +46,46 @@ export class Help {
 		var body = document.createElement("tbody");
 		table.appendChild(body);
 		
+		createTableRow(body, ["XIT ACTION", "Allows the user to semi-automate parts of the game such as buying materials and transferring materials between inventories. Open XIT HELP_ACTION for more information."])
+		createTableRow(body, ["XIT BURN", "Shows the number of days of consumables left and how much is needed to refill the base. Use XIT BURN_ALL or XIT BURN_{planet name} to access."])
+		createTableRow(body, ["XIT CONTRACTS", "Displays a consolidated contract overview with more detail than the default CONTS buffer. Use XIT CONTRACTS to access."])
+		createTableRow(body, ["XIT REPAIR", "Displays a list of materials needed to repair your buildings. Use XIT REPAIR_ALL or XIT REPAIR_{planet name} to access."])
+		
+		
+		const featureHeader = document.createElement('h3');
+		featureHeader.appendChild(document.createTextNode("All Features"));
+		featureHeader.classList.add(...Style.SidebarSectionHead);
+		this.tile.appendChild(featureHeader);
+		
+		table = document.createElement("table");
+		this.tile.appendChild(table);
+		
+		var head = document.createElement("thead");
+		var headRow = document.createElement("tr");
+		head.appendChild(headRow);
+		table.appendChild(head);
+		for(let title of ["Name", "Description"])
+		{
+			const header = document.createElement("th");
+			header.textContent = title;
+			header.style.paddingTop = "0";
+			headRow.appendChild(header);
+		}
+		
+		body = document.createElement("tbody");
+		table.appendChild(body);
+		
 		createTableRow(body, ["LM Unit Prices", "Displays per unit prices on the local market."])
-		createTableRow(body, ["LM Posting Unit Prices", "Displaces per unit prices when posting ads."])
-		createTableRow(body, ["Contract Drafts", "Displays per unit prices when creating CONTD."])
+		createTableRow(body, ["LM Posting Unit Prices", "Displays per unit prices when posting ads."])
 		createTableRow(body, ["Order ETAs", "Displays the date and time when production orders are complete."])
 		createTableRow(body, ["Flight ETAs", "Displays the arrival time when planning a flight."])
 		createTableRow(body, ["Fleet ETAs", "Displays the arrival time of your fleet."])
 		createTableRow(body, ["Queue Load", "Queue Percent Display."])
-		createTableRow(body, ["Consumable Timers", "Adds the number of days of consumables left to WF buffers."])
 		createTableRow(body, ["Notifications", "Shortens and color codes notifications."])
 		createTableRow(body, ["Screen Unpack", "Unpacks the list of screens to the top bar."])
 		createTableRow(body, ["Image Creator", "Loads images and GIFs into chats."])
 		createTableRow(body, ["Inventory Organizer", "Allows for custom sorting of inventories."])
+		createTableRow(body, ["Inventory Search", "Allows the INV buffer to be searched."])
 		createTableRow(body, ["Command Correcter", "Allows for planet names in stock commands (Montem, Promitor, etc.)"])
 		createTableRow(body, ["Sidebar", "Allows the user to customize the left sidebar in XIT SETTINGS."])
 		createTableRow(body, ["Pending Contracts", "Displays the name of the other party in pending contracts."])
@@ -67,6 +95,7 @@ export class Help {
 		createTableRow(body, ["CXPO Order Book", "Adds CXOB information to CXPO buffers."])
 		createTableRow(body, ["Icon Markers", "Allows small icons to be attached in the lower left corner of materials."])
 		createTableRow(body, ["Toggle Chat Delete", "Allows hiding the chat delete button."])
+		createTableRow(body, ["Production Burn Link", "Adds a link to XIT BURN in production buffers."])
 		createTableRow(body, ["Color Schemes", "Changes the colors used on material icons. Set in XIT SETTINGS."])
 		createTableRow(body, ["Advanced Mode", "Hides many pieces of information further minimizing the UI. For experienced users only."])
 		
@@ -122,7 +151,7 @@ export class Help {
 			name: "Action Packages",
 			command: "XIT ACTION",
 			description: "Allows automation of certain tasks.",
-			parameters: "GEN and/or Action name (optional)",
+			parameters: "EDIT and/or Action name (optional)",
 			requiresParameter: false,
 		});
 		createCommandRow(body, {
@@ -193,6 +222,11 @@ export class Help {
 			description: "Links to PrUN Planner.",
 			parameters: "Specific Page (optional)",
 			requiresParameter: false,
+		});
+		createCommandRow(body, {
+			name: "Taiyi's Map",
+			command: "XIT MAP",
+			description: "Links to Taiyi's Map.",
 		});
 		createCommandRow(body, {
 			name: "Sheets",

@@ -82,7 +82,45 @@ export function createConfigureUI(packageConfig, tile, rawActionPackage, userInf
 			{
 				addMessage(messageBox, "Error: Missing group on action at index " + currentConfigIndex.toLocaleString(undefined));
 			}
-			const storageNames = [...userInfo["PMMG-User-Info"].storage].sort(storageSort).map(parseStorageName);
+			var filteredStorages = [...userInfo["PMMG-User-Info"].storage];	// Filter to only storages in the same location as the origin/destination
+			if(action.origin && action.origin == "Configure on Execution" && action.dest && action.dest == "Configure on Execution")
+			{
+				filteredStorages = [...userInfo["PMMG-User-Info"].storage];
+			}
+			else if(action.origin && action.origin == "Configure on Execution" && action.dest)
+			{
+				const destStoragePayload = [...userInfo["PMMG-User-Info"].storage].find(storage => parseStorageName(storage) === action.dest);
+				
+				if(destStoragePayload)
+				{
+					filteredStorages = [...userInfo["PMMG-User-Info"].storage].filter(storage => atSameLocation(storage, destStoragePayload, userInfo));
+				}
+				else
+				{
+					addMessage(messageBox, "Warning: No matching destination payload found.");
+					filteredStorages = [...userInfo["PMMG-User-Info"].storage];
+				}
+			}
+			else if(action.dest && action.dest == "Configure on Execution" && action.origin)
+			{
+				const originStoragePayload = [...userInfo["PMMG-User-Info"].storage].find(storage => parseStorageName(storage) === action.origin);
+				
+				if(originStoragePayload)
+				{
+					filteredStorages = [...userInfo["PMMG-User-Info"].storage].filter(storage => atSameLocation(storage, originStoragePayload, userInfo));
+				}
+				else
+				{
+					addMessage(messageBox, "Warning: No matching origin payload found.");
+					filteredStorages = [...userInfo["PMMG-User-Info"].storage];
+				}
+			}
+			else
+			{
+				filteredStorages = [...userInfo["PMMG-User-Info"].storage];
+			}
+			
+			const storageNames = filteredStorages.sort(storageSort).map(parseStorageName);
 			var originSelect;
 			var destSelect;
 			
@@ -163,7 +201,7 @@ function addMessage(messageBox, message, clear?)
 // Sort storages into an order based on type
 function storageSort(a, b)
 {
-	const storagePriorityMap = {"FTL_FUEL_STORE": 0, "STL_FUEL_STORE": 1, "SHIP_STORE": 2, "STORE": 3, "WAREHOUSE_STORE": 4};
+	const storagePriorityMap = {"FTL_FUEL_STORE": 4, "STL_FUEL_STORE": 3, "SHIP_STORE": 2, "STORE": 0, "WAREHOUSE_STORE": 1};
 	return (a.type && b.type && storagePriorityMap[a.type] > storagePriorityMap[b.type]) ? 1 : -1;
 }
 
@@ -184,4 +222,41 @@ function parseStorageName(storage)
 	}
 	
 	return "Error, unable to parse";
+}
+
+function atSameLocation(storageA, storageB, userInfo)
+{
+	var storageALocation;
+	var storageBLocation;
+	
+	if(storageA.name)	// Storage A is a ship
+	{
+		const storageAShip = userInfo["PMMG-User-Info"]["ships"].find(ship => ship.name.toLowerCase() === storageA.name.toLowerCase() || ship.registration.toLowerCase() === storageA.name.toLowerCase());
+		
+		if(storageAShip && storageAShip.address && storageAShip.address.lines && storageAShip.address.lines[1])
+		{
+			storageALocation = storageAShip.address.lines[1].entity.name;
+		}
+	}
+	else	// Storage A is a base/warehouse
+	{
+		storageALocation = storageA.PlanetName;
+	}
+	
+	if(storageB.name)	// Storage B is a ship
+	{
+		const storageBShip = userInfo["PMMG-User-Info"]["ships"].find(ship => ship.name.toLowerCase() === storageB.name.toLowerCase() || ship.registration.toLowerCase() === storageB.name.toLowerCase());
+		
+		if(storageBShip && storageBShip.address && storageBShip.address.lines && storageBShip.address.lines[1])
+		{
+			storageBLocation = storageBShip.address.lines[1].entity.name;
+		}
+	}
+	else	// Storage B is a base/warehouse
+	{
+		storageBLocation = storageB.PlanetName;
+	}
+	console.log(storageA);
+	console.log(storageB);
+	return storageALocation && storageBLocation && storageALocation === storageBLocation && storageA.id !== storageB.id;
 }

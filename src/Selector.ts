@@ -82,4 +82,5 @@ export const Selector = {
   MaterialDropdownOption: "div[class~='MaterialSelector__suggestionEntry___n44M3FN']",
   SliderTextLabel: "span[class~='rc-slider-mark-text']",
   HorizontalScrollbar: "div[class~='ScrollView__thumb-horizontal___QIUMIda']",
+  InventoryFilters: "div[class~='InventoriesListContainer__filter___x0VgzsU']"
 }

@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "PMMG Extended",
 	"description": "Improve and tweak the interface elements of PrUn website",
-	"version": "1.13.1",
+	"version": "1.13.2",
 	"icons": {
 		"128": "icon128.png"
 	},

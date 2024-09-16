@@ -26,6 +26,7 @@ import { IconMarkers } from "./IconMarkers";
 import { ShippingAds } from "./ShippingAds";
 import { PostLM } from "./PostLM";
 import {ProdBurnLink} from "./ProdBurnLink";
+import {InventorySearch} from "./InventorySearch";
 
 try
 {
@@ -134,6 +135,7 @@ function mainRun(result, isChrome?) {
 		  new ShippingAds(),
 		  new PostLM(webData),
 		  new ProdBurnLink(),
+		  new InventorySearch()
 	], result, webData, userInfo, isChrome);
 	
 	// Start the loop

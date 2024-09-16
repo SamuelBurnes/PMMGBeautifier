@@ -35,7 +35,7 @@ if(browser.storage.session && typeof(browser.storage.session) !== "undefined")
 	storage_location = browser.storage.session;
 }
 
-const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA", "SHIP_SHIPS", "ACCOUNTING_CASH_BALANCES"];
+const loggedMessageTypes = ["COMEX_BROKER_DATA", "SITE_SITES", "STORAGE_STORAGES", "WAREHOUSE_STORAGES", "WORKFORCE_WORKFORCES", "CONTRACTS_CONTRACTS", "CONTRACTS_CONTRACT", "PRODUCTION_SITE_PRODUCTION_LINES", "COMPANY_DATA", "FOREX_TRADER_ORDERS", "COMEX_TRADER_ORDERS", "STORAGE_CHANGE", "COMPANY_DATA", "SHIP_SHIPS", "ACCOUNTING_CASH_BALANCES", "SHIP_DATA"];
 
 async function ProcessEvent(eventdata, event_list, full_event)
 {
@@ -228,6 +228,11 @@ async function logEvent(result, eventdata)
 			}
 			break;
 		case "STORAGE_STORAGES":
+			// Purge stores with duplicate IDs. Delete this after a couple weeks.
+			result["PMMG-User-Info"]["storage"] = result["PMMG-User-Info"]["storage"].filter((obj, index, self) =>
+					index === self.findIndex(o => o.id === obj.id)
+				);
+			
 			eventdata["payload"]["stores"].forEach(store => {
 				const duplicateStoreIndex = result["PMMG-User-Info"]["storage"].findIndex(item => item.id === store["id"]);
 				
@@ -270,37 +275,7 @@ async function logEvent(result, eventdata)
 			break;
 		case "STORAGE_CHANGE":
 			eventdata.payload.stores.forEach(store => {
-				const matchingStore = result["PMMG-User-Info"]["sites"].find(item => item.siteId === store["addressableId"]);
-				
-				const index = result["PMMG-User-Info"]["storage"].findIndex(item => item.id === store["id"]);
-				
-				if(matchingStore)
-				{
-					store["PlanetNaturalId"] = matchingStore["PlanetNaturalId"];
-					store["PlanetName"] = matchingStore["PlanetName"];
-					const givenItems = store["items"];
-					store["items"] = [];
-					givenItems.forEach(item => {
-						if(item.quantity && item.quantity.material)
-						{
-							store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
-						}
-						else
-						{
-							//console.log(item); // Debug line. Some items seem to not have a quantity. This should help figure out what those are.
-						}
-					});
-					
-					if(index != -1)
-					{
-						result["PMMG-User-Info"]["storage"][index] = store;
-					}
-					else
-					{
-						result["PMMG-User-Info"]["storage"].push(store);
-					}
-				}
-				else if(store["name"])	// Ship store
+				if(store["name"])	// Ship store
 				{
 					const matchingShipStoreIndex = result["PMMG-User-Info"]["storage"].findIndex(item => item.addressableId === store["addressableId"]);
 					
@@ -324,6 +299,39 @@ async function logEvent(result, eventdata)
 					else
 					{
 						result["PMMG-User-Info"]["storage"].push(store);
+					}
+				}
+				else
+				{
+					const matchingStore = result["PMMG-User-Info"]["sites"].find(item => item.siteId === store["addressableId"]);
+					
+					const index = result["PMMG-User-Info"]["storage"].findIndex(item => item.id === store["id"]);
+					
+					if(matchingStore)
+					{
+						store["PlanetNaturalId"] = matchingStore["PlanetNaturalId"];
+						store["PlanetName"] = matchingStore["PlanetName"];
+						const givenItems = store["items"];
+						store["items"] = [];
+						givenItems.forEach(item => {
+							if(item.quantity && item.quantity.material)
+							{
+								store["items"].push({"weight": item["weight"], "volume": item["volume"], "MaterialTicker": item["quantity"]["material"]["ticker"], "Amount": item["quantity"]["amount"]});
+							}
+							else
+							{
+								//console.log(item); // Debug line. Some items seem to not have a quantity. This should help figure out what those are.
+							}
+						});
+						
+						if(index != -1)
+						{
+							result["PMMG-User-Info"]["storage"][index] = store;
+						}
+						else
+						{
+							result["PMMG-User-Info"]["storage"].push(store);
+						}
 					}
 				}
 			});
@@ -487,6 +495,14 @@ async function logEvent(result, eventdata)
 			break;
 		case "SHIP_SHIPS":	// ships
 			result["PMMG-User-Info"]["ships"] = eventdata.payload.ships;
+			break;
+		case "SHIP_DATA":	// Ship updates
+				result["PMMG-User-Info"]["ships"].forEach((ship, shipIndex) => {
+					if(ship.id == eventdata.payload.id)
+					{
+						result["PMMG-User-Info"]["ships"][shipIndex] = eventdata.payload;
+					}
+				});
 			break;
 	}
 	

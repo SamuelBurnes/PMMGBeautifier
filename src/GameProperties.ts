@@ -6,13 +6,33 @@ export function mtraConvert(planet)
 		return planet.toLowerCase();
 	}
 	
+	if(planet.length < 3)
+	{
+		return "-";
+	}
+	
 	// Determine the planets' natural IDs (XX-###x)
-	const natural = /^[A-Za-z]{2}-\d{3}[A-Za-z]$/.test(planet) ? planet : PlanetNames[planet.toUpperCase()];
+	var natural = /^[A-Za-z]{2}-\d{3}[A-Za-z]$/.test(planet) ? planet.toUpperCase() : PlanetNames[planet.toUpperCase()];
+	natural = natural.slice(0, -1) + natural.slice(-1).toLowerCase();
+	
+	const namedPlanet = !!ReversePlanetNames[natural]
 	
 	// Get system name or ID
 	const system = ReverseSystemNames[natural.slice(0, -1)] || natural.slice(0, -1);
+	const namedSystem = !!ReverseSystemNames[natural.slice(0, -1)];
 	
-	return (system + " - " + planet).toLowerCase();
+	if(namedPlanet)
+	{
+		return (system + " - " + planet);
+	}
+	else if(namedSystem)
+	{
+		return system + " " + natural.slice(-1);
+	}
+	else
+	{
+		return planet.slice(0, -1) + " " + planet.slice(-1);
+	}
 }
 
 // A function to compare two planets (to be used in .sort() functions)
@@ -171,7 +191,7 @@ export const FriendlyNames = {
 	"InventoryOrganizer": "Inventory Sorting",
 	"CommandCorrecter": "Command Correcter",
 	"CalculatorButton": "Calculator Button",
-	"Sidebar": "Sidebar",
+	"Sidebar": "Left Sidebar",
 	"HeaderMinimizer": "Minimize Headers (Master)",
 	"PendingContracts": "Pending Contracts",
 	"CompactUI": "Compact UI",
@@ -180,7 +200,9 @@ export const FriendlyNames = {
 	"CXOBHighlighter": "CXOB Name Highlighter",
 	"CXPOOrderBook": "CXPO Order Book",
 	"ChatDeleteButton": "Toggle Chat Delete (Master)",
-	"ProdBurnLink": "Production Line Burn Link"
+	"ProdBurnLink": "Production Line Burn Link",
+	"IconMarkers": "Icon Markers",
+	"InventorySearch": "Inventory Search"
 }
 
 export const SortingTriangleHTML = `
