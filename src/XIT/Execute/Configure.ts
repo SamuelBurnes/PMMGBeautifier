@@ -3,6 +3,7 @@ import {
 	createSelectOption
 } from "../../util";
 import {Style} from "../../Style";
+import {addMessage} from "./Execute";
 
 export function needsConfiguration(action)
 {
@@ -67,7 +68,7 @@ export function createConfigureUI(packageConfig, tile, rawActionPackage, userInf
 	
 	if(!rawActionPackage.actions[currentConfigIndex])
 	{
-		addMessage(messageBox, "Error: Missing action at index " + currentConfigIndex.toLocaleString(undefined));
+		addMessage(messageBox, "Missing action at index " + currentConfigIndex.toLocaleString(undefined), "ERROR");
 	}
 	
 	// Create controls based on action type
@@ -80,7 +81,7 @@ export function createConfigureUI(packageConfig, tile, rawActionPackage, userInf
 			}
 			else
 			{
-				addMessage(messageBox, "Error: Missing group on action at index " + currentConfigIndex.toLocaleString(undefined));
+				addMessage(messageBox, "Missing group on action at index " + currentConfigIndex.toLocaleString(undefined), "ERROR");
 			}
 			var filteredStorages = [...userInfo["PMMG-User-Info"].storage];	// Filter to only storages in the same location as the origin/destination
 			if(action.origin && action.origin == "Configure on Execution" && action.dest && action.dest == "Configure on Execution")
@@ -97,7 +98,7 @@ export function createConfigureUI(packageConfig, tile, rawActionPackage, userInf
 				}
 				else
 				{
-					addMessage(messageBox, "Warning: No matching destination payload found.");
+					addMessage(messageBox, "No matching destination payload found.", "WARNING");
 					filteredStorages = [...userInfo["PMMG-User-Info"].storage];
 				}
 			}
@@ -111,7 +112,7 @@ export function createConfigureUI(packageConfig, tile, rawActionPackage, userInf
 				}
 				else
 				{
-					addMessage(messageBox, "Warning: No matching origin payload found.");
+					addMessage(messageBox, "No matching origin payload found.", "WARNING");
 					filteredStorages = [...userInfo["PMMG-User-Info"].storage];
 				}
 			}
@@ -189,13 +190,8 @@ export function createConfigureUI(packageConfig, tile, rawActionPackage, userInf
 			
 			break;
 		default:
-			addMessage(messageBox, "Error: Unrecognized configuration type at index " + currentConfigIndex.toLocaleString(undefined));
+			addMessage(messageBox, "Unrecognized configuration type at index " + currentConfigIndex.toLocaleString(undefined), "ERROR");
 	}
-}
-
-function addMessage(messageBox, message, clear?)
-{
-	messageBox.textContent = clear ? message : message + (messageBox.textContent == "" ? "" : "\n") + messageBox.textContent;
 }
 
 // Sort storages into an order based on type

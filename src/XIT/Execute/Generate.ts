@@ -268,6 +268,8 @@ class GenerateScreen {
 				popup.addPopupRow("number", "Days", group.days || 10, "The number of days of supplies to refill the planet with.", undefined);
 				popup.addPopupRow("text", "Material Exclusions", (group.exclusions || []).join(", "), "Materials to be excluded from the group. List material tickers separated by commas.", undefined);
 				popup.addPopupRow("checkbox", "Use Base Inv", group.useBaseInv == undefined ? true : group.useBaseInv, "Whether to count the materials currently in the base towards the totals.", undefined);
+				popup.addPopupRow("checkbox", "Workforce Only", group.consumablesOnly == undefined ? false : group.consumablesOnly, "Whether to limit the materials in the group to workforce consumables only", undefined);
+				
 				break;
 			case "Repair":
 				// Get list of planets
@@ -336,6 +338,7 @@ class GenerateScreen {
 						group.planet = popup.getRowByName("Planet").rowInput.value;
 						group.days = parseFloat(popup.getRowByName("Days").rowInput.value || 0);
 						group.useBaseInv = popup.getRowByName("Use Base Inv").rowInput.checked;
+						group.consumablesOnly = popup.getRowByName("Workforce Only").rowInput.checked;
 						const exclusions = popup.getRowByName("Material Exclusions").rowInput.value
 						if(exclusions && exclusions != "")
 						{
